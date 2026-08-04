@@ -1,0 +1,142 @@
+@use 'breakpoints' as *;
+
+.item-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: .95rem 1rem;
+  background-color: var(--color-admin-bg-mid);
+  border: 1px solid var(--color-admin-border);
+  border-radius: 5px;
+  transition: border-radius .25s;
+  transition-delay: .20s;
+
+  &.inverse {
+    background-color: var(--color-admin-bg);
+
+    &.accordion-header, &.accordion-header.open {
+      border: none;
+      background-color: var(--color-admin-mid);
+
+      .row-left .title h3 {
+        color: var(--color-admin-light-mid);
+        font-style: italic;
+      }
+
+      svg:not(:global(.alert)):not(:global(.action)) {
+        path {
+          fill: var(--color-admin-light-mid);
+        }
+      }
+    }
+  }
+
+  &.new {
+    .row-left {
+      svg, .count {
+        opacity: .25;
+      }
+    }
+  }
+
+  &.accordion-header {
+    .accordion-indicator {
+      height: auto;
+      width: 9px;
+      transition: rotate .25s;
+
+      path {
+        fill: var(--color-admin-light);
+      }
+
+      &.open {
+        rotate: 90deg;
+      }
+    }
+
+    .row-left {
+      cursor: pointer;
+
+      .icons {
+        gap: 1.5rem;
+      }
+    }
+
+    &.simple {
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
+
+      h3 {
+        color: var(--color-admin-light)
+      }
+    }
+  }
+
+  &.accordion-match {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+
+  &.open {
+    background-color: var(--color-admin-mid-secondary);
+    border-bottom-left-radius: 0px;
+    border-bottom-right-radius: 0px;
+
+    transition: border-radius 0s;
+    transition-delay: 0s;
+  }
+
+  .row-left {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+
+    .icons {
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+
+      .count {
+        color: var(--color-admin-light)
+      }
+    }
+    
+    .title {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+
+      h3 {
+        width: 200px;
+        font-family: var(--font-body);
+        font-weight: 400;
+        font-size: 1.1rem;
+        border-bottom: 1px solid transparent;
+        letter-spacing: 3%;
+      }
+    }
+  }
+
+  .row-right {
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+
+    svg:global(.fa-spin) {
+      width: 15.5px;
+      height: auto;
+
+      path {
+            fill: var(--color-admin-accent); 
+      }
+    }
+
+    .edit {
+
+    }
+
+    .delete {
+
+    }
+  }
+}

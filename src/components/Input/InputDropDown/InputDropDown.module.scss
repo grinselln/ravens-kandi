@@ -1,0 +1,32 @@
+@use 'breakpoints' as *;
+
+.dropdown {
+  position: relative;
+
+  &.inverse button {
+    background-color: var(--color-admin-mid) !important;
+    border-color: var(--color-admin-light-muted) !important;
+  }
+
+  &.inverse-light button {
+    background-color: var(--color-admin-bg-mid) !important;
+  }
+
+  button {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    &:hover {
+      opacity: 1;
+    }
+
+    &.open {
+      border-radius: 5px 5px 0px 0px !important;
+    }
+
+    svg path {
+      fill: var(--color-admin-light)
+    }
+  }
+}

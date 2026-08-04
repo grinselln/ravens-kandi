@@ -1,0 +1,49 @@
+@use 'breakpoints' as *;
+
+.dropdown-list {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    z-index: 10;
+    list-style: none;
+    background-color: var(--color-admin-bg);
+    border: 1px solid var(--color-admin-border);
+    border-top: none;
+    border-radius: 0px 0px 5px 5px;
+    font-size: 0.85rem;
+    overflow: hidden;
+
+    &.inverse {
+      background-color: var(--color-admin-mid);
+      border-color: var(--color-admin-light-muted);
+    }
+
+    &.inverse-light {
+      background-color: var(--color-admin-mid);
+    }
+
+    &.small li {
+      font-size: 0.65rem;
+      padding: .15rem .5rem;
+    }
+
+    &.medium li {
+      font-size: 0.7rem;
+      padding: .35rem .5rem;
+    }
+
+    li {
+      cursor: pointer;
+      color: var(--color-admin-light);
+      padding: .5rem;
+
+      &.selected {
+        background-color: var(--color-admin-primary);
+      }
+
+      &.active {
+        background-color: #211a39;
+      }
+    }
+  }

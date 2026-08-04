@@ -1,0 +1,202 @@
+//@use './styles/_test';
+@use './styles/_grid';
+
+:root {
+  --font-heading: 'Faculty Glyphic', serif;
+  --font-body: 'Figtree', sans-serif;
+
+  --color-primary: #3C3489;
+  --color-primary-15: rgba(60, 52, 137, .15);
+  --color-primary-rgb: 60, 52, 137;
+  --color-primary-dark: #2D1B4E;
+  --color-primary-dark-rgb: 45, 27, 78;
+  --color-accent: #862224;
+  --color-accent-rgb: 134, 34, 36;
+  --color-accent-dark: #4E1B1C;
+  --color-accent-dark-rgb: 78, 27, 28;
+  --color-accent-light: #a92022;
+  --color-accent-muted: #B38484;
+  --color-accent-warm: #E8614A;
+  --color-muted: #989494;
+  --color-confirm: #9bd9a3;
+  --color-alert: #D8536E;
+  --color-bg: #FAF9F7;
+  --color-primary-bg: #f8f2ff;
+  --color-accent-bg: #FFF7F7;
+
+  --color-text: #1A1A1A;
+  --color-text-mid: #4d4d4d;
+  --color-text-white: #FFFFFF;
+  --color-text-light: #E4E4E4;
+
+  --color-admin-primary: #17122A;
+  --color-admin-accent: #722627;
+  --color-admin-bg: #241F3D;
+  --color-admin-bg-mid: #362F52;
+  --color-admin-border: #473E69;
+
+  --color-admin-muted-light: #AFAFAF;
+  --color-admin-muted: #4d4d4d;
+
+  --color-admin-light: #ADA3C9;
+  --color-admin-light-rgb: 173, 163, 201;
+  --color-admin-light-mid: #8F84B3;
+  --color-admin-light-bright: #6359C0;
+  --color-admin-light-muted: #6F6494;
+  --color-admin-mid-light: #473E69;
+  --color-admin-mid-secondary: #3D3560;
+  --color-admin-mid: #2E2848;
+}
+
+body {
+  font-family: var(--font-body);
+  background-color: var(--color-bg);
+  color: var(--color-text);
+
+  &.modal-open {
+    overflow: hidden;
+  }
+}
+
+main {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+html, body {
+    overflow-x: hidden;
+    position: relative;
+}
+
+input {
+  border: none;
+
+  &:focus-visible  {
+    outline: none;
+  }
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-heading);
+  font-weight: 500;
+  letter-spacing: .1rem;
+}
+
+p {
+  letter-spacing: 5%;
+}
+
+span {
+  letter-spacing: 3%;
+}
+
+h1, h2, h3, h4, p, span, a, button, input {
+  text-box-trim: trim-both;
+     // text-box-edge: cap text;
+  text-box-edge: cap alphabetic;
+  padding-top: 1px;
+}
+
+h1, h2, h3, h4, p, span, a {
+  &.alert {
+    color: var(--color-alert)
+  }
+
+  &.action {
+    color: var(----color-admin-light-bright);
+  }
+}
+
+a:hover {
+  opacity: .75;
+}
+
+button {
+  cursor: pointer;
+
+  &:hover {
+    opacity: .75;
+  }
+
+  /*span {
+    display: block;
+    align-items: center;
+  }*/
+}
+
+svg {
+  &.alert {
+    path {
+      fill: var(--color-alert);
+    }
+  }
+
+  &.action path {
+    fill: var(--color-admin-light-bright);
+  }
+
+  &.confirm path {
+    fill: var(--color-confirm);
+  }
+}
+
+/*** COLUMN UTILITY ***/
+.box {
+  width: 100%;
+}
+
+.box-6 {
+  width: 50%;
+}
+
+/*** RESET ***/
+/* 1. Use a more intuitive box-sizing model */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+/* 2. Remove default margins and padding for common layout elements */
+* {
+  margin: 0;
+  padding: 0;
+}
+
+/* 3. Allow percentage-based heights and improve typography rendering */
+html, body {
+  height: 100%;
+}
+
+body {
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* 4. Improve media defaults and responsive scaling */
+img, picture, video, canvas, svg {
+  display: block;
+  max-width: 100%;
+}
+
+/* 5. Inherit fonts for form controls to match the document layout */
+input, button, textarea, select {
+  font: inherit;
+}
+
+/* 6. Avoid text overflows on long headings */
+p, h1, h2, h3, h4, h5, h6 {
+  overflow-wrap: break-word;
+}
+
+/* custom resets */
+a {
+  text-decoration: none;
+  color: var(--color-text);
+}
+
+button {
+  background-color: transparent;
+  border: none;
+  margin: 0px;
+  padding: 0px;
+}

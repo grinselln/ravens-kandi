@@ -1,0 +1,37 @@
+@use 'breakpoints' as *;
+
+.action-button {
+  display: flex;
+  
+  &:disabled {
+    opacity: .25;
+  }
+
+  &.grip, &.new-grip {
+    height: 15px;
+    rotate: 90deg;
+  }
+
+  &.new-grip {
+    opacity: .25
+  }
+
+  .grip {
+    touch-action: none; /* Crucial: stops the browser from hijacking upward drags */
+    cursor: grab;
+  }
+
+  .grip:active {
+    cursor: grabbing;
+  }
+
+  svg:not(:global(.alert)):not(:global(.action)):not(:global(.confirm)) {
+    path {
+      fill: var(--color-admin-light);
+    }
+  }
+
+  svg {
+    height: 18px;
+  }
+}

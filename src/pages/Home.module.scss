@@ -1,0 +1,56 @@
+@use 'breakpoints' as *;
+
+.hero-content-wrapper {
+  height: 100%;
+
+  .hero-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 2rem 2rem 5rem 2rem;
+
+    p {
+      font-size: 1rem;
+      line-height: 1.9rem;
+      letter-spacing: 5%;
+      color: var(--color-text-light);
+    }
+
+    h1 {
+      font-size: 1.3rem;
+      color: var(--color-text-light);
+      padding: 2rem 0rem 2rem 0rem;
+
+      @include bp-md {
+        font-size: 1.5rem;
+      }
+
+      span {
+        color: var(--color-accent-light);
+      }
+    }
+
+    .hero-button-wrapper {
+      display: flex;
+      gap: 1rem;
+
+      .hero-button {
+        background-color: var(--color-primary);
+        color: var(--color-text-light);
+        font-size: 1.05rem;
+        padding: .9rem 1.75rem;
+        border-radius: 50px;
+        transition: opacity .25s;
+
+        &:last-child {
+          background-color: transparent;
+          border: 1px solid var(--color-text-light)
+        }
+
+        &:hover {
+          opacity: .5;
+        }
+      }
+    }
+  }
+}

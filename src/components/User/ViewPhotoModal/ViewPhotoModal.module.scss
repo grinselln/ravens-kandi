@@ -1,0 +1,225 @@
+@use 'breakpoints' as *;
+
+.view-photo-wrapper {
+  display: flex;
+  gap: 1rem;
+  align-items: stretch; // Right side matches left side height perfectly
+  width: 100%;
+
+  .photo-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+
+    flex: 1; // Takes up exactly half the width
+    min-width: 0;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border: 2px solid var(--color-primary);
+      border-radius: 10px;
+    }
+  }
+
+  .details-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 3rem;
+
+    flex: 1; // Takes up exactly half the width
+    // FIX 1: Remove height: 0. Add relative positioning so children can absolute anchor to it.
+    position: relative;
+    min-height: 0;
+
+    .label {
+      font-weight: 600;
+      color: var(--color-primary);
+    }
+
+    .header-details {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      span {
+        display: block;
+      }
+
+      .type-wrapper {
+        display: flex;
+        gap: .5rem;
+        align-items: center;
+
+        .type {
+
+        }
+      }
+      
+      .source {
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+        font-size: .85rem;
+        border: 1px solid var(--color-primary);
+        padding: .25rem .5rem;
+        align-self: flex-start;
+        border-radius: 3px;
+        background-color: var(--color-bg);
+
+        .source-title {
+          display: flex;
+          font-weight: 600;
+        }
+        
+        .source-link {
+          display: flex;
+          font-size: .75rem;
+        }
+
+        svg {
+          color: var(--color-primary);
+          height: 12px;
+          width: auto;
+        }
+
+        a {
+          display: flex;
+
+          &:hover {
+            opacity: .75;
+          }
+        }
+      }
+    } 
+
+    .tags-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: .75rem;
+
+      .tags-display-wrapper {
+        display: flex;
+        flex-direction: column;
+        gap: .5rem;
+        
+        p {
+          font-size: .85rem;
+        }
+      }
+
+      .tag-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+
+        .label {
+          display: block;
+          font-size: .9rem;
+          font-weight: 500;
+          color: var(--color-text);
+        }
+
+        .pill {
+          font-size: .8rem;
+          padding: .25rem;
+          border-radius: 3px;
+          display: block;
+          background-color: var(--color-admin-light-mid);
+          color: var(--color-text-white);
+        }
+
+        .subcategories {
+          display: flex;
+          gap: .5rem;
+          flex-wrap: wrap;
+        } 
+      }
+    }
+
+    .story-content-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: .75rem;
+      
+      flex: 1;        // Continues to fill all remaining whitespace under your tags
+      min-height: 0;
+
+      .label {
+        flex-shrink: 0;
+      }
+
+      .story-wrapper {
+        flex: 1;
+        position: relative; // Creates the bounding box underneath the "Story:" label
+        min-height: 0;
+
+        .accent-box {
+          // This now absolute positions perfectly inside the .accent-box-container area
+          position: absolute;
+          top: 0;
+          bottom: 0;
+          left: 0;
+          right: 0;
+
+          display: flex;
+          flex-direction: column;
+          padding: .5rem;
+          background-color: rgba(173, 163, 201, .25);
+          border: 2px solid var(--color-primary);
+          border-radius: 5px;
+          font-size: .9rem;
+
+
+          .story {
+            scrollbar-color: var(--color-primary) transparent;
+            overflow-y: auto; 
+            flex: 1;
+          }
+        }
+      }
+    }
+  }
+
+  &.odd {
+    .photo-wrapper {
+      img {
+        border-color: var(--color-accent);
+      }
+    }
+
+    .details-wrapper {
+      .label {
+        color: var(--color-accent);
+      }
+
+      .source {
+        border-color: var(--color-accent);
+        
+        svg {
+          color: var(--color-accent);
+        }
+      }
+
+      .tag-wrapper {
+        .pill {
+          background-color: var(--color-accent-muted);
+        }
+      }
+
+      .story-wrapper {
+        .accent-box {
+          border-color: var(--color-accent);
+          background-color: rgba(201, 163, 163, .25);
+
+          .story {
+            scrollbar-color: var(--color-accent) transparent;
+          }
+        }
+      }
+    }
+  }
+}

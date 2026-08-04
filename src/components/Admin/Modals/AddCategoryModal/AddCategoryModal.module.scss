@@ -1,0 +1,30 @@
+@use 'breakpoints' as *;
+
+.new-category-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+
+  .box-accent {
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+    background-color: var(--color-admin-bg);
+    border: 1px solid var(--color-admin-border);
+    border-radius: 5px;
+    padding: .5rem;
+
+    label {
+      margin-bottom: .25rem;
+
+      svg {
+        margin-right: .5rem;
+      }
+    }
+
+    p {
+      color: var(--color-admin-light-muted);
+      font-size: .65rem;
+    }
+  }
+}

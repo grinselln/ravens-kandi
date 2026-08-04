@@ -1,0 +1,98 @@
+@use 'breakpoints' as *;
+
+.button {
+  padding: .75rem 1rem;
+  border-radius: 5px;
+  color: var(--color-text-light);
+  background-color: var(--color-admin-light-bright);
+  border: 1px solid transparent;
+  font-size: .9rem;
+
+  svg {
+    width: 12px;
+    height: 12px;
+  }
+
+  &:disabled {
+    opacity: .25;
+  }
+
+  &.accent {
+    background-color: var(--color-accent);
+    padding: .65rem 1.75rem;
+    font-weight: 600;
+    letter-spacing: 8%;
+  }
+
+  &.accent-outline {
+    background-color: transparent;
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+    padding: .65rem 1.75rem;
+    font-weight: 600;
+    letter-spacing: 5%;
+  }
+
+  &.muted {
+    background-color: var(--color-admin-mid-secondary);
+  }
+
+  &.outline-muted {
+    background-color: transparent;
+    border-color: var(--color-admin-light-bright);
+    color: var(--color-admin-light-mid);
+  }
+
+  &.checkbox-select {
+    //background-color: var(--color-admin-light-mid);
+    background-color: var(--color-admin-mid);
+  }
+
+  &.pill-muted {
+    background-color: transparent;
+    border-color: var(--color-muted);
+    color: var(--color-text-mid);
+    font-size: .67rem;
+    letter-spacing: 5%;
+    padding: .4rem .75rem;
+    border-radius: 20px;
+
+    &.active {
+      border-color: var(--color-primary);
+      color: var(--color-primary);
+      background-color: var(--color-primary-15);
+      font-weight: 600;
+      font-style: italic;
+    }
+  }
+
+  &.pill-square {
+    background-color: var(--color-admin-bg);
+    border-color: var(--color-admin-border);
+    color: var(--color-text-light);
+    font-family: var(--font-body);
+    font-size: .67rem;
+    letter-spacing: 5%;
+    padding: .35rem .5rem;
+    border-radius: 5px;
+
+    &.active {
+      border-color: var(--color-primary);
+      color: var(--color-primary);
+      background-color: var(--color-admin-light);
+      font-weight: 600;
+      font-style: italic;
+    }
+  }
+
+  &.alert {
+    background-color: var(--color-alert);
+  }
+
+  &.no-style {
+    background-color: transparent;
+    border: none;
+    padding: 0px;
+    border-radius: none;
+  }
+}

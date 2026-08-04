@@ -1,0 +1,12 @@
+@use 'breakpoints' as *;
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+
+  .header-buttons {
+    display: flex;
+    gap: .7rem;
+  }
+}

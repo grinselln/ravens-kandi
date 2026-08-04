@@ -1,0 +1,64 @@
+@use 'breakpoints' as *;
+
+$columns: 12;
+$gap: 1rem;
+
+.grid {
+  display: grid;
+  position: relative;
+  grid-template-columns: repeat(#{$columns}, 1fr);
+  gap: $gap;
+}
+
+.col {
+  grid-column: span 12;
+}
+
+@for $i from 1 through $columns {
+  .col-#{$i} {
+    grid-column: span #{$i};
+  }
+}
+
+@include bp-sm {
+  @for $i from 1 through $columns {
+    .col-sm-#{$i} {
+      grid-column: span #{$i};
+    }
+  }
+}
+
+@include bp-md {
+  @for $i from 1 through $columns {
+    .col-md-#{$i} {
+      grid-column: span #{$i};
+    }
+  }
+}
+
+@include bp-lg {
+  @for $i from 1 through $columns {
+    .col-lg-#{$i} {
+      grid-column: span #{$i};
+    }
+  }
+}
+
+@include bp-xl {
+  @for $i from 1 through $columns {
+    .col-xl-#{$i} {
+      grid-column: span #{$i};
+    }
+  }
+}
+
+@include bp-xxl {
+  @for $i from 1 through $columns {
+    .col-xxl-#{$i} {
+      grid-column: span #{$i};
+    }
+  }
+}
+
+
+  

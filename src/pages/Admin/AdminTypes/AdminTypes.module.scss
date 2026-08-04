@@ -1,0 +1,33 @@
+@use 'breakpoints' as *;
+
+.photo-types-wrapper {
+
+  
+
+    
+  
+  
+}
+
+.add-record-wrapper {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  
+  .add-record {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+
+    button {
+      align-self: flex-end;
+      margin-bottom: .5rem;
+    }
+  }
+}
+
+
+
+
+

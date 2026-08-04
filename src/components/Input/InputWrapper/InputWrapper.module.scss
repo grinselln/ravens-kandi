@@ -1,0 +1,115 @@
+@use 'breakpoints' as *;
+
+.input-field-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: .25rem;
+  width: 100%;
+
+  label {
+    color: var(--color-admin-light);
+    font-size: .85rem;
+  }
+
+  &.small {
+    width: unset;
+
+    .input-wrapper.faux-input {
+      button {
+        font-size: .65rem;
+        padding: .16rem .5rem;
+        gap: 1rem;
+        min-width: 150px;
+      }
+    }
+  }
+
+  &.medium {
+    width: unset;
+
+    .input-wrapper.faux-input {
+      button {
+        font-size: .7rem;
+        padding: .35rem .5rem;
+        gap: 1rem;
+        min-width: 150px;
+      }
+    }
+  }
+
+  &.field-light {
+    
+    label {
+      color: var(--color-primary);
+      font-size: 1.1rem;
+      font-weight: 500;
+      letter-spacing: 3%;
+    }
+
+    .input-wrapper {
+      input, textarea {
+        background-color: rgba(var(--color-accent-rgb), .08);
+        border: none;
+        border-bottom: 1.5px solid var(--color-accent);
+        border-radius: 5px 5px 0px 0px;
+      }
+    }
+  }
+
+  .input-wrapper {
+    width: 100%;
+
+    &.row-input {
+      display: flex;
+      width: 200px;
+
+      input {
+        height: 15px;
+        font-family: var(--font-body);
+        padding: 0px;
+        font-size: 1.1rem;
+        font-weight: 400;
+        letter-spacing: 3%;
+        border: none;
+        background-color: transparent;
+        border-bottom: 1px dashed var(--color-admin-light);
+        color: var(--color-admin-light);
+        border-radius: 0px;
+
+        &::placeholder {
+          color: var(--color-admin-light);
+          opacity: .75;
+          font-weight: 400;
+          position: relative;
+          top: 0px;
+          letter-spacing: 3%;
+        }
+      }
+    }
+
+    &.bulk-record-input {
+      width: 100%;
+    }
+
+    &.inverse {
+      input {
+        background-color: var(--color-admin-bg-mid);
+      }
+    }
+
+    input, textarea, &.faux-input button {
+      width: 100%;
+      padding: .5rem;
+      background-color: var(--color-admin-bg);
+      border: 1px solid var(--color-admin-border);
+      border-radius: 5px;
+      font-size: .85rem;
+      color: var(--color-admin-light);
+
+      &:disabled {
+        opacity: .65;
+        pointer-events: none;
+      }
+    }
+  }
+}

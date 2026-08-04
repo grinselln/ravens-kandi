@@ -1,0 +1,7 @@
+@use 'breakpoints' as *;
+
+span.record-count {
+  color: var(--color-admin-light-muted);
+  font-size: .8rem;
+  font-weight: 500;
+}

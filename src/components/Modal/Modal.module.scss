@@ -1,0 +1,150 @@
+@use 'breakpoints' as *;
+
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  min-width: 500px;
+  flex-direction: column; // add
+  max-height: 90%;
+  border-radius: 10px;
+  background-color: var(--color-admin-mid);
+  overflow: hidden;
+
+  &.open {
+    display: flex;
+  }
+
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--color-admin-border);
+    padding: 1.25rem 1.25rem;
+
+    h3 {
+      font-size: 1.2rem;
+      font-family: var(--font-body);
+      font-weight: 400;
+    }
+
+    button {
+      display: flex;
+
+      svg {
+        width: 15px;
+        height: auto;
+
+        path {
+          fill: var(--color-admin-light);
+        }
+      }
+    }
+  }
+
+  .body {
+    padding: 1.3rem .65rem;
+
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+
+        display: flex;
+
+    &> div {
+      padding: 0rem .65rem;
+    }
+
+    p:not(:global(.alert)) {
+      color: var(--color-text-light);
+    }
+  }  
+
+  .footer {
+    display: flex;
+    justify-content: flex-end;
+    padding: 1rem 1.25rem;
+    border-top: 1px solid var(--color-admin-border);
+    gap: 1rem;
+
+    button {
+      padding: .75rem 1rem;
+      font-size: .85rem;
+      letter-spacing: 3%;
+    }
+  }
+
+  &.add-records {
+    width: 45%;
+    max-width: 600px;
+  }
+
+  &.add-category {
+    width: 35%;
+    max-width: 550px;
+  }
+
+  &.add-photo {
+    width: 60%;
+    max-width: 950px;
+  }
+
+  &.view-photo {
+    width: 85%;
+    max-width: 1300px;
+    background-color: var(--color-primary-bg);
+
+    .header {
+      border-color: var(--color-primary);
+
+      h3 {
+        color: var(--color-primary);
+      }
+
+      svg path {
+        fill: var(--color-primary);
+      }
+    }
+  }
+
+  &.view-photo-o {
+    width: 85%;
+    max-width: 1300px;
+    background-color: var(--color-accent-bg);
+
+    .header {
+      border-color: var(--color-accent);
+
+      h3 {
+        color: var(--color-accent);
+      }
+
+      svg path {
+        fill: var(--color-accent);
+      }
+    }
+  }
+
+  &.delete-confirm {
+    width: 40%;
+    max-width: 550px;
+  }
+}
+
+.overlay {
+  display: none;
+  background-color: rgba(0, 0, 0, .75);
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  width: 100vw;
+  height: 100vh;
+  z-index: 999;
+
+  &.open {
+    display: block;
+  }
+}

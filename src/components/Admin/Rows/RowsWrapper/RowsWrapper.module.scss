@@ -1,0 +1,12 @@
+@use 'breakpoints' as *;
+
+.item-rows {
+    display: flex;
+    flex-direction: column;
+    gap: .75rem;
+
+    &.subcategories {
+      //padding-left: 2rem;
+      margin-left: 2rem;
+    }
+}

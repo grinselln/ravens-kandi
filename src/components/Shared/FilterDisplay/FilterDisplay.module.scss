@@ -1,0 +1,46 @@
+@use 'breakpoints' as *;
+
+
+.categories {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 0px 10%;
+
+  .category {
+    display: flex;
+    align-items: center;
+
+    h3 {
+      color: var(--color-muted);
+      text-transform: uppercase;
+      letter-spacing: 4%;
+      margin-right: 2rem;
+    }
+
+    .subcategories {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: .5rem;
+
+      .subcategory {
+
+      }
+    }
+  }
+
+  &.admin {
+    padding: 0rem .5rem;
+
+    .category {
+      h3 {
+        font-family: var(--font-body);
+        font-weight: 400;
+        color: var(--color-text-light);
+        font-size: 1rem;
+        text-transform: none;
+      }
+    }
+  }
+}

@@ -1,0 +1,304 @@
+@use 'breakpoints' as *;
+
+.layout {
+  display: flex;
+  flex-direction: column;
+
+  &.nav-dark {
+    width: 100vw;
+    height: 100vh;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    background: linear-gradient(119.13deg, rgba(26, 10, 46, 0.1) -0.6%, rgba(45, 27, 78, 0.75) 54.73%, #0D0D1A 100%), 
+    linear-gradient(119.36deg, rgba(10, 5, 20, 0.15) 25%, rgba(10, 5, 20, 0.75) 75%, rgba(10, 5, 20, 0.85) 100%),
+    url('/src/assets/images/hero.png') center / cover no-repeat;
+
+    .nav {
+      display: flex;
+      flex-direction: column;
+      border-bottom: none;
+      padding: 1rem;
+      background-color: transparent;
+
+      @include bp-md {
+        padding: 2rem;
+      }
+
+      @include bp-lg {
+        align-items: flex-start;
+        padding: 1.25rem 3rem;
+      }
+
+      .logo {
+        color: var(--color-text-light);
+        font-size: 2.5rem;
+
+        @include bp-md {
+          font-size: 2.75rem;
+        }
+
+        @include bp-lg {
+          font-size: 2rem;
+        }
+
+        svg {
+          width: 1.1rem;
+          height: 1.1rem;
+          margin: 0rem .7rem;
+
+          @include bp-lg {
+            width: .9rem;
+            height: .9rem;
+            margin: 0rem .55rem;
+          }
+        }
+      }
+    }
+  }
+
+  &.admin {
+    height: 100vh;
+    background-color: var(--color-admin-primary);
+
+    .nav {
+      flex: none;
+      background-color: transparent;
+      border-bottom-color: var(--color-admin-accent);
+
+      .logo {
+        color: var(--color-text-light);
+      }
+
+      .account {
+        display: flex;
+        align-items: center;
+        color: var(--color-text-light);
+        font-size: 1.2rem;
+        gap: 1rem;
+      }
+    }
+
+    main {
+      flex-direction: row;
+      flex: 1;
+      min-height: 0;
+      padding: 0px;
+      height: unset;
+    }
+
+    p {
+      letter-spacing: 3%;
+    }
+
+    h2, h3, h4, p:not(:global(.alert)) {
+      color: var(--color-text-light)
+    }
+
+    svg path {
+      //fill: var(--color-text-light)
+    }
+
+    textarea {
+      resize: none;
+    }
+
+    input, textarea {
+      color: var(--color-admin-light);
+
+      &::placeholder {
+        color: var(--color-admin-light-muted);
+        opacity: 1; /* Ensures Firefox displays the exact color */
+        letter-spacing: 3%;
+      }
+
+      &:focus-visible {
+        border-color: var(--color-admin-light-muted);
+      }
+    }
+  }
+
+  .nav {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    justify-content: space-between;
+    padding: 1rem 1.3rem;
+    border-bottom: 1.5px solid #AFA9EC;
+    background-color: var(--color-bg);
+
+    position: sticky !important;
+    top: 0;
+    z-index: 100;
+
+    a {
+      text-decoration: none;
+    }
+
+    .logo {
+      font-size: 1.5rem;
+      letter-spacing: 3%;
+      font-family: var(--font-heading);
+      display: flex;
+      align-items: center;
+      color: var(--color-primary);
+      //color: brown;
+
+      svg { 
+        width: .8rem;
+        height: .8rem;
+        margin: 0rem .5rem;
+
+        path {
+          fill: var(--color-accent);
+        }
+      }
+
+      /*@include bp-sm {
+        color: lightsalmon;
+      }
+
+      @include bp-md {
+        color: lightseagreen;
+      }
+
+      @include bp-lg {
+        color: lightblue;
+      }
+
+      @include bp-xl {
+        color: lightslategray;
+      }
+
+      @include bp-xxl {
+        color:#AFA9EC;
+      }*/
+    }
+
+    button.open {
+      @include bp-md {
+        display: none;
+      }
+
+      svg {
+        width: 1.3rem;
+        height: 1.3rem;
+
+        path {
+          fill: var(--color-primary)
+        }
+      }
+    }
+
+    .nav-links-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      position: absolute;
+      top: 0px;
+      bottom: 0px;
+      background-color: var(--color-bg);
+      width: 18rem;
+      right: -18rem;
+      padding: 0rem 2rem;
+      border-left: 3px solid var(--color-primary);
+      transition: right .5s;
+
+      &.open {
+        right: 0rem;
+      }
+
+      @include bp-md {
+        position: relative;
+        width: unset;
+        top: unset;
+        bottom: unset;
+        right: unset;
+        border: none;
+      }
+
+      button {
+        padding: 1rem 0rem;
+
+        @include bp-md {
+          display: none;
+        }
+
+        svg {
+          width: 1.5rem;
+          height: 1.5rem;
+
+          path {
+            fill: var(--color-primary)
+          }
+        }
+      }
+
+      .nav-links {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        gap: 1.5rem;
+        list-style: none;
+        padding-top: 1rem;
+
+        @include bp-md {
+          gap: 2rem;
+          padding-top: 0rem;
+          flex-direction: row;
+          align-items: center;
+        }
+
+        li {
+          a, a:visited {
+            font-family: var(--font-heading);
+            color: var(--color-muted);
+            font-size: 1.1rem;
+            letter-spacing: .12rem;
+            text-transform: uppercase;
+            border-bottom: 1.5px solid transparent;
+            transition: color .35s, border-color .35s;
+            
+            &:global(.active), &:hover {
+              color: var(--color-accent);
+              border-bottom: 1.5px solid var(--color-accent);
+            }
+
+            &.social-media {
+              display: flex;
+              border-bottom: none;
+              transition: opacity .35s;
+              padding: 0px;
+              color: var(--color-primary);
+
+              &:hover {
+                opacity: .5;
+              }
+
+              svg {
+                height: 1.5rem;
+              }
+            }
+
+            @include bp-md {
+              font-size: .9rem;
+              padding-left: .12rem;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  main {
+    padding: 0rem 1.3rem;
+
+    @include bp-md {
+      padding: 0rem 2rem;
+    }
+
+    @include bp-lg {
+      padding: 0rem 5rem;
+    }
+  }
+}

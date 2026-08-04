@@ -1,0 +1,38 @@
+@use 'breakpoints' as *;
+
+.page-header {
+  width: 100%;
+  text-align: center;
+  padding: 3rem 0rem 2.5rem 0rem;
+  
+  @include bp-md {
+    padding: 4rem 0rem 2.5rem 0rem;
+  }
+
+  h1 {
+    color: var(--color-primary);
+    margin-bottom: 1.5rem;
+    font-size: 1.9rem;
+
+    @include bp-md {
+      font-size: 2.2rem;
+    }
+  }
+
+  .subtitle {
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+
+    p {
+      font-family: var(--font-heading);
+      color: var(--color-muted);
+      font-size: .65rem;
+      letter-spacing: .05rem;
+
+      @include bp-md {
+        font-size: .75rem;
+      }
+    }
+  }
+}
