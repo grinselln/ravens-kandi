@@ -43,7 +43,7 @@ export const addPhoto = async (data: {title: string, story: string, source: stri
   data.categories.forEach((id) => formData.append("categories", String(id)));
   data.subcategories.forEach((id) => formData.append("subcategories", String(id)));
 
-  return apiFetch(`${API_URL}/photos`, {requiresAuth: true}, {
+  return apiFetch(`${API_URL}/photos/new`, {requiresAuth: true}, {
     method: 'POST',
     body: formData
   })
