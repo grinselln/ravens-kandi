@@ -23,3 +23,11 @@ $bp-xxl: 82.5rem; // ultra-wide
 @mixin bp-xxl {
   @media (min-width: #{$bp-xxl}) { @content; }
 }
+
+:export {
+  bpSM: $bp-sm;
+  bpMD: $bp-md;
+  bpLG: $bp-lg;
+  bpXL: $bp-xl;
+  bpXXL: $bp-xxl;
+}
