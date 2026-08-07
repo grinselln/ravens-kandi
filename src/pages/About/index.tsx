@@ -215,7 +215,7 @@ const About = () => {
       <div className={`${styles['history-entry']} ${styles['inverse-entry']} grid`}>
         <div className={`${styles['entry']} col col-md-6`}>
           <h3>06 - A permanent part of my life</h3>
-          <h2>Conventions & Cosplay</h2>
+          <h2>Beyond the Events</h2>
           <p>It’s been an all encompassing journey. So many pieces of my life have been touched by something that I essentially just stumbled into. Kandi is no longer tied to festivals, events, vacations, or experiences. It’s now tied to me. It’s rare that I leave the house without wearing some.</p>
           <p>I’ll set aside time just to make kandi, just to make sure I always have bracelets on hand. It has had such an unexpected impact on me, and I hope it leaves an impact on those I’ve made a connection with.</p>
         </div>

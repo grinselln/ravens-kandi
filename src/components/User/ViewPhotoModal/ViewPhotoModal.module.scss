@@ -5,6 +5,11 @@
   gap: 1rem;
   align-items: stretch; // Right side matches left side height perfectly
   width: 100%;
+  flex-direction: column;
+
+  @include bp-sm {
+    flex-direction: row;
+  }
 
   .photo-wrapper {
     display: flex;
@@ -89,8 +94,10 @@
         a {
           display: flex;
 
-          &:hover {
-            opacity: .75;
+          @media (hover: hover) {
+            &:hover {
+              opacity: .75;
+            }
           }
         }
       }

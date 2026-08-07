@@ -93,18 +93,20 @@ function Layout({ children, darkNav = false, isAdmin = false }: LayoutProps) {
     <div className={`${styles.layout} ${darkNav ? styles['nav-dark'] : ''} ${isAdmin ? styles['admin'] : ''}`}>
       <nav className={styles.nav}>
         <Link to="/" className={styles.logo}>Raven's<FontAwesomeIcon icon={faDiamond} />Kandi</Link>
-        <button className={styles.open} onClick={() => setIsMobileNavOpen(!isMobileNavOpen)}><FontAwesomeIcon icon={faBars} /></button>
         {!darkNav && !isAdmin && (
-          <div className={`${styles['nav-links-wrapper']}${isMobileNavOpen ? ` ${styles.open}` : ""}`}>
-            <button className={styles.close} onClick={() => setIsMobileNavOpen(!isMobileNavOpen)}><FontAwesomeIcon icon={faClose} /></button>
-            <ul className={styles['nav-links']}>
-              <li><NavLink to="/">Home</NavLink></li>
-              <li><NavLink to="/creations">Creations</NavLink></li>
-              <li><NavLink to="/about">About</NavLink></li>
-              <li><NavLink to="/contact">Contact</NavLink></li>
-              <li><a href="https://www.instagram.com/ravenskandi" className={styles['social-media']} target="_blank"><FontAwesomeIcon icon={faInstagram} /></a></li>
-            </ul>
-          </div>
+          <>
+            <button className={styles.open} onClick={() => setIsMobileNavOpen(!isMobileNavOpen)}><FontAwesomeIcon icon={faBars} /></button>
+            <div className={`${styles['nav-links-wrapper']}${isMobileNavOpen ? ` ${styles.open}` : ""}`}>
+              <button className={styles.close} onClick={() => setIsMobileNavOpen(!isMobileNavOpen)}><FontAwesomeIcon icon={faClose} /></button>
+              <ul className={styles['nav-links']}>
+                <li><NavLink to="/">Home</NavLink></li>
+                <li><NavLink to="/creations">Creations</NavLink></li>
+                <li><NavLink to="/about">About</NavLink></li>
+                <li><NavLink to="/contact">Contact</NavLink></li>
+                <li><a href="https://www.instagram.com/ravenskandi" className={styles['social-media']} target="_blank"><FontAwesomeIcon icon={faInstagram} /></a></li>
+              </ul>
+            </div>
+          </>
         )}
         {isAdmin && user?.username && (
           <div className={styles.account}>

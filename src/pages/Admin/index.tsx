@@ -11,11 +11,12 @@ import { fetchPhotoSubcategories, fetchSubcategories } from '@/api/subcategories
 import { useMemo } from 'react';
 
 const API_URL = import.meta.env.VITE_API_URL;
+const API_UPLOAD_DIRECTORY = import.meta.env.VITE_API_UPLOAD_DIRECTORY;
 
 const Admin = () => {
   const queryClient = useQueryClient();
 
-  const baseUploadUrl = `${API_URL}/uploads/`;
+  const baseUploadUrl = `${API_URL}/${API_UPLOAD_DIRECTORY}/`;
 
   const { data: allPhotos } = useQuery({
     queryKey: ['photos', 'all'],

@@ -27,12 +27,14 @@
 
       span {
         color: var(--color-accent-light);
+        text-shadow: 0px 0px 3px rgba(0,0,0, .5);
       }
     }
 
     .hero-button-wrapper {
       display: flex;
       gap: 1rem;
+      flex-wrap: wrap;
 
       .hero-button {
         background-color: var(--color-primary);
@@ -47,8 +49,10 @@
           border: 1px solid var(--color-text-light)
         }
 
-        &:hover {
-          opacity: .5;
+        @media (hover: hover) {
+          &:hover {
+            opacity: .5;
+          }
         }
       }
     }

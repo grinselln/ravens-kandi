@@ -21,12 +21,23 @@
         font-weight: 300;
         color: var(--color-text-light);
 
-        &.active, &:hover {
+        &.active {
           background: linear-gradient(90deg, #2A1627 25%, #20142A 50%, #17122A 80%);
           border-left: 7px solid rgba(150, 44, 46, 0.75);
 
           svg path {
             fill: var(--color-accent)
+          }
+        }
+
+        @media (hover: hover) {
+          &:hover {
+            background: linear-gradient(90deg, #2A1627 25%, #20142A 50%, #17122A 80%);
+            border-left: 7px solid rgba(150, 44, 46, 0.75);
+
+            svg path {
+              fill: var(--color-accent)
+            }
           }
         }
 

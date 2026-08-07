@@ -96,6 +96,11 @@
     width: 85%;
     max-width: 1300px;
     background-color: var(--color-primary-bg);
+    min-width: unset;;
+
+    @include bp-md {
+      min-width: 500px;
+    }
 
     .header {
       border-color: var(--color-primary);
@@ -114,6 +119,11 @@
     width: 85%;
     max-width: 1300px;
     background-color: var(--color-accent-bg);
+    min-width: unset;;
+
+    @include bp-md {
+      min-width: 500px;
+    }
 
     .header {
       border-color: var(--color-accent);
