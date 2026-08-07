@@ -98,8 +98,6 @@ const Creations = () => {
     document.addEventListener('click', handleDropDownMouseDown);
     return () => document.removeEventListener('click', handleDropDownMouseDown);
   }, [activeId, windowBreakPoints.isMobile]);
-
-  console.log("[filters]", selectedCategoryFilters);
   
   return (
     <Layout>

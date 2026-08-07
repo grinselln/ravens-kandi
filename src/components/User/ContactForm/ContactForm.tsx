@@ -52,8 +52,6 @@ export default function ContactForm() {
     }
   }, []);
 
-  console.log("[errors]", errors.validMessage);
-
   return (
     <form id='contactForm' method="POST" action="https://formsubmit.co/4a005f989176c3e97d68a7bc21e9d46e" encType="multipart/form-data">
       <input type="hidden" name="_next" value={`${redirectUrl}?success=true`} />
