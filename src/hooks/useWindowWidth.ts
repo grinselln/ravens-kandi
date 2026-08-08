@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import breakpoints from "@/styles/_breakpoints.module.scss";
+import { breakpoints } from "@/styles/breakpoints";
 
 export function useWindowWidth() {
   const [width, setWidth] = useState(window.innerWidth);

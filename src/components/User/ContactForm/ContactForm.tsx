@@ -12,20 +12,50 @@ export default function ContactForm() {
   const [subject, setSubject] = useState<string>("");
   const [message, setMessage] = useState<string>("");
   const [errors, setErrors] = useState<any>({
-    validName: false,
-    validEmail: false,
-    validSubject: false,
-    validMessage: false
+    validName: null,
+    validEmail: null,
+    validSubject: null,
+    validMessage: null,
+    allBlank: true
   });
 
-  const onCheckErrors = () => {
-    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/; 
+  const onCheckErrors = (field: string) => {
+    if (name === "" && email === "" && subject === "" && message === "") {
+      setErrors({
+        validName: null,
+        validEmail: null,
+        validSubject: null,
+        validMessage: null,
+        allBlank: true
+      })
+
+      return;
+    };
+
+    let fieldValidation = {};
+
+    switch (field) {
+      case "name":
+        fieldValidation = {validName: name !== ""};
+        break;
+      case "email":
+        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/; 
+        fieldValidation = {validEmail: emailRegex.test(email)};
+        break;
+      case "subject":
+        fieldValidation = {validSubject: subject !== ""};
+        break;
+      case "message":
+        fieldValidation = {validMessage: message !== ""};
+        break;
+      default:
+        break;
+    }
 
     setErrors({
-      validName: name !== "",
-      validEmail: emailRegex.test(email),
-      validSubject: subject !== "",
-      validMessage: message !== ""
+      ...errors,
+      ...fieldValidation,
+      allBlank: false
     })
   }
 
@@ -63,46 +93,46 @@ export default function ContactForm() {
         <div className={styles['form-row']}>
           <InputText
             label='Name'
-            wrapperClass={!errors.validName ? "error" : ""}
+            wrapperClass={errors.validName === false && !errors.allBlank ? "error" : ""}
             fieldWrapperClass='field-light'
             value={name}
             setValue={(name) => setName(name)}
             type="text"
             name="name"
-            onBlur={() => onCheckErrors()}
+            onBlur={() => onCheckErrors("name")}
           />
           <InputText
             label='E-mail'
-            wrapperClass={!errors.validEmail ? "error" : ""}
+            wrapperClass={errors.validEmail === false && !errors.allBlank ? "error" : ""}
             fieldWrapperClass='field-light'
             value={email}
             setValue={(email) => setEmail(email)}
             type="email"
             name="email"
-            onBlur={() => onCheckErrors()}
+            onBlur={() => onCheckErrors("email")}
           />
         </div>
         <div className={styles['form-row']}>
           <InputText
             label='Subject'
-            wrapperClass={!errors.validSubject ? "error" : ""}
+            wrapperClass={errors.validSubject === false && !errors.allBlank ? "error" : ""}
             fieldWrapperClass='field-light'
             value={subject}
             setValue={(subject) => setSubject(subject)}
             type="subject"
             name="subject"
-            onBlur={() => onCheckErrors()}
+            onBlur={() => onCheckErrors("subject")}
           />
         </div>
         <div className={styles['form-row']}>
           <InputTextArea
             label='Message'
             fieldWrapperClass='field-light'
-            wrapperClass={!errors.validMessage ? "error" : ""}
+            wrapperClass={errors.validMessage === false && !errors.allBlank ? "error" : ""}
             value={message}
             setValue={(message) => setMessage(message)}
             name="message"
-            onBlur={() => onCheckErrors()}
+            onBlur={() => onCheckErrors("message")}
           />
         </div>
         <Button onClick={() => {}} isDisabled={isSendDisabled} type="submit">Send</Button>

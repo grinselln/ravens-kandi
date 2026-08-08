@@ -1,4 +1,4 @@
-@use 'breakpoints.module' as *;
+@use '_breakpoints' as *;
 
 .intro {
   border: 1px solid var(--color-primary);
