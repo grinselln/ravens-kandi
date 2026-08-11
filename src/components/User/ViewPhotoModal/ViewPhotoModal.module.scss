@@ -7,7 +7,7 @@
   width: 100%;
   flex-direction: column;
 
-  @include bp-sm {
+  @include bp-md {
     flex-direction: row;
   }
 
