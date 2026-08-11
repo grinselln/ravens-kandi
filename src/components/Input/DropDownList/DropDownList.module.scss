@@ -12,7 +12,8 @@
     border-top: none;
     border-radius: 0px 0px 5px 5px;
     font-size: 0.85rem;
-    overflow: hidden;
+    max-height: 150px;
+    overflow-y: auto;
 
     &.inverse {
       background-color: var(--color-admin-mid);

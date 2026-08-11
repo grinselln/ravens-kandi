@@ -60,7 +60,9 @@
 
   &.admin {
     height: 100vh;
+    height: 100svh;
     background-color: var(--color-admin-primary);
+    padding: 0px;
 
     .nav {
       flex: none;
@@ -69,23 +71,60 @@
 
       .logo {
         color: var(--color-text-light);
+        font-size: 1.25rem;
+
+        @include bp-lg {
+          font-size: 1.5rem;
+        }
+
+        svg { 
+          width: .7rem;
+          height: .7rem;
+          margin: 0rem .4rem;
+
+          @include bp-lg {
+            width: .8rem;
+            height: .8rem;
+            margin: 0rem .5rem;
+          }
+        }
       }
 
       .account {
         display: flex;
         align-items: center;
         color: var(--color-text-light);
-        font-size: 1.2rem;
-        gap: 1rem;
+        font-size: .8rem;
+        gap: .5rem;
+
+        @include bp-lg {
+          font-size: 1.1rem;
+          gap: 1rem;
+        }
+
+        button {
+          svg {
+            height: 15px;
+
+            @include bp-lg {
+              height: 18px;
+            }
+          }
+        }
       }
     }
 
     main {
-      flex-direction: row;
-      flex: 1;
-      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
       padding: 0px;
-      height: unset;
+
+      @include bp-lg {
+        flex-direction: row;
+        flex: 1;
+        min-height: 0;
+      }
     }
 
     p {
@@ -94,10 +133,6 @@
 
     h2, h3, h4, p:not(:global(.alert)) {
       color: var(--color-text-light)
-    }
-
-    svg path {
-      //fill: var(--color-text-light)
     }
 
     textarea {
@@ -143,7 +178,7 @@
       display: flex;
       align-items: center;
       color: var(--color-primary);
-      //color: brown;
+      //color: brown !important;
 
       svg { 
         width: .8rem;
@@ -156,23 +191,23 @@
       }
 
       /*@include bp-sm {
-        color: lightsalmon;
+        color: lightsalmon !important;
       }
 
       @include bp-md {
-        color: lightseagreen;
+        color: lightseagreen !important;
       }
 
       @include bp-lg {
-        color: lightblue;
+        color: lightblue !important;
       }
 
       @include bp-xl {
-        color: lightslategray;
+        color: lightslategray !important;
       }
 
       @include bp-xxl {
-        color:#AFA9EC;
+        color:#AFA9EC !important;
       }*/
     }
 

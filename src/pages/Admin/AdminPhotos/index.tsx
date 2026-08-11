@@ -323,32 +323,12 @@ const AdminPhotos = () => {
               </div>
             </div>
           </div>
-          <RowAccordion
-            isOpenDefault={true}
-            header={(isOpen, onToggle, isInverse) => 
-              <Row
-                isSimple={true}
-                isOrderingDisabled={true}
-                isOrderingHidden={true}
-                title={<h3>Search by categories</h3>} 
-                order={null} 
-                isAccordion={true} 
-                isOpen={isOpen} 
-                accordionToggle={onToggle}
-                actionElements={null}
-              />
-            }
-          >
-            <div className={styles['categories-wrapper']}>
-              <FilterDisplay
-                categoryData={categories}
-                selectedCategoryFilters={selectedCategoryFilters}
-                setSelectedCategoryFilters={setSelectedCategoryFilters}
-                isAdmin={true}
-              />
-            </div>
-
-          </RowAccordion>
+          <FilterDisplay
+            categoryData={categories}
+            selectedCategoryFilters={selectedCategoryFilters}
+            setSelectedCategoryFilters={setSelectedCategoryFilters}
+            isAdmin={true}
+          />
           <div className={styles['bottom-filters']}>
             <div className={styles['missing-filters']}>
               <div className={styles['missing-option']}>
@@ -395,11 +375,11 @@ const AdminPhotos = () => {
                 setSelectedBulkEdit([]);
               }} isDisabled={false}>Bulk Select</Button>
               <div className={styles['bulk-controls']}>
-                <ActionButton variant='alert' icon={faTrashCan} onAction={() => handleDelete()} isDisabled={(selectedBulkEdit.length === 0 && isBulkEdit) || !isBulkEdit} />
                 <ActionButton variant='default' icon={faEdit} onAction={() => {
                   setSelectedEditPhotos(selectedEditPhotosFull)
                   setIsBulkEdit(false);
                 }} isDisabled={selectedBulkEdit.length <= 1 || !isBulkEdit || !bulkEditValid} />
+                <ActionButton variant='alert' icon={faTrashCan} onAction={() => handleDelete()} isDisabled={(selectedBulkEdit.length === 0 && isBulkEdit) || !isBulkEdit} />  
               </div>
             </div>
           </div>
@@ -412,7 +392,7 @@ const AdminPhotos = () => {
                 const pendingStatus = selectedBulkEdit.find((item: any) => item.id === photo.id);
 
                 return (
-                  <div className={`col-3 ${styles['photo-wrapper']}${missingData.hasMissingData ? ` ${styles.alert}` : ""}`} key={`photo_${photo.id}`}>
+                  <div className={`col-6 col-sm-4 col-xl-3 ${styles['photo-wrapper']}${missingData.hasMissingData ? ` ${styles.alert}` : ""}`} key={`photo_${photo.id}`}>
                     <div className={styles['image-wrapper']}>
                       <img src={`${baseUploadUrl}${photo.photo_filename}`} />
                       <div className={styles.badges}>

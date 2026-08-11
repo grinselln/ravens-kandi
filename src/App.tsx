@@ -11,7 +11,6 @@ import AdminTypes from './pages/Admin/AdminTypes';
 import { useEffect } from 'react';
 import Login from './pages/Login/Login';
 
-
 function App() {
   useEffect(() => {
     let openModals = 0;

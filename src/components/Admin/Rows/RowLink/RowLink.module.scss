@@ -5,9 +5,17 @@
   align-items: center;
   gap: .5rem;
   color: var(--color-text-light);
-  font-size: .75rem;
+  font-size: .55rem;
   letter-spacing: 5%;
   white-space: nowrap;
+
+  @include bp-md {
+    font-size: .65rem;
+  }
+
+  @include bp-xl {
+    font-size: .75rem;
+  }
 
   svg {
     path {

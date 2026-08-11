@@ -14,6 +14,7 @@ interface IRowInput {
 const RowInput = ({ value, setValue, isNew, inputItemLabel, isDisabled } : IRowInput) => {
   return (
     <InputText
+      fieldWrapperClass='row-input-wrapper'
       wrapperClass='row-input'
       placeholder={`${isNew ? "New" : "Edit"} ${inputItemLabel}`}
       value={value}

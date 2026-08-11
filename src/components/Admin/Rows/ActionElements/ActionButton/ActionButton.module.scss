@@ -8,7 +8,7 @@
   }
 
   &.grip, &.new-grip {
-    height: 15px;
+    height: unset;
     rotate: 90deg;
   }
 
@@ -32,6 +32,14 @@
   }
 
   svg {
-    height: 18px;
+    height: 14px;
+
+    @include bp-md {
+      height: 15px;
+    }
+
+    @include bp-xl {
+      height: 18px;
+    }
   }
 }

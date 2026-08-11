@@ -1,7 +1,16 @@
 @use '_breakpoints' as *;
 
 span.record-count {
+  display: none;
   color: var(--color-admin-light-muted);
-  font-size: .8rem;
   font-weight: 500;
+
+  @include bp-md {
+    font-size: .7rem;
+    display: block;
+  }
+
+  @include bp-xl {
+    font-size: .8rem;
+  }
 }

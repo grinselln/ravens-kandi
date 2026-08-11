@@ -16,35 +16,35 @@ const LayoutAdmin = ({children}: ILayoutAdmin) => {
   const {recordType, warningMessage, onDismissWarningMessage, onConfirmWarning} = useDeleteConfirmation();
 
   const links = {
-    DASHBOARD: "dashboard",
+    DASHBOARD: "",
     PHOTOS: "photos",
     CATEGORIES: "categories",
     TYPES: "types"
   }
 
-  const currentPage = window.location.href;
+  const currentPage = window.location.pathname.replace("/admin", "").replace("/", "");
   
   return (
     <Layout isAdmin={true}>
         <div className={styles.sidebar}>
           <ul>
             <li>
-              <Link to="/admin" className={currentPage.includes(links.DASHBOARD) ? styles.active : ""}>
-                <FontAwesomeIcon icon={faHouse} /> <span>Dashboard</span>
+              <Link to="/admin" className={currentPage === links.DASHBOARD ? styles.active : ""}>
+                <span><FontAwesomeIcon icon={faHouse} /> <span>Dashboard</span></span>
               </Link>
             </li>
             <li>
-              <Link to="/admin/photos" className={currentPage.includes(links.PHOTOS) ? styles.active : ""}>
+              <Link to="/admin/photos" className={currentPage === links.PHOTOS ? styles.active : ""}>
                 <FontAwesomeIcon icon={faImage} /> Photos
               </Link>
             </li>
             <li>
-              <Link to="/admin/types" className={currentPage.includes(links.TYPES) ? styles.active : ""}>
+              <Link to="/admin/types" className={currentPage === links.TYPES ? styles.active : ""}>
                 <FontAwesomeIcon icon={faTag} /> Types
               </Link>
             </li>
             <li>
-              <Link to="/admin/categories" className={currentPage.includes(links.CATEGORIES) ? styles.active : ""}>
+              <Link to="/admin/categories" className={currentPage === links.CATEGORIES ? styles.active : ""}>
                 <FontAwesomeIcon icon={faTableCellsLarge} /> Categories
               </Link>
             </li>

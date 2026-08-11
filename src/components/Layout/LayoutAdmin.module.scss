@@ -1,29 +1,74 @@
 @use '_breakpoints' as *;
 
 .sidebar {
-  flex: none;
-  width: 300px;
+  display: flex;
+  overflow-x: auto;
+  
+  @include bp-sm {
+    justify-content: center;
+    overflow-x: unset;
+  }
+
+  @include bp-lg {
+    justify-content: unset;
+    overflow-y: unset;
+    flex: none;
+    width: 250px;
+  }
+
+  @include bp-xl {
+    width: 300px;
+  }
 
   ul {
-    margin-top: 2rem;
+    list-style: none;
     display: flex;
-    flex-direction: column;
+    align-items: center;
+    flex-shrink: 0;
     gap: 1rem;
+
+    @include bp-lg {
+      width: 100%;
+      align-items: unset;
+      flex-shrink: unset;
+      margin-top: 2rem;
+      flex-direction: column;
+    }
 
     li {
       a {
         display: flex;
         align-items: center;
-        padding: .85rem 1.3rem;
-        border-left: 7px solid transparent;
-
+        padding: .6rem .8rem;
+        font-size: .8rem;
         font-family: var(--font-heading);
         font-weight: 300;
         color: var(--color-text-light);
+        border-left: 3px solid transparent;
+        border-right: 3px solid transparent;
+
+        @include bp-lg {
+          font-size: 1rem;
+          padding: .85rem 1.3rem;
+          border-left: 7px solid transparent;
+          border-right: unset;
+        }
+
+        span {
+          display: flex;
+          flex-wrap: nowrap;
+        }
 
         &.active {
-          background: linear-gradient(90deg, #2A1627 25%, #20142A 50%, #17122A 80%);
-          border-left: 7px solid rgba(150, 44, 46, 0.75);
+          background: linear-gradient(90deg, #2A1627 0%, #20142A 25%, #20142A 75%, #2A1627 100%);
+          border-left: 3px solid rgba(150, 44, 46, 0.75);
+          border-right: 3px solid rgba(150, 44, 46, 0.75);
+
+          @include bp-lg {
+            background: linear-gradient(90deg, #2A1627 25%, #20142A 50%, #17122A 80%);
+            border-left-width: 7px;
+            border-right: unset;
+          }
 
           svg path {
             fill: var(--color-accent)
@@ -32,8 +77,15 @@
 
         @media (hover: hover) {
           &:hover {
-            background: linear-gradient(90deg, #2A1627 25%, #20142A 50%, #17122A 80%);
-            border-left: 7px solid rgba(150, 44, 46, 0.75);
+            background: linear-gradient(90deg, #2A1627 0%, #20142A 25%, #20142A 75%, #2A1627 100%);
+            border-left: 3px solid rgba(150, 44, 46, 0.75);
+            border-right: 3px solid rgba(150, 44, 46, 0.75);
+
+            @include bp-lg {
+              background: linear-gradient(90deg, #2A1627 25%, #20142A 50%, #17122A 80%);
+              border-left-width: 7px;
+              border-right: unset;
+            }
 
             svg path {
               fill: var(--color-accent)
@@ -42,13 +94,20 @@
         }
 
         svg {
-          width: 22px;
-          height: 22px;
+          width: 15px;
+          height: 15px;
           margin-right: .5rem;
+
+          @include bp-lg {
+            margin-right: .7rem;
+            width: 18px;
+            height: 18px;
+          }
         }
         
         span {
           letter-spacing: 7%;
+          align-items: center;
         }
       }
     }
@@ -59,7 +118,10 @@
   flex: 1;
   min-height: 0;
   overflow-y: auto;
-  padding: 2.5rem;
-
+  padding: 1.5rem 1rem;
   background-color: var(--color-admin-bg);
+
+  @include bp-lg {
+    padding: 2.5rem;
+  }
 }
