@@ -36,13 +36,14 @@ interface IUploadItem {
 type SortOption = "" | "alpha" | "viewsA" | "viewsD";
 
 const API_URL = import.meta.env.VITE_API_URL;
+const API_UPLOAD_DIRECTORY = import.meta.env.VITE_API_UPLOAD_DIRECTORY;
 
 const AdminPhotos = () => {
   const queryClient = useQueryClient();
   const [searchParams, setSearchParams] = useSearchParams();
   const filter = searchParams.get('filter');
 
-  const baseUploadUrl = `${API_URL}/uploads/`;
+  const baseUploadUrl = `${API_URL}/${API_UPLOAD_DIRECTORY}/`;
   const [searchText, setSearchText] = useState<string>("");
   const [selectedPhotoTypes, setSelectedPhotoTypes] = useState<Array<number>>([]);
   const [selectedSortOption, setSelectedSortOption] = useState<IOption>({label: "", value: ""});

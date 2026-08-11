@@ -1,25 +1,25 @@
-$bp-sm: 36rem; // stacked → two-column
-$bp-md: 48rem; // tablet / compact desktop
-$bp-lg: 62rem; // desktop
-$bp-xl: 75rem; // wide desktop
-$bp-xxl: 82.5rem; // ultra-wide
+$bpSM: 36rem; // stacked → two-column
+$bpMD: 48rem; // tablet / compact desktop
+$bpLG: 62rem; // desktop
+$bpXL: 75rem; // wide desktop
+$bpXXL: 82.5rem; // ultra-wide
 
 @mixin bp-sm {
-  @media (min-width: #{$bp-sm}) { @content; }
+  @media (min-width: #{$bpSM}) { @content; }
 }
 
 @mixin bp-md {
-  @media (min-width: #{$bp-md}) { @content; }
+  @media (min-width: #{$bpMD}) { @content; }
 }
 
 @mixin bp-lg {
-  @media (min-width: #{$bp-lg}) { @content; }
+  @media (min-width: #{$bpLG}) { @content; }
 }
 
 @mixin bp-xl {
-  @media (min-width: #{$bp-xl}) { @content; }
+  @media (min-width: #{$bpXL}) { @content; }
 }
 
 @mixin bp-xxl {
-  @media (min-width: #{$bp-xxl}) { @content; }
+  @media (min-width: #{$bpXXL}) { @content; }
 }

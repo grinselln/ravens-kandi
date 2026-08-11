@@ -1,4 +1,4 @@
-@use 'breakpoints' as *;
+@use '_breakpoints' as *;
 
 .layout {
   display: flex;
@@ -7,6 +7,7 @@
   &.nav-dark {
     width: 100vw;
     height: 100vh;
+    height: 100svh; 
     background-repeat: no-repeat;
     background-position: center;
     background-size: cover;
@@ -194,7 +195,7 @@
       display: flex;
       flex-direction: column;
       align-items: flex-end;
-      position: absolute;
+      position: fixed;
       top: 0px;
       bottom: 0px;
       background-color: var(--color-bg);
@@ -218,6 +219,7 @@
       }
 
       button {
+        display: flex;
         padding: 1rem 0rem;
 
         @include bp-md {
@@ -271,8 +273,10 @@
               padding: 0px;
               color: var(--color-primary);
 
-              &:hover {
-                opacity: .5;
+              @media (hover: hover) {
+                &:hover {
+                  opacity: .5;
+                }
               }
 
               svg {
@@ -291,6 +295,9 @@
   }
 
   main {
+    height: calc(100vh - 70px);
+    height: calc(100svh - 70px);
+    overflow-y: auto;
     padding: 0rem 1.3rem;
 
     @include bp-md {

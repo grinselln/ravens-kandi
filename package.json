@@ -4,8 +4,9 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
+    "dev": "node src/scripts/generate-breakpoints.mjs && vite",
+    "build": "node src/scripts/generate-breakpoints.mjs && vite build",
+    "deploy": "yarn build && node deploy.js",
     "lint": "eslint .",
     "preview": "vite preview"
   },
@@ -32,10 +33,12 @@
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.3",
+    "dotenv": "^17.4.2",
     "eslint": "^10.6.0",
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.3",
     "globals": "^17.7.0",
+    "ssh2-sftp-client": "^12.1.1",
     "typescript": "^6.0.3",
     "vite": "^8.1.1"
   }

@@ -34,7 +34,7 @@ const Login = () => {
   return (
     <div className={styles['login-wrapper']}>
       <div className={styles.login}>
-        <h1>Raven's<FontAwesomeIcon icon={faDiamond} />Kandi Admin Panel</h1>
+        <h1><span>Raven's<FontAwesomeIcon icon={faDiamond} />Kandi</span>&nbsp;Admin Panel</h1>
         <div className={styles.actions}>
           <Link to={`${API_URL}/auth/google`} className={styles.primary}>Login</Link>
           {errorMessage && (

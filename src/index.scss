@@ -53,7 +53,7 @@ body {
   background-color: var(--color-bg);
   color: var(--color-text);
 
-  &.modal-open {
+  &.modal-open main {
     overflow: hidden;
   }
 }
@@ -65,16 +65,8 @@ main {
 }
 
 html, body {
-    overflow-x: hidden;
+    overflow: hidden;
     position: relative;
-}
-
-input {
-  border: none;
-
-  &:focus-visible  {
-    outline: none;
-  }
 }
 
 h1, h2, h3, h4 {
@@ -93,9 +85,25 @@ span {
 
 h1, h2, h3, h4, p, span, a, button, input {
   text-box-trim: trim-both;
-     // text-box-edge: cap text;
   text-box-edge: cap alphabetic;
   padding-top: 1px;
+}
+
+input {
+  border: none;
+  text-box-edge: unset;
+
+  &:focus-visible  {
+    outline: none;
+  }
+}
+
+textarea {
+  text-box-edge: unset;
+  
+  &:focus-visible  {
+    outline: none;
+  }
 }
 
 h1, h2, h3, h4, p, span, a {
@@ -108,15 +116,19 @@ h1, h2, h3, h4, p, span, a {
   }
 }
 
-a:hover {
-  opacity: .75;
+@media (hover: hover) {
+  a:hover {
+    opacity: .75;
+  }
 }
 
 button {
   cursor: pointer;
 
-  &:hover {
-    opacity: .75;
+  @media (hover: hover) {
+    &:hover {
+      opacity: .75;
+    }
   }
 
   /*span {
