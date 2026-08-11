@@ -42,7 +42,6 @@ const API_UPLOAD_DIRECTORY = import.meta.env.VITE_API_UPLOAD_DIRECTORY;
 const PhotoDetailsModal = ({selectedPhotos = [], setSelectedPhotos, isOpen, setIsOpen, photoTypes, categories, subcategories}: IPhotoDetailsModal) => {
   const baseUploadUrl = `${API_URL}/${API_UPLOAD_DIRECTORY}/`;
   const containerRef = useRef(null);
-
   const queryClient = useQueryClient();
   const { windowBreakPoints } = useWindowWidth();
 
