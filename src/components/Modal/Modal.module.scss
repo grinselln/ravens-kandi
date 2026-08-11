@@ -17,7 +17,7 @@
     max-height: 90%;
     min-width: 500px;
     height: unset;
-    border-radius: 10px;
+    border-radius: 5px;
   }
 
   &.open {
@@ -120,10 +120,16 @@
   }
 
   &.view-photo {
+    height: unset;
     width: 85%;
-    max-width: 1300px;
+    max-width: 1000px;
     background-color: var(--color-primary-bg);
-    min-width: unset;;
+    min-width: unset;
+    border-radius: 5px;
+
+    @include bp-sm {
+      width: 75%;
+    }
 
     @include bp-md {
       min-width: 500px;
@@ -143,10 +149,16 @@
   }
 
   &.view-photo-o {
+    height: unset;
     width: 85%;
-    max-width: 1300px;
+    max-width: 1000px;
     background-color: var(--color-accent-bg);
-    min-width: unset;;
+    min-width: unset;
+    border-radius: 5px;
+
+    @include bp-sm {
+      width: 75%;
+    }
 
     @include bp-md {
       min-width: 500px;
