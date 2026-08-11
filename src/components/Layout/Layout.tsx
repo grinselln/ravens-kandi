@@ -29,7 +29,6 @@ function Layout({ children, darkNav = false, isAdmin = false }: LayoutProps) {
   const popupRef = useRef<Window | null>(null);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const resolvedRef = useRef(false);
-
   const [isMobileNavOpen, setIsMobileNavOpen] = useState<boolean>(false);
 
   const clearPoll = () => {

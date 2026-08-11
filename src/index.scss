@@ -1,4 +1,3 @@
-//@use './styles/_test';
 @use './styles/_grid';
 
 :root {
@@ -83,7 +82,7 @@ span {
   letter-spacing: 3%;
 }
 
-h1, h2, h3, h4, p, span, a, button, input {
+h1, h2, h3, h4, span, a, button, input {
   text-box-trim: trim-both;
   text-box-edge: cap alphabetic;
   padding-top: 1px;

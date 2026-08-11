@@ -4,12 +4,16 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: .95rem 1rem;
+  padding: .85rem .75rem;
   background-color: var(--color-admin-bg-mid);
   border: 1px solid var(--color-admin-border);
   border-radius: 5px;
   transition: border-radius .25s;
   transition-delay: .20s;
+
+  @include bp-lg {
+    padding: .75rem .75rem;
+  }
 
   &.inverse {
     background-color: var(--color-admin-bg);
@@ -42,8 +46,12 @@
   &.accordion-header {
     .accordion-indicator {
       height: auto;
-      width: 9px;
+      width: 7px;
       transition: rotate .25s;
+
+      @include bp-lg {
+        width: 9px
+      }
 
       path {
         fill: var(--color-admin-light);
@@ -56,25 +64,54 @@
 
     .row-left {
       cursor: pointer;
+      flex-grow: 1;
+
+      @include bp-lg {
+        flex-grow: unset;
+      }
 
       .icons {
-        gap: 1.5rem;
+        gap: .65rem;
+
+        @include bp-lg {
+          gap: 1rem;
+        }
+
+        @include bp-xl {
+          gap: 1.5rem;
+        }
       }
     }
 
     &.simple {
-      padding-left: 1.5rem;
-      padding-right: 1.5rem;
+      padding-left: .5rem;
+      padding-right: .5rem;
 
-      h3 {
-        color: var(--color-admin-light)
+      @include bp-lg {
+        padding-left: 1rem;
+        padding-right: 1rem;
+      }
+
+      .title h3 {
+        color: var(--color-admin-light);
+
+
+
+        @include bp-lg {
+
+        }
       }
     }
   }
 
   &.accordion-match {
-    padding-left: 1.5rem;
-    padding-right: 1.5rem;
+    padding-left: .5rem;
+    padding-right: .5rem;
+
+    @include bp-lg {
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
+    }
   }
 
   &.open {
@@ -89,15 +126,33 @@
   .row-left {
     display: flex;
     align-items: center;
-    gap: 1.5rem;
+    gap: .8rem;
+
+    @include bp-lg {
+      gap: 1.5rem;
+    }
 
     .icons {
       display: flex;
       align-items: center;
-      gap: .75rem;
+      gap: .15rem;
+
+      @include bp-lg {
+        gap: .75rem;
+      }
 
       .count {
-        color: var(--color-admin-light)
+        color: var(--color-admin-light);
+        font-size: .8rem;
+        display: flex;
+
+        @include bp-lg {
+          font-size: .9rem;
+        }
+
+        @include bp-xl {
+          font-size: 1rem;
+        }
       }
     }
     
@@ -105,14 +160,36 @@
       display: flex;
       align-items: center;
       gap: 1.5rem;
+      margin-right: .55rem;
+      flex-grow: 1;
+      justify-content: space-between;
+
+      @include bp-xl {
+        flex-grow: unset;
+        justify-content: unset;  
+        margin-right: 0px;
+      }
 
       h3 {
-        width: 200px;
         font-family: var(--font-body);
         font-weight: 400;
-        font-size: 1.1rem;
+        font-size: .9rem;
         border-bottom: 1px solid transparent;
         letter-spacing: 3%;
+        height: 18px;
+        display: flex;
+        align-items: center;
+
+        @include bp-lg {
+          height: 22px;
+          font-size: 1rem;
+          
+        }
+
+        @include bp-xl {
+          font-size: 1.1rem;
+          width: 200px;
+        }
       }
     }
   }
@@ -120,14 +197,30 @@
   .row-right {
     display: flex;
     align-items: center;
-    gap: 1.2rem;
+    gap: .5rem;
+
+    @include bp-md {
+      gap: .75rem;
+    }
+
+    @include bp-lg {
+      gap: 1rem;
+    }
+
+    @include bp-xl {
+      gap: 1.2rem;
+    }
 
     svg:global(.fa-spin) {
-      width: 15.5px;
+      width: 12.5px;
       height: auto;
 
+      @include bp-md {
+        width: 15.5px;
+      }
+
       path {
-            fill: var(--color-admin-accent); 
+        fill: var(--color-admin-accent); 
       }
     }
 

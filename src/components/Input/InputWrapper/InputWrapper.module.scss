@@ -16,10 +16,15 @@
 
     .input-wrapper.faux-input {
       button {
-        font-size: .65rem;
-        padding: .16rem .5rem;
+        font-size: .58rem;
+        padding: .05rem .5rem;
         gap: 1rem;
         min-width: 150px;
+
+        @include bp-lg {
+          font-size: .65rem;
+          padding: .16rem .5rem;
+        }
       }
     }
   }
@@ -57,6 +62,14 @@
     }
   }
 
+  &.row-input-wrapper {
+    width: unset;
+
+    @include bp-md {
+      width: 100%;
+    }
+  }
+
   .input-wrapper {
     width: 100%;
 
@@ -66,13 +79,17 @@
 
     &.row-input {
       display: flex;
-      width: 200px;
+      width: 150px;
+
+      @include bp-md {
+        width: 200px;
+      }
 
       input {
-        height: 15px;
+        height: 18px;
         font-family: var(--font-body);
         padding: 0px;
-        font-size: 1.1rem;
+        font-size: .9rem;
         font-weight: 400;
         letter-spacing: 3%;
         border: none;
@@ -80,6 +97,10 @@
         border-bottom: 1px dashed var(--color-admin-light);
         color: var(--color-admin-light);
         border-radius: 0px;
+
+        @include bp-lg {
+          font-size: 1rem;
+        }
 
         &::placeholder {
           color: var(--color-admin-light);
@@ -104,12 +125,17 @@
 
     input, textarea, &.faux-input button {
       width: 100%;
-      padding: .5rem;
+      padding: .35rem;
       background-color: var(--color-admin-bg);
       border: 1px solid var(--color-admin-border);
       border-radius: 5px;
-      font-size: .85rem;
+      font-size: .75rem;
       color: var(--color-admin-light);
+
+      @include bp-sm {
+        font-size: .85rem;
+        padding: .5rem;
+      }
 
       &:disabled {
         opacity: .65;

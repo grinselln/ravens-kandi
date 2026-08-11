@@ -7,12 +7,18 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  min-width: 500px;
   flex-direction: column; // add
-  max-height: 90%;
-  border-radius: 10px;
+  width: 100%;
+  height: 100%;
   background-color: var(--color-admin-mid);
   overflow: hidden;
+
+  @include bp-md {
+    max-height: 90%;
+    min-width: 500px;
+    height: unset;
+    border-radius: 10px;
+  }
 
   &.open {
     display: flex;
@@ -78,18 +84,39 @@
   }
 
   &.add-records {
-    width: 45%;
-    max-width: 600px;
+    width: 100%;
+
+    @include bp-md {
+      width: 45%;
+      max-width: 600px;
+    }
   }
 
   &.add-category {
-    width: 35%;
-    max-width: 550px;
+    width: 100%;
+
+    @include bp-md {
+      width: 75%;
+      height: unset;
+      max-width: 550px;
+    }
+
+    @include bp-xl {
+      width: 45%;
+      
+    }
   }
 
   &.add-photo {
-    width: 60%;
     max-width: 950px;
+
+    @include bp-md {
+      width: 95%;
+    }
+
+    @include bp-xl {
+      width: 70%;
+    }
   }
 
   &.view-photo {

@@ -160,7 +160,7 @@ const RowsSubcategories = ({ categories, subcategories, parentCategory, selected
         return (
           <RowTag
             {...(parentCategory.order_index !== -1 && {subcategory: subcategory, categoryId: parentCategory.id, index, container: subcategoryContainerRef})}
-            isOrderingDisabled={(selectedSubcategoryRecord.id !== null && !selectedSubcategoryRecord.isNew) || selectedSubcategoryRecord.isNew}
+            isOrderingDisabled={(selectedSubcategoryRecord.id !== null && !selectedSubcategoryRecord.isNew) || selectedSubcategoryRecord.isNew || (editingStatus.isEditing && !isEditingCurrent)}
             isOrderingHidden={parentCategory.order_index === -1}
             key={`subcategory-row_${subcategory.id}`}
             title={<>
@@ -173,7 +173,7 @@ const RowsSubcategories = ({ categories, subcategories, parentCategory, selected
                     isDisabled={false}
                   />
                 : <h3>{subcategory.title}</h3>}
-              {linkedCategory && (
+              {linkedCategory && !isEditingCurrent && (
                 <RowLink title={linkedCategory.title} />
               )}
               </>
@@ -184,7 +184,7 @@ const RowsSubcategories = ({ categories, subcategories, parentCategory, selected
               <InputDropDown
                 isSmall={true}
                 placeholder='Assign to Category'
-                value={editedSubcategoryRecord.category_id}
+                value={linkedCategory.id}
                 setValue={(newValue) => setEditedSubcategoryRecord((prev : any) => ({...prev, category_id: newValue.value }))}
                 options={dropdownOptions}
                 isDisabled={false}

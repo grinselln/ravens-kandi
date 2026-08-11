@@ -22,8 +22,18 @@
       align-self: flex-end;
       margin-bottom: .5rem;
 
+      @include bp-sm {
+        margin-bottom: .55rem;
+      }
+
       button {
-        
+        svg {
+          height: 15px;
+          
+           @include bp-sm {
+            height: 18px;
+           }
+        }
       }
     }
   }

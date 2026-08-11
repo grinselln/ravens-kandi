@@ -32,7 +32,7 @@ const FilterDisplay = ({isAdmin, categoryData, selectedCategoryFilters, setSelec
 
   return (
     viewableCategories.length > 0 && (
-      <div className={`${styles.accordion}${isAccordionOpen ? ` ${styles.open}` : ""}${windowBreakPoints.isMobile ? ` ${styles['mobile']}` : ""}`}>
+      <div className={`${styles.accordion}${isAccordionOpen ? ` ${styles.open}` : ""}${windowBreakPoints.isMobile ? ` ${styles['mobile']}` : ""}${isAdmin ? ` ${styles.admin}` : ""}`}>
         <div className={styles['accordion-header']}
           onClick={(e) => {
             setIsAccordionOpen(!isAccordionOpen)

@@ -26,6 +26,7 @@ import SortableCategoryAccordion from '@/components/Admin/Rows/SortableCategoryA
 import { DragDropProvider } from '@dnd-kit/react';
 import { isSortable } from '@dnd-kit/react/sortable';
 import { arrayMove } from '@dnd-kit/helpers';
+import { useWindowWidth } from '@/hooks/useWindowWidth';
 
 const queryClient = new QueryClient()
 
@@ -43,6 +44,7 @@ window.__TANSTACK_QUERY_CLIENT__ = queryClient
 const AdminCategories = () => {
   const queryClient = useQueryClient();
   
+  const { windowBreakPoints } = useWindowWidth();
   const {pendingDeleteId, warningMessage, onDismissWarningMessage, assignWarningMessage, assignRecordType, assignOnConfirm, assignPendingDeleteId} = useDeleteConfirmation();
 
   const blankCategoryRecord = {
@@ -404,7 +406,7 @@ const AdminCategories = () => {
                                 isDisabled={false}
                               />
                             : <h3>{category.title}</h3>}
-                            {linkedSubcategory && !editingTrigger && (
+                            {linkedSubcategory && !editingTrigger && !windowBreakPoints.isXS && (
                               <RowLink
                                 title={`${linkedSubcategory.triggerSubcategoryCategory.title} > ${linkedSubcategory.triggerSubcategory.title}`}
                               />
@@ -431,17 +433,19 @@ const AdminCategories = () => {
                               <RecordCount count={category.subcategories.length} label='subcategory' pluralLabel='subcategories' />
                               {category.order_index !== -1 && (
                                 <>
-                                  <ActionButton variant={'default'} icon={linkedSubcategory ? faLinkSlash : faLink} isDisabled={editingStatus.isEditing} onAction={() => {
-                                    if(!linkedSubcategory) {
-                                      handleOnEdit(category, true)
-                                    }
-                                    else {
-                                      handleOnSave({
-                                        ...category,
-                                        trigger_subcategory_id: null
-                                      });
-                                    }
-                                  }} />
+                                  {!windowBreakPoints.isXS && (
+                                    <ActionButton variant={'default'} icon={linkedSubcategory ? faLinkSlash : faLink} isDisabled={editingStatus.isEditing} onAction={() => {
+                                      if(!linkedSubcategory) {
+                                        handleOnEdit(category, true)
+                                      }
+                                      else {
+                                        handleOnSave({
+                                          ...category,
+                                          trigger_subcategory_id: null
+                                        });
+                                      }
+                                    }} />
+                                  )}
                                   {(!editingCurrent && !editingTrigger) ? (
                                     <ActionButton variant={'default'} icon={faEdit} isDisabled={editingStatus.isEditing} onAction={() => handleOnEdit(category)} />
                                   ) : (

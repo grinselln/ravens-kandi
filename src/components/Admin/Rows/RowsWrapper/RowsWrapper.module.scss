@@ -6,7 +6,8 @@
     gap: .75rem;
 
     &.subcategories {
-      //padding-left: 2rem;
-      margin-left: 2rem;
+      @include bp-md {
+        margin-left: 2rem;
+      }
     }
 }

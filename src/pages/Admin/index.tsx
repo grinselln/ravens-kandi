@@ -74,9 +74,10 @@ const Admin = () => {
     queryFn: fetchSubcategories,
   });
 
-  const { categoryTopPhotos, categoryViews, subcategoryViews } = useMemo(() => {
+  const { viewTopPhotos, categoryTopPhotos, categoryViews, subcategoryViews } = useMemo(() => {
     let categoryViewsObj: any = {};
     let subcategoryViewsObj: any = {};
+    const viewTopPhotos = (mostViewedPhotos ?? []).filter((photo: any) => photo.views !== 0);
 
     const triggerSubcategories = [...new Set((categories?.groupedCategories ?? []).map((category: any) => category.trigger_subcategory_id))];
 
@@ -109,18 +110,20 @@ const Admin = () => {
     });
 
     const categoryViews = Object.values(categoryViewsObj)
+    .filter((category: any) => category.totalViews !== 0)
     .map((category: any) => ({...category, averageViews: category.totalViews / category.totalPhotos === Infinity ? 0 : Math.round(category.totalViews / category.totalPhotos)}))
     .sort((a: any, b: any) => {
       return b.averageViews - a.averageViews
     }).slice(0, 5);
 
     const subcategoryViews = Object.values(subcategoryViewsObj)
+    .filter((subcategory: any) => subcategory.totalViews !== 0)
     .map((subcategory: any) => ({...subcategory, averageViews: subcategory.totalViews / subcategory.totalPhotos === Infinity ? 0 : Math.round(subcategory.totalViews / subcategory.totalPhotos)}))
     .sort((a: any, b: any) => {
       return b.averageViews - a.averageViews
     }).slice(0, 5);
 
-    const topFivePhotos = (mostViewedPhotos ?? []).slice(0, 5);
+    const topFivePhotos = (viewTopPhotos ?? []).slice(0, 5);
     let categoryTopPhotosObj: any = {};
 
     topFivePhotos.forEach((photo: any) => {
@@ -142,10 +145,11 @@ const Admin = () => {
     const categoryTopPhotos = Object.values(categoryTopPhotosObj)
     .sort((a: any, b: any) => b.topPhotoCount - a.topPhotoCount);
 
-    return { 
-      categoryTopPhotos,
-      categoryViews, 
-      subcategoryViews
+    return {
+      viewTopPhotos: viewTopPhotos ?? [], 
+      categoryTopPhotos: categoryTopPhotos ?? [],
+      categoryViews: categoryViews ?? [], 
+      subcategoryViews: subcategoryViews ?? []
     };
   }, [allPhotos, photoCategories, photoSubcategories, categories?.groupedCategories, categories?.groupedCategoriesMap, mostViewedPhotos]);
 
@@ -153,25 +157,25 @@ const Admin = () => {
     <LayoutAdmin>
       <div className={styles['admin-wrapper']}>
         <div className='grid'>
-          <div className='col-3'>
+          <div className='col-6 col-lg-3'>
             <div className={styles['stat-box']}>
               <span className={styles.header}>Total Photos</span>
               <span className={styles.count}>{allPhotos?.length ?? 0}</span>
             </div>
           </div>
-          <div className='col-3'>
+          <div className='col-6 col-lg-3'>
             <div className={`${styles['stat-box']} ${styles['alert']}`}>
               <span className={styles.header}>Unassigned Photos</span>
               <span className={styles.count}>{unassignedPhotos?.length ?? 0}</span>
             </div>
           </div>
-          <div className='col-3'>
+          <div className='col-6 col-lg-3'>
             <div className={`${styles['stat-box']}`}>
               <span className={styles.header}>Categories</span>
               <span className={styles.count}>{(categories?.groupedCategories?.length ?? 1) - 1}</span>
             </div>
           </div>
-          <div className='col-3'>
+          <div className='col-6 col-lg-3'>
             <div className={styles['stat-box']}>
               <span className={styles.header}>Subcategories</span>
               <span className={styles.count}>{subcategories?.length ?? 0}</span>
@@ -197,6 +201,9 @@ const Admin = () => {
             <h2>Unassigned photos</h2>
             <Link to={'/admin/photos?filter=unassigned'}>View all</Link>
           </div>
+          {(unassignedPhotos ?? []).length === 0 && (
+            <p>No unassigned photos.</p>
+          )}
           <div className={styles.photos}>
             {(unassignedPhotos ?? []).map((photo: any) => {
               const hasMissingData = !!photo.missing_type || !!photo.missing_category || !!photo.missing_subcategory;
@@ -228,8 +235,11 @@ const Admin = () => {
             <h2>Most viewed photos</h2>
             <Link to={'/admin/photos?filter=viewsD'}>View all</Link>
           </div>
+          {(viewTopPhotos).length === 0 && (
+            <p>No photos.</p>
+          )}
           <div className={styles.photos}>
-            {(mostViewedPhotos ?? []).map((photo: any) => {
+            {(viewTopPhotos).map((photo: any) => {
               return (
                 <div className={`${styles.photo}`} key={`photoView_${photo.id}`}>
                   <img src={`${baseUploadUrl}${photo.photo_filename}`} />
@@ -243,19 +253,21 @@ const Admin = () => {
               )
             })}
           </div>
-          <div className={styles['category-wrapper']}>
-            <h3>
-              Top Photo Categories
-            </h3>
-            <div className={styles['category-views']}>
-              {(categoryTopPhotos ?? []).map((category: any) => (
-                <span className={styles['category-view']}>
-                  <span>{category.title}</span>
-                  <span className={styles.views}>{category.topPhotoCount}</span>
-                </span>
-              ))}
+          {categoryTopPhotos.length > 0 && (
+            <div className={styles['category-wrapper']}>
+              <h3>
+                Top Photo Categories
+              </h3>
+              <div className={styles['category-views']}>
+                {(categoryTopPhotos).map((category: any) => (
+                  <span className={styles['category-view']}>
+                    <span>{category.title}</span>
+                    <span className={styles.views}>{category.topPhotoCount}</span>
+                  </span>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
         </div>
         <div className={styles['category-display']}>
           <h2>Most viewed categories & subcategories</h2>
@@ -264,12 +276,15 @@ const Admin = () => {
               Categories
             </h3>
             <div className={styles['category-views']}>
-              {(categoryViews ?? []).map((category: any) => (
+              {(categoryViews).map((category: any) => (
                 <span className={styles['category-view']}>
                   <span>{category.title}</span>
                   <span className={styles.views}>{category.averageViews}</span>
                 </span>
               ))}
+              {categoryViews.length === 0 && (
+                <p>No data.</p>
+              )}
             </div>
           </div>
           <div className={styles['category-wrapper']}>
@@ -277,12 +292,15 @@ const Admin = () => {
               Subcategories
             </h3>
             <div className={styles['category-views']}>
-              {(subcategoryViews ?? []).map((subcategory: any) => (
+              {(subcategoryViews).map((subcategory: any) => (
                 <span className={styles['category-view']}>
                   <span>{subcategory.title}</span>
                   <span className={styles.views}>{subcategory.averageViews}</span>
                 </span>
               ))}
+              {subcategoryViews.length === 0 && (
+                <p>No data.</p>
+              )}
             </div>
           </div>
         </div>

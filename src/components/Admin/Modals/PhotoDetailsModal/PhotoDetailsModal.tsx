@@ -11,6 +11,7 @@ import { faImages } from "@fortawesome/free-regular-svg-icons";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { addPhoto, updatePhoto } from "@/api/photos";
 import ActionButton from "../../Rows/ActionElements/ActionButton/ActionButton";
+import { useWindowWidth } from "@/hooks/useWindowWidth";
 
 interface IOption {
   label: string;
@@ -40,7 +41,11 @@ const API_UPLOAD_DIRECTORY = import.meta.env.VITE_API_UPLOAD_DIRECTORY;
 
 const PhotoDetailsModal = ({selectedPhotos = [], setSelectedPhotos, isOpen, setIsOpen, photoTypes, categories, subcategories}: IPhotoDetailsModal) => {
   const baseUploadUrl = `${API_URL}/${API_UPLOAD_DIRECTORY}/`;
+  const containerRef = useRef(null);
+
   const queryClient = useQueryClient();
+  const { windowBreakPoints } = useWindowWidth();
+
   const [uploadItems, setUploadItems] = useState<IUploadItem[]>([]);
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -199,13 +204,17 @@ const PhotoDetailsModal = ({selectedPhotos = [], setSelectedPhotos, isOpen, setI
   }, [photoTypes]);
 
   const availableCategories = useMemo(() => {
-    return (categories).filter((category: any) => category.id !== 1).map((category: any) => {
+    return (categories).filter((category: any) => {
+      const hasTriggerSubcategory = !!category.trigger_subcategory_id;
+      
+      return category.id !== 1 && (selectedSubcategories.includes(category.trigger_subcategory_id) || !hasTriggerSubcategory)
+    }).map((category: any) => {
       if(category.trigger_subcategory_id && subcategories) {
         const triggerSubcategory = subcategories.find((subcategory: any) => subcategory.id === category.trigger_subcategory_id);
         const triggerSubcategoryCategory = categories.find((category: any) => category.id === triggerSubcategory?.category_id);
 
         if(triggerSubcategory && triggerSubcategoryCategory) {
-        return {
+          return {
             ...category,
             linkedSubcategory: {
               triggerSubcategoryCategory,
@@ -217,7 +226,7 @@ const PhotoDetailsModal = ({selectedPhotos = [], setSelectedPhotos, isOpen, setI
 
       return category
     });
-  }, [categories, subcategories]);
+  }, [categories, subcategories, selectedSubcategories]);
 
   const formattedPhotoSource = useMemo(() => {
     if(photoSource === "" || photoSource === "http://") return "";
@@ -291,6 +300,25 @@ const PhotoDetailsModal = ({selectedPhotos = [], setSelectedPhotos, isOpen, setI
   }
 
   useEffect(() => {
+    const ref: any = containerRef?.current
+  if (isOpen && ref) {
+    ref.scrollTop = 0;
+  }
+}, [isOpen]);
+
+  useEffect(() => {
+    const ref: any = containerRef?.current;
+    const hasSelectedCatSub = selectedCategories.length > 0 || selectedSubcategories.length > 0;
+
+    if(ref && hasSelectedCatSub && windowBreakPoints.isMobile) {
+      ref.scrollTo({
+        top: ref.scrollHeight,
+        behavior: 'smooth'
+      });
+    }
+  }, [selectedCategories, selectedSubcategories]);
+
+  useEffect(() => {
   return () => {
     uploadItems.forEach(item => URL.revokeObjectURL(item.previewUrl));
     };
@@ -336,7 +364,7 @@ const PhotoDetailsModal = ({selectedPhotos = [], setSelectedPhotos, isOpen, setI
         </>
       }
     >
-      <div className={styles['new-photo-wrapper']}>
+      <div ref={containerRef} className={styles['new-photo-wrapper']}>
         <div className={styles['photo-details']}>
           {selectedPhotos.length <= 1 && (
             <InputText
@@ -363,14 +391,6 @@ const PhotoDetailsModal = ({selectedPhotos = [], setSelectedPhotos, isOpen, setI
                 onChange={(e) => handleFiles(e.target.files)}
               />
             )}
-            {/*{existingPhoto && (
-              <div className={`${styles['preview-grid']}`}>
-                <div className={`${styles['preview-item']}`}>
-                    <img src={`${baseUploadUrl}${existingPhoto}`} alt="" className={styles.previewImage} />
-                    <ActionButton icon={faSquareXmark} variant="alert" onAction={(e) => { e.stopPropagation(); setExistingPhoto(null) }} isDisabled={false} />
-                  </div>
-              </div>
-            )}*/}
             {uploadItems.length > 0 && (
               <div className={`${styles['preview-grid']}${uploadItems.length > 1 ? ` ${styles.multiple}` : ""}`}>
                 {uploadItems.map(item => (
@@ -438,10 +458,9 @@ const PhotoDetailsModal = ({selectedPhotos = [], setSelectedPhotos, isOpen, setI
               <div className={styles['selection-wrapper']}>
                 {availableCategories.map((category: any, idx: number) => {
                   const isCategorySelected = selectedCategories.includes(category.id);
-                  const isCategoryDisabled = !!category.trigger_subcategory_id && !selectedSubcategories.includes(category.trigger_subcategory_id);
 
                   return (
-                    <div key={`categoryDetails_${category.id}`} className={`${styles['category-selection-wrapper']}${isCategoryDisabled ? ` ${styles.disabled}` : ""}`}>
+                    <div key={`categoryDetails_${category.id}`} className={`${styles['category-selection-wrapper']}`}>
                       {idx !== 0 && (
                         <hr />
                       )}
@@ -453,26 +472,21 @@ const PhotoDetailsModal = ({selectedPhotos = [], setSelectedPhotos, isOpen, setI
                               setSelectedCategories((prev: any) => prev.filter((prevItem: any) => prevItem !== category.id));
 
                               const categorySubcategories = category.subcategories.map((subcategory: any) => subcategory.id);
-                              setSelectedSubcategories((prev: any) => prev.filter((prevItem: any) => !categorySubcategories.includes(prevItem)));
+                              setSelectedSubcategories((prev: any) => prev.filter((prevItem: any) => !categorySubcategories.includes(prevItem) && !selectedSubcategories.includes(prevItem)));
                             }
                             else {
                               setSelectedCategories((prev: any) => [...prev, category.id]);
                             }
                           }} 
-                          isDisabled={isCategoryDisabled}
+                          isDisabled={false}
                           >
                           <span className={`${styles['checkbox-select']}${isCategorySelected ? ` ${styles.selected}` : ""}`}>
                             <FontAwesomeIcon icon={isCategorySelected ? faCheckSquare : faSquare} />
                             {category.title}
                           </span>
                         </Button>
-                        {isCategoryDisabled && !!category?.linkedSubcategory && (
-                          <p className={styles['trigger-notice']}>
-                            <FontAwesomeIcon icon={faLink} /><span>hidden until triggered ({`${category.linkedSubcategory.triggerSubcategoryCategory.title} > ${category.linkedSubcategory.triggerSubcategory.title}`})</span>
-                          </p>
-                        )}
                       </div>
-                      {isCategorySelected && !isCategoryDisabled && (
+                      {isCategorySelected && (
                         <div className={styles['subcategory-selection-wrapper']}>
                           {category.subcategories.map((subcategory: any) => {
                             const isSubcategorySelected = selectedSubcategories.includes(subcategory.id);
@@ -480,10 +494,15 @@ const PhotoDetailsModal = ({selectedPhotos = [], setSelectedPhotos, isOpen, setI
                             return (
                               <Button key={`detail-subcategory_${subcategory.id}`} additionalClass="no-style" 
                                 onClick={() => {
+                                  const triggerCategory = categories.find((category) => category.trigger_subcategory_id === subcategory.id);
+
                                   if(isSubcategorySelected) {
+                                    if (triggerCategory) setSelectedCategories((prev: any) => prev.filter((prevItem: any) => prevItem !== triggerCategory.id));
+                                    
                                     setSelectedSubcategories((prev: any) => prev.filter((prevItem: any) => prevItem !== subcategory.id));
                                   }
                                   else {
+                                    if (triggerCategory) setSelectedCategories((prev: any) => [...prev, triggerCategory.id]);
                                     setSelectedSubcategories((prev: any) => [...prev, subcategory.id]);
                                   }
                                 }} 

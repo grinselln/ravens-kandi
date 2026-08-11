@@ -8,7 +8,7 @@ import { faEdit, faTrashCan } from '@fortawesome/free-regular-svg-icons';
 import InputText from '@/components/Input/InputText/InputText';
 import { useEffect, useRef, useState } from 'react';
 import { addPhotoType, addPhotoTypes, deletePhotoType, fetchPhotoTypes, reorderPhotoTypes, updatePhotoType } from '@/api/photoTypes';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import RowsWrapper from '@/components/Admin/Rows/RowsWrapper/RowsWrapper';
 import Row from '@/components/Admin/Rows/Row/Row';
 import ActionButton from '@/components/Admin/Rows/ActionElements/ActionButton/ActionButton';
@@ -20,6 +20,7 @@ import {isSortable } from '@dnd-kit/react/sortable';
 import {RestrictToVerticalAxis} from '@dnd-kit/abstract/modifiers';
 import { arrayMove} from '@dnd-kit/helpers';
 import SortableTypeRow from '@/components/Admin/Rows/SortableTypeRow/SortableTypeRow';
+import AddBulkModal from '@/components/Admin/Modals/AddBulkModal/AddBulkModal';
 
 interface IUpdatePhotoType {
   title: string,
@@ -48,12 +49,11 @@ const AdminTypes = () => {
   const [newRecordValue, setNewRecordValue] = useState<string>("");
 
   const [showAddNew, setShowAddNew] = useState<boolean>(false);
-  const [addedRecords, setAddedRecords] = useState<Array<string>>([]);
-  const [newAddedRecordValue, setNewAddedRecordValue] = useState<string>("");
   
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ['photoTypes'], 
     queryFn: fetchPhotoTypes,
+    placeholderData: keepPreviousData,
   });
 
   const addMutation = useMutation({
@@ -71,8 +71,6 @@ const AdminTypes = () => {
     mutationFn: (newRecords: Array<string>) => addPhotoTypes(newRecords),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['photoTypes'] });
-      setAddedRecords([]);
-      setNewAddedRecordValue("");
       setShowAddNew(false);
     },
     onError: (error) => {
@@ -145,10 +143,12 @@ const AdminTypes = () => {
     addMutation.mutate(newRecordValue);
   };
 
-  const handleOnAddBulk = () => {
+  const handleOnAddBulk = (addedRecords: any) => {
     if(addedRecords.length === 0) return;
 
-    addBulkMutation.mutate(addedRecords);
+    const convertedRecords = addedRecords.map((record: any) => record.title);
+
+    addBulkMutation.mutate(convertedRecords);
   };
 
   const handleOnEdit = (photoTypeRecord : IPhotoType) => {
@@ -308,51 +308,13 @@ const AdminTypes = () => {
         </RowsWrapper>
       </div>
 
-      <Modal
-        additionalClass='add-records'
-        visibility={showAddNew}
-        setVisibility={(showValue) => setShowAddNew(showValue)}
-        title={"Add Photo Types"}
-        modalButtons={
-          <>
-            <Button additionalClass="outline-muted" onClick={() => setShowAddNew(false)} isDisabled={false}>Cancel</Button>
-            <Button onClick={() => handleOnAddBulk()} isDisabled={addedRecords.length === 0}>Save photo types</Button>
-          </>
-        }
-      >
-        <div className={styles['add-record-wrapper']}>
-          {addedRecords.map((addedRecord, idx) => {
-
-            return (
-              <div className={styles['add-record']} key={`addedRecord_${addedRecord}`}>
-                <InputText
-                  wrapperClass='bulk-record-input'
-                  label='Name'
-                  value={addedRecord}
-                  setValue={() => null }
-                  isDisabled={true}
-                />
-                <ActionButton variant={"alert"} icon={faTrashCan} isDisabled={false} onAction={() => {
-                  setAddedRecords(prevItems => prevItems.filter(item => item !== addedRecord));
-                }} />
-              </div>
-            )
-          })}
-          <div className={styles['add-record']}>
-            <InputText
-              wrapperClass='bulk-record-input'
-              label='Name'
-              value={newAddedRecordValue}
-              placeholder='Photo type title'
-              setValue={(newValue) => setNewAddedRecordValue(newValue) }
-            />
-            <ActionButton variant={"default"} icon={faPlus} isDisabled={newAddedRecordValue === "" || addedRecords.includes(newAddedRecordValue)} onAction={() => {
-              setAddedRecords((prev) => [...prev, newAddedRecordValue]);
-              setNewAddedRecordValue("");
-            }} />
-          </div>
-        </div>
-      </Modal>
+      <AddBulkModal
+        showModal={showAddNew}
+        setShowModal={(showValue: any) => setShowAddNew(showValue)}
+        recordType='Type'
+        recordTypePlural='Types'
+        onSave={(newRecords: any) => handleOnAddBulk(newRecords)}
+      />
     </LayoutAdmin>
   );
 };

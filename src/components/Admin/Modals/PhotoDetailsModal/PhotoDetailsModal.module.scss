@@ -2,20 +2,26 @@
 
 .new-photo-wrapper {
   display: flex;
-  gap: 1.5rem;
-  min-height: 0;
+  flex-direction: column;
+  gap: .75rem;
   flex: 1;
-
   overflow-y: auto;
   scrollbar-color: var(--color-admin-light) transparent;
 
+  @include bp-md {
+    gap: 1.5rem;
+    flex-direction: row;
+  }
 
   .photo-details {
     display: flex;
     flex-direction: column;
     gap: 1rem;
-    width: 375px;
     flex-shrink: 0;
+
+    @include bp-md {
+      width: 375px;
+    }
 
     .upload {
       position: relative;
@@ -28,10 +34,14 @@
       background-color: var(--color-admin-bg);
       border: 2px dashed var(--color-admin-border);
       cursor: pointer;
-      flex-basis: 375px;
+      flex-basis: 250px;
       min-height: 0;
       overflow: hidden;
       flex-shrink: 0;
+
+      @include bp-md {
+        flex-basis: 375px;
+      }
 
       &.multiple {
         padding: 0rem;
@@ -88,7 +98,6 @@
             display: flex;
             justify-content: center;
             position: absolute;
-            //white-space: nowrap;
             inset: 0;
             place-self: center;
             background-color: var(--color-alert);
@@ -180,7 +189,10 @@
     flex-direction: column;
     gap: .5rem;
     flex: 1;
-    min-height: 0;
+
+    @include bp-md {
+      min-height: 0;
+    }
 
     .header {
       color: var(--color-admin-light);
@@ -190,37 +202,33 @@
 
     .accent-box-wrapper {
       display: flex;
-        flex: 1;
-        min-height: 0;
+      width: 100%;
 
       .accent-box {
         display: flex;
         flex-direction: column;
-        
         background-color: var(--color-admin-bg);
         border: 1px solid var(--color-admin-border);
         border-radius: 10px;
-        padding: 1rem .5rem;
+        padding: .5rem .5rem;
+        flex: 1;
 
-         flex: 1;
-          min-height: 0;
+        @include bp-lg {
+          padding: 1rem .5rem;
+        }
 
         .selection-wrapper {
-          flex: 1;
-          min-height: 0;
-          overflow-y: auto;
           padding: 0rem .5rem;
-          scrollbar-color: var(--color-admin-light) transparent;
 
           .category-selection-wrapper {
-          display: flex;
-          flex-direction: column;
-          gap: .5rem;
+            display: flex;
+            flex-direction: column;
+            gap: .5rem;
 
-          hr {
-            margin: 1rem 0px .5rem 0rem;
-            border: 1px solid var(--color-admin-border);
-          }
+            hr {
+              margin: 1rem 0px .5rem 0rem;
+              border: 1px solid var(--color-admin-border);
+            }
 
           .checkbox-select {
             display: flex;
@@ -264,8 +272,15 @@
           .subcategory-selection-wrapper {
             display: flex;
             flex-wrap: wrap;
-            margin-left: 1.5rem;
-            gap: .5rem;
+            gap: .25rem;
+
+            @include bp-md {
+              gap: .5rem;
+            }
+
+            @include bp-lg {
+              margin-left: 1.5rem;
+            }
 
             .checkbox-select {
               display: flex;
@@ -273,13 +288,26 @@
               align-items: center;
               background-color: var(--color-admin-primary);
               padding: .25rem .5rem;
-              font-size: .75rem;
+              font-size: .6rem;
               border-radius: 5px;
-              //gap: .25rem;
             
+              @include bp-md {
+                font-size: .75rem;
+              }
+
               svg {
-                width: 10px;
-                height: 10px;
+                width: 8px;
+                height: 8px;
+
+                @include bp-md {
+                  width: 10px;
+                  height: 10px;
+                }
+              }
+
+              span {
+                position: relative;
+                top: -1px;
               }
 
               &.selected {
