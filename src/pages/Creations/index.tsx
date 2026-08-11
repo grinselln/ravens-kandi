@@ -1,16 +1,18 @@
 import { fetchPhotoTypes } from "@/api/photoTypes";
 import Layout from "@/components/Layout/Layout";
 import PageHeader from "@/components/User/PageHeader/PageHeader";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import styles from './Creations.module.scss';
 import Button from "@/components/Input/Button/Button";
 import { fetchCategories } from "@/api/categories";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import FilterDisplay from "@/components/Shared/FilterDisplay/FilterDisplay";
 import { fetchPhotos, updateViews } from "@/api/photos";
 import ViewPhotoModal from "@/components/User/ViewPhotoModal/ViewPhotoModal";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faDiamond, faDiamondTurnRight, faSpinner, faSquare } from "@fortawesome/free-solid-svg-icons";
+import { faChevronDown, faChevronUp, faDiamond, faDiamondTurnRight, faSpinner, faSquare } from "@fortawesome/free-solid-svg-icons";
+import { useWindowWidth } from "@/hooks/useWindowWidth";
+import ActionButton from "@/components/Admin/Rows/ActionElements/ActionButton/ActionButton";
 
 interface IPhotoType {
   id: number;
@@ -19,10 +21,13 @@ interface IPhotoType {
 }
 
 const API_URL = import.meta.env.VITE_API_URL;
+const API_UPLOAD_DIRECTORY = import.meta.env.VITE_API_UPLOAD_DIRECTORY;
 
 const Creations = () => {
-  const baseUploadUrl = `${API_URL}/uploads/`;
+  const baseUploadUrl = `${API_URL}/${API_UPLOAD_DIRECTORY}/`;
   const queryClient = useQueryClient();
+  const {windowBreakPoints} = useWindowWidth();
+
   const [selectedPhotoTypes, setSelectedPhotoTypes] = useState<Array<number>>([]);
   //const [selectedSortOption, setSelectedSortOption] = useState<IOption>({label: "", value: ""});
   const [selectedCategoryFilters, setSelectedCategoryFilters] = useState<any>({});
@@ -43,6 +48,7 @@ const Creations = () => {
         //sort: isSortOption(selectedSortOption.value) ? selectedSortOption.value : ""
       })
     },
+    placeholderData: keepPreviousData,
   });
 
   const { data, isLoading, isError, error } = useQuery({
@@ -66,8 +72,32 @@ const Creations = () => {
   });
 
   const noFiltersSelected = useMemo(() => {
-    return selectedPhotoTypes.length === 0 && Object.keys(selectedCategoryFilters).length === 0
+    return Object.keys(selectedCategoryFilters).length === 0
   }, [selectedPhotoTypes, selectedCategoryFilters]);
+
+  const [activeId, setActiveId] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (activeId === null) return;
+
+    if (!windowBreakPoints.isMobile) {
+      setActiveId(null);
+      return;
+    }
+
+    const handleDropDownMouseDown = (e: MouseEvent) => { 
+      const target = e.target as HTMLElement;
+      const clickedCard = target.closest('[data-card-id]');
+
+      if (!clickedCard) {
+        // click landed outside every card — close it
+        setActiveId(null);
+      }
+    }
+
+    document.addEventListener('click', handleDropDownMouseDown);
+    return () => document.removeEventListener('click', handleDropDownMouseDown);
+  }, [activeId, windowBreakPoints.isMobile]);
   
   return (
     <Layout>
@@ -125,7 +155,15 @@ const Creations = () => {
             (photos ?? []).map((photo: any, idx: number) => {
 
               return (
-                <div className={`col-3 ${styles['photo-wrapper']}`} key={`photo_${photo.id}`}>
+                <div className={`col-6 col-md-4 col-xl-3 ${styles['photo-wrapper']}${activeId === photo.id ? ` ${styles.active}` : ''}`} key={`photo_${photo.id}`}
+                data-card-id={photo.id}  
+                onClick={() => {
+                    if (windowBreakPoints.isMobile) { 
+                      setActiveId(prev => prev === photo.id ? null : photo.id) 
+                    }
+                  }
+                }
+                >
                   <div className={styles.overlay}>
                     {photo.title && (
                       <span className={styles.title}>{photo.title}</span>

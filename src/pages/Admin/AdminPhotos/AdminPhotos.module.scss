@@ -1,4 +1,4 @@
-@use 'breakpoints' as *;
+@use '_breakpoints' as *;
 
 .photos-wrapper {
   display: flex;
@@ -179,14 +179,17 @@
             top: 12px;
             right: 12px;
 
-            &:hover {
-              opacity: 1;
+            @media (hover: hover) {
+              &:hover {
+                opacity: 1;
 
-              .checkbox-select svg {
-                color: var(--color-confirm);
-                background-color: var(--color-admin-light);
+                .checkbox-select svg {
+                  color: var(--color-confirm);
+                  background-color: var(--color-admin-light);
+                }
               }
             }
+            
 
             .checkbox-select {
               display: flex;

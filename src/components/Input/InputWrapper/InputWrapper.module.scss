@@ -1,4 +1,4 @@
-@use 'breakpoints' as *;
+@use '_breakpoints' as *;
 
 .input-field-wrapper {
   display: flex;
@@ -48,6 +48,7 @@
 
     .input-wrapper {
       input, textarea {
+        color: var(--color-text);
         background-color: rgba(var(--color-accent-rgb), .08);
         border: none;
         border-bottom: 1.5px solid var(--color-accent);
@@ -58,6 +59,10 @@
 
   .input-wrapper {
     width: 100%;
+
+    &.error input, &.error textarea {
+      border: 2px solid var(--color-alert);
+    }
 
     &.row-input {
       display: flex;

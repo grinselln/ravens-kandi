@@ -1,4 +1,4 @@
-@use 'breakpoints' as *;
+@use '_breakpoints' as *;
 
 .button {
   padding: .75rem 1rem;
@@ -21,7 +21,7 @@
     background-color: var(--color-accent);
     padding: .65rem 1.75rem;
     font-weight: 600;
-    letter-spacing: 8%;
+    letter-spacing: 5%;
   }
 
   &.accent-outline {

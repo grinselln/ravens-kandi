@@ -14,9 +14,10 @@ interface IViewPhotoModal {
 }
 
 const API_URL = import.meta.env.VITE_API_URL;
+const API_UPLOAD_DIRECTORY = import.meta.env.VITE_API_UPLOAD_DIRECTORY;
 
 const ViewPhotoModal = ({isOpen, setIsOpen, photo}: IViewPhotoModal) => {
-  const baseUploadUrl = `${API_URL}/uploads/`;
+  const baseUploadUrl = `${API_URL}/${API_UPLOAD_DIRECTORY}/`;
   
   const [copied, setCopied] = useState(false);
 
