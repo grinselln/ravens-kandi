@@ -177,8 +177,8 @@
       font-family: var(--font-heading);
       display: flex;
       align-items: center;
-      //color: var(--color-primary);
-      color: brown !important;
+      color: var(--color-primary);
+      //color: brown !important;
 
       svg { 
         width: .8rem;
@@ -190,7 +190,7 @@
         }
       }
 
-      @include bp-sm {
+      /*@include bp-sm {
         color: lightsalmon !important;
       }
 
@@ -208,7 +208,7 @@
 
       @include bp-xxl {
         color:#AFA9EC !important;
-      }
+      }*/
     }
 
     button.open {
