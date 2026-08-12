@@ -56,7 +56,7 @@ const LayoutAdmin = ({children}: ILayoutAdmin) => {
         <Modal
           visibility={warningMessage !== null}
           setVisibility={() => onDismissWarningMessage()}
-          additionalClass='delete-confirm'
+          additionalClass={['delete-confirm']}
           title={`Confirm ${recordType} Deletion`}
           modalButtons={
             <>

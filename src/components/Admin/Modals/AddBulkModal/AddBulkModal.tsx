@@ -35,7 +35,7 @@ const AddBulkModal = ({ records, recordType, recordTypePlural, dropdownData, sho
 
   return (
     <Modal
-      additionalClass='add-records'
+      additionalClass={['add-records']}
       visibility={showModal}
       setVisibility={() => resetStates()}
       title={`Add ${recordTypePlural}`}

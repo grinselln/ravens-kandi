@@ -40,7 +40,7 @@ const Row = ({ additionalClass, title, order, isInverse, isAccordion, isNew, isO
         {((!isOrderingHidden || isAccordion || (order !== null && order !== -1)) && !isSimple) && (
           <div className={styles.icons}>
             {!isOrderingHidden && (
-              <ActionButton ref={dragHandleRef} additionalClass={isNew ? "new-grip" : "grip"} variant='default' icon={faGrip} 
+              <ActionButton ref={dragHandleRef} additionalClass={[isNew ? "new-grip" : "grip"]} variant='default' icon={faGrip} 
               isDisabled={isOrderingDisabled} onAction={() => {}}
               />
             )}
