@@ -50,7 +50,7 @@ const AddCategoryModal = ({ isOpen, setIsOpen, triggerSubcategories, subcategori
 
   return (
     <Modal
-        additionalClass='add-category'
+        additionalClass={['add-category']}
         visibility={isOpen}
         setVisibility={() => {
           setIsOpen(false);

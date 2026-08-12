@@ -155,7 +155,7 @@ const Creations = () => {
             (photos ?? []).map((photo: any, idx: number) => {
 
               return (
-                <div className={`col-6 col-md-4 col-xl-3 ${styles['photo-wrapper']}${activeId === photo.id ? ` ${styles.active}` : ''}`} key={`photo_${photo.id}`}
+                <div className={`col col-sm-6 col-md-4 col-xl-3 ${styles['photo-wrapper']}${activeId === photo.id ? ` ${styles.active}` : ''}`} key={`photo_${photo.id}`}
                 data-card-id={photo.id}  
                 onClick={() => {
                     if (windowBreakPoints.isMobile) { 

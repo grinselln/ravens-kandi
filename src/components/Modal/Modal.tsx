@@ -2,14 +2,15 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import styles from './Modal.module.scss';
 import { faClose } from '@fortawesome/free-solid-svg-icons';
 import { useEffect } from 'react';
+import clsx from 'clsx';
 
 interface IModal {
   visibility: boolean;
   setVisibility?: (value: boolean) => void;
-  additionalClass?: string;
+  additionalClass?: string[];
   title: string;
   children: React.ReactNode;
-  modalButtons: React.ReactNode;
+  modalButtons: React.ReactNode; 
 }
 
 const Modal = ({ visibility, setVisibility, additionalClass, title, children, modalButtons } : IModal) => {
@@ -24,10 +25,14 @@ const Modal = ({ visibility, setVisibility, additionalClass, title, children, mo
     };
   }, [visibility]);
 
-  
   return (
     <>
-      <div className={`${styles.modal}${visibility ? ` ${styles.open}` : ""}${additionalClass ? ` ${styles[additionalClass]}` : ""}`}>
+      <div 
+        className={clsx(
+          styles.modal,
+          visibility ? styles.open : "",
+          ...(additionalClass ?? []).map((cls: string) => styles[cls])
+        )}>
         <div className={styles.header}>
           <h3>{title}</h3>
           {!!setVisibility && (
@@ -37,8 +42,10 @@ const Modal = ({ visibility, setVisibility, additionalClass, title, children, mo
           )}
           
         </div>
-        <div className={styles.body}>
-          {children}
+        <div className={styles['body-wrapper']}>
+          <div className={styles.body}>
+            {children}
+          </div>
         </div>
         {!!modalButtons && (
           <div className={styles.footer}>

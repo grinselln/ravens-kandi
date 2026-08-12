@@ -24,6 +24,12 @@
     display: flex;
   }
 
+  &.fit-content {
+    @include bp-md {
+      width: unset !important;
+    }
+  }
+
   .header {
     display: flex;
     align-items: center;
@@ -53,12 +59,10 @@
 
   .body {
     padding: 1.3rem .65rem;
-
     flex: 1;
     min-height: 0;
     overflow: hidden;
-
-        display: flex;
+    display: flex;
 
     &> div {
       padding: 0rem .65rem;
@@ -120,15 +124,16 @@
   }
 
   &.view-photo {
-    height: unset;
-    width: 85%;
     max-width: 1000px;
     background-color: var(--color-primary-bg);
     min-width: unset;
+    height: unset;
+    width: 95%;
+    max-height: 90%;
     border-radius: 5px;
 
-    @include bp-sm {
-      width: 75%;
+    @include bp-md {
+      width: 90%;
     }
 
     @include bp-md {
@@ -146,23 +151,15 @@
         fill: var(--color-primary);
       }
     }
+
+    .body-wrapper {
+      overflow-y: auto;
+      scrollbar-color: var(--color-primary) transparent;
+    }
   }
 
   &.view-photo-o {
-    height: unset;
-    width: 85%;
-    max-width: 1000px;
     background-color: var(--color-accent-bg);
-    min-width: unset;
-    border-radius: 5px;
-
-    @include bp-sm {
-      width: 75%;
-    }
-
-    @include bp-md {
-      min-width: 500px;
-    }
 
     .header {
       border-color: var(--color-accent);
@@ -174,6 +171,10 @@
       svg path {
         fill: var(--color-accent);
       }
+    }
+
+    .body-wrapper {
+      scrollbar-color: var(--color-accent) transparent;
     }
   }
 

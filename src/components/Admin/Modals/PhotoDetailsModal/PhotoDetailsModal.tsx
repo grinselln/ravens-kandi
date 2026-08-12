@@ -349,7 +349,7 @@ const PhotoDetailsModal = ({selectedPhotos = [], setSelectedPhotos, isOpen, setI
         : selectedPhotos.length > 1
         ? "Edit Photo"
         : "Add Photo"}
-      additionalClass="add-photo"
+      additionalClass={["add-photo"]}
       modalButtons={
         <>
           <Button additionalClass="outline-muted" onClick={() => {
