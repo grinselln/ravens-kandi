@@ -57,6 +57,11 @@
     }
   }
 
+  .body-wrapper {
+    flex: 1;
+    overflow-y: auto;
+  }
+
   .body {
     padding: 1.3rem .65rem;
     flex: 1;
@@ -153,7 +158,6 @@
     }
 
     .body-wrapper {
-      overflow-y: auto;
       scrollbar-color: var(--color-primary) transparent;
     }
   }

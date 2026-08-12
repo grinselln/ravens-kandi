@@ -420,7 +420,6 @@ const PhotoDetailsModal = ({selectedPhotos = [], setSelectedPhotos, isOpen, setI
           )}
 
           {uploadItems.length <= 1 && (
-            <>
             <div className={styles.source}>
               <InputText
                 label='Source'
@@ -433,16 +432,17 @@ const PhotoDetailsModal = ({selectedPhotos = [], setSelectedPhotos, isOpen, setI
                 <p className="alert">Invalid URL</p>
               )}
             </div>
-              <InputTextArea
-                label='Story'
-                placeholder='Details of the interaction...'
-                value={photoStory}
-                setValue={(story) => setPhotoStory(story)}
-              />
-            </>
           )}
         </div>
         <div className={styles['category-details']}>
+          {uploadItems.length <= 1 && (
+            <InputTextArea
+              label='Story'
+              placeholder='Details of the interaction...'
+              value={photoStory}
+              setValue={(story) => setPhotoStory(story)}
+            />
+          )}
           <InputDropDown
             label='Photo type'
             placeholder='Select photo type'
