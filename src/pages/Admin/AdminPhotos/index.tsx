@@ -1,11 +1,10 @@
 import LayoutAdmin from '@/components/Layout/LayoutAdmin';
 import styles from './AdminPhotos.module.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus, faClose, faTag, faTableCellsLarge, faTableList, faChevronDown, faCheckSquare, faSquare, faSpinner, faCheck, faSquareXmark } from '@fortawesome/free-solid-svg-icons';
-import { faEdit, faEye, faImages, faTrashCan } from '@fortawesome/free-regular-svg-icons';
+import { faPlus, faTag, faTableCellsLarge, faTableList, faCheckSquare, faSquare, faSpinner } from '@fortawesome/free-solid-svg-icons';
+import { faEdit, faEye, faTrashCan } from '@fortawesome/free-regular-svg-icons';
 import InputText from '@/components/Input/InputText/InputText';
 import { useEffect, useMemo, useState } from 'react';
-import InputTextArea from '@/components/Input/InputTextArea/InputTextArea';
 import InputDropDown from '@/components/Input/InputDropDown/InputDropDown';
 import DashboardHeader from '@/components/Admin/DashboardHeader/DashboardHeader';
 import Button from '@/components/Input/Button/Button';
@@ -14,10 +13,8 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import PhotoDetailsModal from '@/components/Admin/Modals/PhotoDetailsModal/PhotoDetailsModal';
 import { fetchCategories, fetchPhotoCategories } from '@/api/categories';
 import { fetchPhotoSubcategories, fetchSubcategories } from '@/api/subcategories';
-import { deletePhoto, fetchPhotos, fetchPhotosAdmin } from '@/api/photos';
+import { deletePhoto, fetchPhotosAdmin } from '@/api/photos';
 import ActionButton from '@/components/Admin/Rows/ActionElements/ActionButton/ActionButton';
-import RowAccordion from '@/components/Admin/Rows/RowAccordion/RowAccordion';
-import Row from '@/components/Admin/Rows/Row/Row';
 import FilterDisplay from '@/components/Shared/FilterDisplay/FilterDisplay';
 import { useSearchParams } from 'react-router-dom';
 
@@ -48,7 +45,6 @@ const AdminPhotos = () => {
   const [selectedPhotoTypes, setSelectedPhotoTypes] = useState<Array<number>>([]);
   const [selectedSortOption, setSelectedSortOption] = useState<IOption>({label: "", value: ""});
   const [selectedCategoryFilters, setSelectedCategoryFilters] = useState<any>({});
-  const [selectedSubcategories, setSelectedSubcategories] = useState<Array<number>>([]);
   const [selectedBulkEdit, setSelectedBulkEdit] = useState<Array<IUploadItem>>([]);
   const [selectedAlerts, setSelectedAlerts] = useState<any>({missingType: false, missingCategory: false, missingSubcategory: false})
   const [isAddModalOpen, setIsAddModalOpen] = useState<boolean>(false);
@@ -106,7 +102,7 @@ const AdminPhotos = () => {
     queryFn: fetchPhotoSubcategories
   });
   
-  const { data: photoTypes, isLoading, isError, error } = useQuery({
+  const { data: photoTypes } = useQuery({
     queryKey: ['photoTypes'], 
     queryFn: fetchPhotoTypes,
   });
@@ -216,8 +212,7 @@ const AdminPhotos = () => {
     const subcategoriesEqual = allItemsEqual(selectedBulkPhotos?.subcategories ?? []);
 
     return selectedBulkPhotos.every((photo: any) => {
-      return photo.title === selectedBulkPhotos[0].title
-      && photo.photo_type_id === selectedBulkPhotos[0].photo_type_id
+      return photo.photo_type_id === selectedBulkPhotos[0].photo_type_id
       && categoriesEqual
       && subcategoriesEqual
     });
@@ -394,7 +389,15 @@ const AdminPhotos = () => {
                 return (
                   <div className={`col-6 col-sm-4 col-xl-3 ${styles['photo-wrapper']}${missingData.hasMissingData ? ` ${styles.alert}` : ""}`} key={`photo_${photo.id}`}>
                     <div className={styles['image-wrapper']}>
-                      <img src={`${baseUploadUrl}${photo.photo_filename}`} />
+                      <img src={`${baseUploadUrl}${photo.photo_filename}`} onClick={() => {
+                        if (isBulkEdit) {
+                          if(selectedBulkEdit.some((item: any) => item.id === photo.id)) {
+                            setSelectedBulkEdit((prev: any) => prev.filter((prevItem:any) => prevItem.id !== photo.id))
+                          } else {
+                            handleBulkAdd(photo);
+                          }
+                        }
+                      }} />
                       <div className={styles.badges}>
                         {getMissingData(photo).hasMissingData && (
                           <div className={styles.alerts}>
@@ -452,9 +455,9 @@ const AdminPhotos = () => {
                         </div>
                         <div className={styles.actions}>
                           <ActionButton variant='default' icon={faEdit} onAction={() => setSelectedEditPhotos([photo])} isDisabled={false} />
-                            <ActionButton variant='alert' icon={faTrashCan} onAction={() => {
-                              handleBulkAdd({...photo, isDelete: true})
-                            }} isDisabled={false} />
+                          <ActionButton variant='alert' icon={faTrashCan} onAction={() => {
+                            handleBulkAdd({...photo, isDelete: true})
+                          }} isDisabled={false} />
                         </div>
                       </div>
                     </div>
