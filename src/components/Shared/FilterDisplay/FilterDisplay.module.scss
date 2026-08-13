@@ -167,12 +167,10 @@
   }
 
   &.admin {
-
     @include bp-md {
       padding: 0rem .5rem;
     }
     
-
     .category {
       gap: .8rem;
 

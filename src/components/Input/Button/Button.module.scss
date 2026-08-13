@@ -79,8 +79,13 @@
       border-color: var(--color-primary);
       color: var(--color-primary);
       background-color: var(--color-admin-light);
-      font-weight: 600;
-      font-style: italic;
+      text-shadow: 0.4px 0 0 currentColor, -0.4px 0 0 currentColor;
+      
+
+      span {
+        transform: skewX(-10deg);
+        display: inline-block;
+      }
     }
   }
 
