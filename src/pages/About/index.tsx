@@ -1,13 +1,11 @@
-import Button from '@/components/Input/Button/Button';
 import styles from './About.module.scss'
-import Layout from "@/components/Layout/Layout";
 import PageHeader from "@/components/User/PageHeader/PageHeader";
 import { Link } from 'react-router-dom';
 
 
 const About = () => {
   return (
-    <Layout>
+    <>
       <PageHeader 
         title="About Me" 
         subtitle="how making kandi & perlers" 
@@ -247,7 +245,7 @@ const About = () => {
         <h1>Want to say hello?</h1>
         <Link to={"/contact"} className='accent'><span>Send Me A Message</span></Link>
       </div>
-    </Layout>
+    </>
   );
 };
 

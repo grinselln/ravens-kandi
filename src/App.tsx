@@ -10,6 +10,7 @@ import AdminCategories from './pages/Admin/AdminCategories';
 import AdminTypes from './pages/Admin/AdminTypes';
 import { useEffect } from 'react';
 import Login from './pages/Login/Login';
+import Layout from './components/Layout/Layout';
 
 function App() {
   useEffect(() => {
@@ -39,15 +40,17 @@ function App() {
   
   return (
     <Routes>
-      <Route path="/" element={<Home />} />
-      <Route path="/creations" element={<Creations />} />
-      <Route path="/about" element={<About />} />
-      <Route path="/contact" element={<Contact />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/admin" element={<RequireAuth><Admin /></RequireAuth>} />
-      <Route path="/admin/photos" element={<RequireAuth><AdminPhotos /></RequireAuth>} />
-      <Route path="/admin/categories" element={<RequireAuth><AdminCategories /></RequireAuth>} />
-      <Route path="/admin/types" element={<RequireAuth><AdminTypes /></RequireAuth>} />
+      <Route element={<Layout />}>
+        <Route path="/" element={<Home />} />
+        <Route path="/creations" element={<Creations />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/admin" element={<RequireAuth><Admin /></RequireAuth>} />
+        <Route path="/admin/photos" element={<RequireAuth><AdminPhotos /></RequireAuth>} />
+        <Route path="/admin/categories" element={<RequireAuth><AdminCategories /></RequireAuth>} />
+        <Route path="/admin/types" element={<RequireAuth><AdminTypes /></RequireAuth>} />
+      </Route>
     </Routes>
   );
 }

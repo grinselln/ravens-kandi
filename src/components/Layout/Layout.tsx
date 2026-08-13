@@ -1,4 +1,4 @@
-import { Link, NavLink, useNavigate } from 'react-router-dom'
+import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import styles from './Layout.module.scss'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faInstagram } from '@fortawesome/free-brands-svg-icons'
@@ -16,13 +16,11 @@ import { getMe, logout } from '@/api/auth';
 const API_URL = import.meta.env.VITE_API_URL;
 const API_URL_ORIGIN = new URL(API_URL).origin;
 
-interface LayoutProps {
-  children: React.ReactNode
-  darkNav?: boolean
-  isAdmin?: boolean;
-}
-
-function Layout({ children, darkNav = false, isAdmin = false }: LayoutProps) {
+function Layout() {
+  const location = useLocation();
+  const isDarkNav = location.pathname === '/';
+  const isAdmin = location.pathname.startsWith('/admin');
+  
   const navigate = useNavigate();
   const {isSessionExpired, dismissSessionExpired} = useSessionStore();
   const { user } = useAuth();
@@ -86,13 +84,14 @@ function Layout({ children, darkNav = false, isAdmin = false }: LayoutProps) {
       window.removeEventListener('message', handler);
       clearPoll();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
-    <div className={`${styles.layout} ${darkNav ? styles['nav-dark'] : ''} ${isAdmin ? styles['admin'] : ''}`}>
+    <div className={`${styles.layout} ${isDarkNav ? styles['nav-dark'] : ''} ${isAdmin ? styles['admin'] : ''}`}>
       <nav className={styles.nav}>
         <Link to="/" className={styles.logo}>Raven's<FontAwesomeIcon icon={faDiamond} />Kandi</Link>
-        {!darkNav && !isAdmin && (
+        {!isDarkNav && !isAdmin && (
           <>
             <button className={styles.open} onClick={() => setIsMobileNavOpen(!isMobileNavOpen)}><FontAwesomeIcon icon={faBars} /></button>
             <div className={`${styles['nav-links-wrapper']}${isMobileNavOpen ? ` ${styles.open}` : ""}`}>
@@ -121,7 +120,7 @@ function Layout({ children, darkNav = false, isAdmin = false }: LayoutProps) {
           </div>
         )}
       </nav>
-      <main>{children}</main>
+      <main><Outlet /></main>
       <Modal
         visibility={isSessionExpired}
         title='Session Expired'

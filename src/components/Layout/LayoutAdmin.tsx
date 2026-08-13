@@ -1,9 +1,7 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import styles from './LayoutAdmin.module.scss'
-import Layout from "@/components/Layout/Layout";
-import { faHouse, faImage, faTableCellsLarge, faTableList, faTag } from '@fortawesome/free-solid-svg-icons';
+import { faHouse, faImage, faTableCellsLarge, faTag } from '@fortawesome/free-solid-svg-icons';
 import { Link } from 'react-router-dom';
-import { useState } from 'react';
 import Modal from '../Modal/Modal';
 import Button from '../Input/Button/Button';
 import { useDeleteConfirmation } from '../Admin/Providers/DeleteModalProvider';
@@ -25,54 +23,52 @@ const LayoutAdmin = ({children}: ILayoutAdmin) => {
   const currentPage = window.location.pathname.replace("/admin", "").replace("/", "");
   
   return (
-    <Layout isAdmin={true}>
-        <div className={styles.sidebar}>
-          <ul>
-            <li>
-              <Link to="/admin" className={currentPage === links.DASHBOARD ? styles.active : ""}>
-                <span><FontAwesomeIcon icon={faHouse} /> <span>Dashboard</span></span>
-              </Link>
-            </li>
-            <li>
-              <Link to="/admin/photos" className={currentPage === links.PHOTOS ? styles.active : ""}>
-                <FontAwesomeIcon icon={faImage} /> Photos
-              </Link>
-            </li>
-            <li>
-              <Link to="/admin/types" className={currentPage === links.TYPES ? styles.active : ""}>
-                <FontAwesomeIcon icon={faTag} /> Types
-              </Link>
-            </li>
-            <li>
-              <Link to="/admin/categories" className={currentPage === links.CATEGORIES ? styles.active : ""}>
-                <FontAwesomeIcon icon={faTableCellsLarge} /> Categories
-              </Link>
-            </li>
-          </ul>
-        </div>
-        <div className={styles.body}>
-          {children}
-        </div>
-        <Modal
-          visibility={warningMessage !== null}
-          setVisibility={() => onDismissWarningMessage()}
-          additionalClass={['delete-confirm']}
-          title={`Confirm ${recordType} Deletion`}
-          modalButtons={
-            <>
-              <Button additionalClass="outline-muted" onClick={() => onDismissWarningMessage()} isDisabled={false}>Cancel</Button>
-              <Button additionalClass="alert" onClick={() => onConfirmWarning ? onConfirmWarning() : null} isDisabled={false}>Delete</Button>
-            </>
-          }
-        >
-          <p>{warningMessage}</p>
+    <>
+      <div className={styles.sidebar}>
+        <ul>
+          <li>
+            <Link to="/admin" className={currentPage === links.DASHBOARD ? styles.active : ""}>
+              <span><FontAwesomeIcon icon={faHouse} /> <span>Dashboard</span></span>
+            </Link>
+          </li>
+          <li>
+            <Link to="/admin/photos" className={currentPage === links.PHOTOS ? styles.active : ""}>
+              <FontAwesomeIcon icon={faImage} /> Photos
+            </Link>
+          </li>
+          <li>
+            <Link to="/admin/types" className={currentPage === links.TYPES ? styles.active : ""}>
+              <FontAwesomeIcon icon={faTag} /> Types
+            </Link>
+          </li>
+          <li>
+            <Link to="/admin/categories" className={currentPage === links.CATEGORIES ? styles.active : ""}>
+              <FontAwesomeIcon icon={faTableCellsLarge} /> Categories
+            </Link>
+          </li>
+        </ul>
+      </div>
+      <div className={styles.body}>
+        {children}
+      </div>
+      <Modal
+        visibility={warningMessage !== null}
+        setVisibility={() => onDismissWarningMessage()}
+        additionalClass={['delete-confirm']}
+        title={`Confirm ${recordType} Deletion`}
+        modalButtons={
+          <>
+            <Button additionalClass="outline-muted" onClick={() => onDismissWarningMessage()} isDisabled={false}>Cancel</Button>
+            <Button additionalClass="alert" onClick={() => onConfirmWarning ? onConfirmWarning() : null} isDisabled={false}>Delete</Button>
+          </>
+        }
+      >
+        <p>{warningMessage}</p>
       </Modal>
-    </Layout>
+    </>
+
   );
 };
 
 export default LayoutAdmin;
-function useSatate<T>(DASHBOARD: string): [any, any] {
-  throw new Error('Function not implemented.');
-}
 
