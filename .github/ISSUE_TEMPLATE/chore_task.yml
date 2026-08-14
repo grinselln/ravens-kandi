@@ -3,18 +3,6 @@ description: Code maintenance or clean up
 title: "[Chore]: "
 labels: ["chore"]
 body:
-  - type: dropdown
-    id: area
-    attributes:
-      label: Area
-      description: Which part of the site does this affect?
-      options:
-        - public-site
-        - admin
-        - infra
-    validations:
-      required: true
-
   - type: textarea
     id: task
     attributes:

@@ -3,18 +3,6 @@ description: Functionality optimization and organization
 title: "[Refactor]: "
 labels: ["refactor"]
 body:
-  - type: dropdown
-    id: area
-    attributes:
-      label: Area
-      description: Which part of the site does this affect?
-      options:
-        - public-site
-        - admin
-        - infra
-    validations:
-      required: true
-
   - type: textarea
     id: opportunity
     attributes:

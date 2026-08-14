@@ -3,18 +3,6 @@ description: Something is broken or not working as expected
 title: "[Bug]: "
 labels: ["bug"]
 body:
-  - type: dropdown
-    id: area
-    attributes:
-      label: Area
-      description: Which part of the site does this affect?
-      options:
-        - public-site
-        - admin
-        - infra
-    validations:
-      required: true
-
   - type: textarea
     id: actual
     attributes:
