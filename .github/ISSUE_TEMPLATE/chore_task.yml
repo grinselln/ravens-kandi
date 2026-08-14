@@ -1,0 +1,40 @@
+name: Chore Task
+description: Code maintenance or clean up
+title: "[Chore]: "
+labels: ["chore"]
+body:
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      description: Which part of the site does this affect?
+      options:
+        - public-site
+        - admin
+        - infra
+    validations:
+      required: true
+
+  - type: textarea
+    id: task
+    attributes:
+      label: Task
+      description: What needs to be done?
+    validations:
+      required: true
+
+  - type: textarea
+    id: approach
+    attributes:
+      label: Proposed approach
+      description: Rough idea of how you'd tackle this — doesn't need to be final
+    validations:
+      required: true
+
+  - type: textarea
+    id: notes
+    attributes:
+      label: Notes / open questions
+      description: Unresolved decisions, dependencies on other issues, things to figure out along the way
+    validations:
+      required: false
