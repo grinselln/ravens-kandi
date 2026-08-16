@@ -1,12 +1,13 @@
+import { IAdminPhotosQueryData, IPublicPhotoFetchData, IPublicPhotosQueryData, IUpdatePhoto } from "@/interfaces/IPhotos";
 import { apiFetch } from "./apiFetch";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
 export const fetchPhotos = async (data: {
   type: Array<number> | null,
-  filters: Array<any> | null,
+  filters: Array<IPublicPhotoFetchData> | null,
   //sort: "" | "alpha" | "viewsA" | "viewsD"
-}) => {
+}): Promise<IPublicPhotosQueryData> => {
   return apiFetch(`${API_URL}/photos`, { requiresAuth: false }, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -16,12 +17,12 @@ export const fetchPhotos = async (data: {
 
 export const fetchPhotosAdmin = async (data: {
   type: Array<number> | null,
-  filters: Array<any> | null,
+  filters: Array<IPublicPhotoFetchData> | null,
   missingType: boolean | null,
   missingCategory: boolean | null,
   missingSubcategory: boolean | null,
   sort: "" | "alpha" | "viewsA" | "viewsD"
-}) => {
+}): Promise<IAdminPhotosQueryData> => {
   return apiFetch(`${API_URL}/photos/admin`, { requiresAuth: true }, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -49,7 +50,7 @@ export const addPhoto = async (data: {title: string, story: string, source: stri
   })
 }
 
-export const updatePhoto = async (id: number, data: any) => {
+export const updatePhoto = async (id: number, data: IUpdatePhoto) => {
   return apiFetch(`${API_URL}/photos/${id}`, {requiresAuth: true}, {
     method: 'PUT',
     headers: {

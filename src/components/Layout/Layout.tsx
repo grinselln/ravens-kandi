@@ -86,7 +86,7 @@ function Layout({ children, darkNav = false, isAdmin = false }: LayoutProps) {
       window.removeEventListener('message', handler);
       clearPoll();
     }
-  }, []);
+  }, [dismissSessionExpired]);
 
   return (
     <div className={`${styles.layout} ${darkNav ? styles['nav-dark'] : ''} ${isAdmin ? styles['admin'] : ''}`}>
@@ -115,7 +115,7 @@ function Layout({ children, darkNav = false, isAdmin = false }: LayoutProps) {
                 await logout();
                 navigate("/login");
               } catch (err) {
-                // error message
+                console.log("[logout error]: ", err);
               }
             }} />
           </div>

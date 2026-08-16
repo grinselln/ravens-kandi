@@ -1,12 +1,13 @@
+import { IPhotoSubcategoriesQueryData, ISubcategory } from "@/interfaces/ISubcategories";
 import { apiFetch } from "./apiFetch";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
-export const fetchSubcategories = async () => {
+export const fetchSubcategories = async (): Promise<Array<ISubcategory>> => {
   return apiFetch(`${API_URL}/subcategories`, {requiresAuth: false});
 };
 
-export const fetchPhotoSubcategories = async () => {
+export const fetchPhotoSubcategories = async (): Promise<IPhotoSubcategoriesQueryData> => {
   return apiFetch(`${API_URL}/subcategories/photoSubcategories`, {requiresAuth: true});
 };
 
