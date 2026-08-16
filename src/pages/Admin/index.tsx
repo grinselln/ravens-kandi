@@ -1,21 +1,21 @@
 import LayoutAdmin from '@/components/Layout/LayoutAdmin';
 import styles from './Admin.module.scss';
-import Button from '@/components/Input/Button/Button';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEye, faPlus, faTableCellsLarge, faTableList, faTag } from '@fortawesome/free-solid-svg-icons';
+import { faEye, faTableCellsLarge, faTableList, faTag } from '@fortawesome/free-solid-svg-icons';
 import { Link } from 'react-router-dom';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { fetchPhotosAdmin } from '@/api/photos';
 import { fetchCategories, fetchPhotoCategories } from '@/api/categories';
 import { fetchPhotoSubcategories, fetchSubcategories } from '@/api/subcategories';
 import { useMemo } from 'react';
+import { IAdminQueryPhoto, IPhotoCategoryViews, IPhotoCategoryViewsAvg, IPhotoTopCount } from '@/interfaces/IPhotos';
+import { ICategoryQueryGroupedCategory, IPhotoCategory } from '@/interfaces/ICategories';
+import { IPhotoSubcategory } from '@/interfaces/ISubcategories';
 
 const API_URL = import.meta.env.VITE_API_URL;
 const API_UPLOAD_DIRECTORY = import.meta.env.VITE_API_UPLOAD_DIRECTORY;
 
 const Admin = () => {
-  const queryClient = useQueryClient();
-
   const baseUploadUrl = `${API_URL}/${API_UPLOAD_DIRECTORY}/`;
 
   const { data: allPhotos } = useQuery({
@@ -75,17 +75,17 @@ const Admin = () => {
   });
 
   const { viewTopPhotos, categoryTopPhotos, categoryViews, subcategoryViews } = useMemo(() => {
-    let categoryViewsObj: any = {};
-    let subcategoryViewsObj: any = {};
-    const viewTopPhotos = (mostViewedPhotos ?? []).filter((photo: any) => photo.views !== 0);
+    const categoryViewsObj = {} as Record<number, IPhotoCategoryViews>;
+    const subcategoryViewsObj = {} as Record<number, IPhotoCategoryViews>;
+    const viewTopPhotos = (mostViewedPhotos ?? []).filter((photo: IAdminQueryPhoto) => photo.views !== 0);
 
-    const triggerSubcategories = [...new Set((categories?.groupedCategories ?? []).map((category: any) => category.trigger_subcategory_id))];
+    const triggerSubcategories = [...new Set((categories?.groupedCategories ?? []).map((category: ICategoryQueryGroupedCategory) => category.trigger_subcategory_id))];
 
-    (allPhotos ?? []).forEach((photo: any) => {
-      (photoCategories?.[photo.id] ?? []).forEach((category: any) => {
+    (allPhotos ?? []).forEach((photo: IAdminQueryPhoto) => {
+      (photoCategories?.[photo.id] ?? []).forEach((category: IPhotoCategory) => {
         const viewData = categoryViewsObj[category.id];
-        const currentViews = !!viewData ? viewData.totalViews : 0;
-        const currentPhotos = !!viewData ? viewData.totalPhotos : 0;
+        const currentViews = viewData?.totalViews ?? 0;
+        const currentPhotos = viewData?.totalPhotos ?? 0;
 
         categoryViewsObj[category.id] = {
           title: category.title,
@@ -94,10 +94,10 @@ const Admin = () => {
         }
       });
 
-      (photoSubcategories?.[photo.id] ?? []).forEach((subcategory: any) => {
+      (photoSubcategories?.[photo.id] ?? []).forEach((subcategory: IPhotoSubcategory) => {
         const viewData = subcategoryViewsObj[subcategory.id];
-        const currentViews = !!viewData ? viewData.totalViews : 0;
-        const currentPhotos = !!viewData ? viewData.totalPhotos : 0;
+        const currentViews = viewData?.totalViews ?? 0;
+        const currentPhotos = viewData?.totalPhotos ?? 0;
 
         if(!triggerSubcategories.includes(subcategory.id)) {
           subcategoryViewsObj[subcategory.id] = {
@@ -109,29 +109,29 @@ const Admin = () => {
       });
     });
 
-    const categoryViews = Object.values(categoryViewsObj)
-    .filter((category: any) => category.totalViews !== 0)
-    .map((category: any) => ({...category, averageViews: category.totalViews / category.totalPhotos === Infinity ? 0 : Math.round(category.totalViews / category.totalPhotos)}))
-    .sort((a: any, b: any) => {
+    const categoryViews: Array<IPhotoCategoryViews> = Object.values(categoryViewsObj)
+    .filter((category: IPhotoCategoryViews) => category.totalViews !== 0)
+    .map((category: IPhotoCategoryViews) => ({...category, averageViews: category.totalViews / category.totalPhotos === Infinity ? 0 : Math.round(category.totalViews / category.totalPhotos)}))
+    .sort((a: IPhotoCategoryViewsAvg, b: IPhotoCategoryViewsAvg) => {
       return b.averageViews - a.averageViews
     }).slice(0, 5);
 
-    const subcategoryViews = Object.values(subcategoryViewsObj)
-    .filter((subcategory: any) => subcategory.totalViews !== 0)
-    .map((subcategory: any) => ({...subcategory, averageViews: subcategory.totalViews / subcategory.totalPhotos === Infinity ? 0 : Math.round(subcategory.totalViews / subcategory.totalPhotos)}))
-    .sort((a: any, b: any) => {
+    const subcategoryViews: Array<IPhotoCategoryViews> = Object.values(subcategoryViewsObj)
+    .filter((subcategory: IPhotoCategoryViews) => subcategory.totalViews !== 0)
+    .map((subcategory: IPhotoCategoryViews) => ({...subcategory, averageViews: subcategory.totalViews / subcategory.totalPhotos === Infinity ? 0 : Math.round(subcategory.totalViews / subcategory.totalPhotos)}))
+    .sort((a: IPhotoCategoryViewsAvg, b: IPhotoCategoryViewsAvg) => {
       return b.averageViews - a.averageViews
     }).slice(0, 5);
 
     const topFivePhotos = (viewTopPhotos ?? []).slice(0, 5);
-    let categoryTopPhotosObj: any = {};
+    const categoryTopPhotosObj = {} as Record<number, IPhotoTopCount>;
 
-    topFivePhotos.forEach((photo: any) => {
+    topFivePhotos.forEach((photo: IAdminQueryPhoto) => {
       const categoryList = photoCategories?.[photo.id] ?? [];
 
-      categoryList.forEach((category: any) => {
+      categoryList.forEach((category: IPhotoCategory) => {
         const categoryOrder = categories?.groupedCategoriesMap?.[category.id]?.order_index ?? 0;
-        const currentPhotoCount = !!categoryTopPhotosObj[category.id] ? categoryTopPhotosObj[category.id].topPhotoCount : 0;
+        const currentPhotoCount = categoryTopPhotosObj[category.id] ? categoryTopPhotosObj[category.id].topPhotoCount : 0;
 
         if(categoryOrder !== 0) {
           categoryTopPhotosObj[category.id] = {
@@ -143,7 +143,7 @@ const Admin = () => {
     });
 
     const categoryTopPhotos = Object.values(categoryTopPhotosObj)
-    .sort((a: any, b: any) => b.topPhotoCount - a.topPhotoCount);
+    .sort((a: IPhotoTopCount, b: IPhotoTopCount) => b.topPhotoCount - a.topPhotoCount);
 
     return {
       viewTopPhotos: viewTopPhotos ?? [], 
@@ -205,7 +205,7 @@ const Admin = () => {
             <p>No unassigned photos.</p>
           )}
           <div className={styles.photos}>
-            {(unassignedPhotos ?? []).map((photo: any) => {
+            {(unassignedPhotos ?? []).map((photo: IAdminQueryPhoto) => {
               const hasMissingData = !!photo.missing_type || !!photo.missing_category || !!photo.missing_subcategory;
               return (
                 <div className={`${styles.photo} ${hasMissingData ? ` ${styles.alert}` : ""}`} key={`photoMissing_${photo.id}`}>
@@ -239,7 +239,7 @@ const Admin = () => {
             <p>No photos.</p>
           )}
           <div className={styles.photos}>
-            {(viewTopPhotos).map((photo: any) => {
+            {(viewTopPhotos).map((photo: IAdminQueryPhoto) => {
               return (
                 <div className={`${styles.photo}`} key={`photoView_${photo.id}`}>
                   <img src={`${baseUploadUrl}${photo.photo_filename}`} />
@@ -259,7 +259,7 @@ const Admin = () => {
                 Top Photo Categories
               </h3>
               <div className={styles['category-views']}>
-                {(categoryTopPhotos).map((category: any) => (
+                {(categoryTopPhotos).map((category: IPhotoTopCount) => (
                   <span className={styles['category-view']}>
                     <span>{category.title}</span>
                     <span className={styles.views}>{category.topPhotoCount}</span>
@@ -276,7 +276,7 @@ const Admin = () => {
               Categories
             </h3>
             <div className={styles['category-views']}>
-              {(categoryViews).map((category: any) => (
+              {(categoryViews).map((category: IPhotoCategoryViews) => (
                 <span className={styles['category-view']}>
                   <span>{category.title}</span>
                   <span className={styles.views}>{category.averageViews}</span>
@@ -292,7 +292,7 @@ const Admin = () => {
               Subcategories
             </h3>
             <div className={styles['category-views']}>
-              {(subcategoryViews).map((subcategory: any) => (
+              {(subcategoryViews).map((subcategory: IPhotoCategoryViews) => (
                 <span className={styles['category-view']}>
                   <span>{subcategory.title}</span>
                   <span className={styles.views}>{subcategory.averageViews}</span>
@@ -310,3 +310,4 @@ const Admin = () => {
 };
 
 export default Admin;
+

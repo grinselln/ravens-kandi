@@ -16,3 +16,9 @@ export interface IReorderRecord {
 export interface IReorderResponse {
   message: string;
 }
+
+export type RecordObject = Record<string | number, string | number | boolean | null>;
+
+export type DynamicNestedObject = {
+  [key: string | number]: string | number | boolean | DynamicNestedObject;
+};

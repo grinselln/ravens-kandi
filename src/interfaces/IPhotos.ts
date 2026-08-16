@@ -33,6 +33,9 @@ export interface ISelectedPhoto extends IPublicQueryPhoto {
 
 export interface IAdminQueryPhoto extends IPhoto {
   type_title: string;
+  missing_type: boolean;
+  missing_category: boolean;
+  missing_subcategory: boolean;
 }
 
 export interface IUploadItem {
@@ -69,4 +72,19 @@ export interface IUpdatePhoto {
   photo_type_id: number | null,
   categories: Array<number>;
   subcategories: Array<number>;
+}
+
+export interface IPhotoCategoryViews {
+  title: string;
+  totalViews: number;
+  totalPhotos: number;
+  averageViews?: number;
+}
+
+export interface IPhotoCategoryViewsAvg extends IPhotoCategoryViews {
+  averageViews: number;
+}
+
+export interface IPhotoTopCount extends IPhotoCategory {
+  topPhotoCount: number;
 }
