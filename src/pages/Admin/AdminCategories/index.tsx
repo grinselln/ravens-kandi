@@ -3,13 +3,13 @@ import styles from './AdminCategories.module.scss';
 import DashboardHeader from "@/components/Admin/DashboardHeader/DashboardHeader";
 import Button from "@/components/Input/Button/Button";
 import LayoutAdmin from "@/components/Layout/LayoutAdmin";
-import { faCheck, faClose, faDiamond, faLink, faLinkSlash, faPlus, faTrashCan } from "@fortawesome/free-solid-svg-icons";
+import { faCheck, faClose, faDiamond, faLink, faLinkSlash, faPlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Row from '@/components/Admin/Rows/Row/Row';
 import RecordCount from '@/components/Admin/Rows/ActionElements/RecordCount/RecordCount';
 import RowAccordion from '@/components/Admin/Rows/RowAccordion/RowAccordion';
 import RowInput from '@/components/Admin/Rows/RowInput/RowInput';
-import { useMemo, useState } from 'react';
+import { ComponentProps, useMemo, useState } from 'react';
 import { QueryClient, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { addCategory, deleteCategory, fetchCategories, reorderCategories, updateCategory } from '@/api/categories';
 import ActionButton from '@/components/Admin/Rows/ActionElements/ActionButton/ActionButton';
@@ -27,6 +27,9 @@ import { DragDropProvider } from '@dnd-kit/react';
 import { isSortable } from '@dnd-kit/react/sortable';
 import { arrayMove } from '@dnd-kit/helpers';
 import { useWindowWidth } from '@/hooks/useWindowWidth';
+import { IAddCategory, ICategoriesQueryData, ICategoryQueryGroupedCategory, ICategoryQueryGroupedCategorySubcategory, ICategoryQueryOption, ICategoryWithLink, IEditedCategoryRecord, IExistingCategoryDraft, INewCategoryDraft, IReorderCategoryContext, IUpdateCategory } from '@/interfaces/ICategories';
+import { IBlankEditSubcategory, ISubcategory } from '@/interfaces/ISubcategories';
+import { IAddedBulkRecord, IDropDownOption, IReorderRecord, IReorderResponse } from '@/interfaces/IRecords';
 
 const queryClient = new QueryClient()
 
@@ -47,13 +50,14 @@ const AdminCategories = () => {
   const { windowBreakPoints } = useWindowWidth();
   const {pendingDeleteId, warningMessage, onDismissWarningMessage, assignWarningMessage, assignRecordType, assignOnConfirm, assignPendingDeleteId} = useDeleteConfirmation();
 
-  const blankCategoryRecord = {
+  const blankCategoryRecord: INewCategoryDraft = {
     isNew: false,
     id: null,
     title: "",
     subcategories: [],
     newSubcategoryTitles: [],
-    triggerSubcategoryId: null
+    order_index: null,
+    trigger_subcategory_id: null
   };
 
   const blankSubcategoryRecord = {
@@ -64,18 +68,17 @@ const AdminCategories = () => {
     category_id: null
   };
 
-  const [selectedCategoryRecord, setSelectedCategoryRecord] = useState<any>(blankCategoryRecord);
-  const [editedCategoryRecord, setEditedCategoryRecord] = useState<any>(blankCategoryRecord);
-  const [selectedSubcategoryRecord, setSelectedSubcategoryRecord] = useState<any>(blankSubcategoryRecord);
-  const [editedSubcategoryRecord, setEditedSubcategoryRecord] = useState<any>(blankSubcategoryRecord);
+  const [selectedCategoryRecord, setSelectedCategoryRecord] = useState<IEditedCategoryRecord>(blankCategoryRecord);
+  const [editedCategoryRecord, setEditedCategoryRecord] = useState<IEditedCategoryRecord>(blankCategoryRecord);
+  const [selectedSubcategoryRecord, setSelectedSubcategoryRecord] = useState<IBlankEditSubcategory>(blankSubcategoryRecord);
+  const [editedSubcategoryRecord, setEditedSubcategoryRecord] = useState<IBlankEditSubcategory>(blankSubcategoryRecord);
   const [triggerEditId, setTriggerEditId] = useState<number | null>(null);
   
   const [showSubcategoryAddNew, setShowSubcategoryAddNew] = useState<boolean>(false);
 
   const [showCategoryAddNew, setShowCategoryAddNew] = useState<boolean>(false);
-  const [sortableCategoryIds, setSortableCategoryIds] = useState<Array<string>>([]);
 
-  const { data, isLoading, isError, error } = useQuery({
+  const { data } = useQuery({
     queryKey: ['categories'], 
     queryFn: fetchCategories,
   });
@@ -86,12 +89,13 @@ const AdminCategories = () => {
   });
 
   const addMutation = useMutation({
-    mutationFn: (newCategory: {title: string; subcategories: any; newSubcategoryTitles: any; triggerSubcategoryId: any}) => addCategory(newCategory),
+    mutationFn: (newCategory: IAddCategory | IEditedCategoryRecord) => addCategory(newCategory),
     onSuccess: async () => {
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ['categories'] }),
         queryClient.invalidateQueries({ queryKey: ['subcategories'] })
       ])
+      setSelectedCategoryRecord(blankCategoryRecord);
       setEditedCategoryRecord(blankCategoryRecord);
     },
     onError: (error) => {
@@ -100,7 +104,7 @@ const AdminCategories = () => {
   });
 
   const addBulkMutation = useMutation({
-    mutationFn: (newRecords: any) => addSubcategories(newRecords),
+    mutationFn: (newRecords: Array<IAddedBulkRecord>) => addSubcategories(newRecords),
     onSuccess: async () => {
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ['categories'] }),
@@ -113,11 +117,11 @@ const AdminCategories = () => {
   });
 
   const updateMutation = useMutation({
-    mutationFn: (updates: {id: number, updatedCategory: any}) => updateCategory(updates.id, updates.updatedCategory),
+    mutationFn: (updates: {id: number, updatedCategory: IUpdateCategory}) => updateCategory(updates.id, updates.updatedCategory),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['categories'] });
-      setSelectedCategoryRecord(blankSubcategoryRecord);
-      setEditedCategoryRecord(blankSubcategoryRecord);
+      setSelectedCategoryRecord(blankCategoryRecord);
+      setEditedCategoryRecord(blankCategoryRecord);
       setTriggerEditId(null);
     },
     onError: (error) => {
@@ -125,46 +129,59 @@ const AdminCategories = () => {
     }
   });
 
-  const reorderMutation = useMutation({
-    mutationFn: (payload: { isCategory: boolean; categoryId?: number; items: any[] }) => {
+  const reorderMutation = useMutation<
+    IReorderResponse,
+    Error,
+    { isCategory: boolean; categoryId?: number; items: Array<IReorderRecord> },
+    IReorderCategoryContext
+  >({
+    mutationFn: (payload: { isCategory: boolean; categoryId?: number; items: Array<IReorderRecord> }) => {
       if (payload.isCategory) {
         return reorderCategories(payload.items);
       }
         return reorderSubcategories(payload.categoryId!, payload.items);
       },
-      onError: (error, variables, context: any) => {
+      onError: (error, _variables, context) => {
         console.error('Reorder failed:', error);
 
-        queryClient.setQueryData(['categories'], context.previousData);
+        queryClient.setQueryData<ICategoriesQueryData>(['categories'], context?.previousData);
       },
       onMutate: async (payload) => {
         await queryClient.cancelQueries({ queryKey: ['categories'] });
-        const previousData = queryClient.getQueryData(['categories']);
+        const previousData = queryClient.getQueryData<ICategoriesQueryData>(['categories'])
 
-        queryClient.setQueryData(['categories'], (old: any) => {
+        queryClient.setQueryData<ICategoriesQueryData>(['categories'], (old) => {
           if (!old) return old;
 
-          const reorderedMap = new Map(payload.items.map((item: any) => [item.id, item.order_index]));
+          const reorderedMap = new Map(payload.items.map((item: IReorderRecord) => [item.id, item.order_index]));
 
           if (payload.isCategory) {
             const newGroupedCategories = [...old.groupedCategories]
-              .map((category: any) => ({
-                ...category,
-                order_index: reorderedMap.has(category.id) ? reorderedMap.get(category.id) : category.order_index
-              }))
-              .sort((a: any, b: any) => a.order_index - b.order_index);
+              .map((category: ICategoryQueryGroupedCategory) => {
+                const newOrder = reorderedMap.get(category.id);
+
+                return ({
+                  ...category,
+                  order_index: newOrder ?? category.order_index
+                })
+              })
+              .sort((a: ICategoryQueryGroupedCategory, b: ICategoryQueryGroupedCategory) => a.order_index - b.order_index);
 
             return { ...old, groupedCategories: newGroupedCategories };
           }
 
           return {
             ...old,
-            groupedCategories: old.groupedCategories.map((category: any) => {
+            groupedCategories: old.groupedCategories.map((category: ICategoryQueryGroupedCategory) => {
               if (category.id !== payload.categoryId) return category;
 
               const newSubcategories = [...category.subcategories]
-                .map((sub: any) => ({ ...sub, order_index: reorderedMap.get(sub.id) }))
-                .sort((a: any, b: any) => a.order_index - b.order_index);
+                .map((sub: ICategoryQueryGroupedCategorySubcategory) => {
+                  const newOrder = reorderedMap.get(category.id);
+
+                  return ({ ...sub, order_index: newOrder ?? sub.order_index })
+                })
+                .sort((a: ICategoryQueryGroupedCategorySubcategory, b: ICategoryQueryGroupedCategorySubcategory) => a.order_index - b.order_index);
 
               return { ...category, subcategories: newSubcategories };
             })
@@ -192,43 +209,45 @@ const AdminCategories = () => {
     }
   })
 
-  const handleOnAdd = (newRecordData?: any) => {
-    if((!!!newRecordData && editedCategoryRecord.title === "") || (!!newRecordData && newRecordData.title === "")) return;
+  const handleOnAdd = (newRecordData?: IAddCategory) => {
+    const source = newRecordData ?? editedCategoryRecord;
 
-    let newRecord = newRecordData ? newRecordData : editedCategoryRecord;
+    if (source.title === "") return;
 
-    addMutation.mutate(newRecord);
+    addMutation.mutate(source);
   };
 
-  const handleOnAddSubcategoryBulk = (addedRecords: any) => {
+  const handleOnAddSubcategoryBulk = (addedRecords: Array<IAddedBulkRecord>) => {
     if(addedRecords.length === 0) return;
 
-    const convertedRecords = addedRecords.map((record: any) => ({...record, category: record.value}));
+    const convertedRecords = addedRecords.map((record: IAddedBulkRecord) => ({...record, category: record.value}));
 
     addBulkMutation.mutate(convertedRecords);
   };
 
-  const handleOnEdit = (categoryRecord: any, isTriggerEdit?: boolean) => { 
-    setSelectedCategoryRecord(categoryRecord);
-    setEditedCategoryRecord(categoryRecord);
+  const handleOnEdit = (categoryRecord: ICategoryWithLink, isTriggerEdit?: boolean) => { 
+    const editableRecord: IExistingCategoryDraft = { ...categoryRecord, isNew: false };
+    
+    setSelectedCategoryRecord(editableRecord);
+    setEditedCategoryRecord(editableRecord);
 
     if(isTriggerEdit) {
       setTriggerEditId(categoryRecord.id);
     }
   };
 
-  const handleOnSave = (recordOverride = null) => {
+  const handleOnSave = (recordOverride: ICategoryWithLink | null = null) => {
     if(editedCategoryRecord === null) return;
 
     const editedRecord = recordOverride ? recordOverride : editedCategoryRecord;
+
+    if (editedRecord.id === null) return;
 
     updateMutation.mutate({
       id: editedRecord.id,
       updatedCategory: {
         title: editedRecord.title,
-        triggerSubcategoryId: editedRecord.trigger_subcategory_id,
-        order: editedRecord.order_index,
-        views: editedRecord.views
+        trigger_subcategory_id: editedRecord.trigger_subcategory_id,
       }
     })
   }
@@ -240,7 +259,9 @@ const AdminCategories = () => {
     })
   }
 
-  const handleDragEnd = (event: any) => {
+  type DragEndEvent = NonNullable<ComponentProps<typeof DragDropProvider>['onDragEnd']>;
+
+  const handleDragEnd: DragEndEvent = (event) => {
     if (event.canceled) return;
 
     const { source } = event.operation;
@@ -252,9 +273,9 @@ const AdminCategories = () => {
     const isCategory = type === 'category';
     const listItems = isCategory
       ? categoriesWithLinks
-      : (categoriesWithLinks.find((c: any) => c.id === group)?.subcategories ?? []);
+      : (categoriesWithLinks.find((c: ICategoryWithLink) => c.id === group)?.subcategories ?? []);
 
-    const reordered = arrayMove(listItems, initialIndex, index).map((item: any, idx: number) => ({
+    const reordered = arrayMove(listItems, initialIndex, index).map((item: ICategoryWithLink | ICategoryQueryGroupedCategorySubcategory, idx: number) => ({
       id: item.id,
       order_index: idx,
     }));
@@ -281,11 +302,11 @@ const AdminCategories = () => {
     }
   }, [editedCategoryRecord, editedSubcategoryRecord, triggerEditId]);
 
-  const {categoriesWithLinks, categoriesWithLinksAll, unassignedCategory, categoryIds, dropdownCategoryData} = useMemo(() => {
-    const categoriesWithLinksAll = (data?.groupedCategories ?? []).map((category: any) => {
+  const {categoriesWithLinks, categoriesWithLinksAll, unassignedCategory, dropdownCategoryData} = useMemo(() => {
+    const categoriesWithLinksAll = (data?.groupedCategories ?? []).map((category: ICategoryQueryGroupedCategory) => {
       if(category.trigger_subcategory_id && dataSubcategories) {
-        const triggerSubcategory = dataSubcategories.find((subcategory: any) => subcategory.id === category.trigger_subcategory_id);
-        const triggerSubcategoryCategory = data.groupedCategories.find((category: any) => category.id === triggerSubcategory?.category_id);
+        const triggerSubcategory = dataSubcategories.find((subcategory: ISubcategory) => subcategory.id === category.trigger_subcategory_id);
+        const triggerSubcategoryCategory = (data?.groupedCategories ?? []).find((category: ICategoryQueryGroupedCategory) => category.id === triggerSubcategory?.category_id);
 
         if(triggerSubcategory && triggerSubcategoryCategory) {
          return {
@@ -301,13 +322,13 @@ const AdminCategories = () => {
       return category
     });
 
-    const unassignedCategory = categoriesWithLinksAll.find((category: any) => category.order_index === -1);
+    const unassignedCategory = categoriesWithLinksAll.find((category: ICategoryWithLink) => category.order_index === -1);
 
-    const categoriesWithLinks = categoriesWithLinksAll.filter((category: any) => category.order_index !== -1);
+    const categoriesWithLinks = categoriesWithLinksAll.filter((category: ICategoryWithLink) => category.order_index !== -1);
 
-    const categoryIds = categoriesWithLinks.map((category: any) => category.id);
+    const categoryIds = categoriesWithLinks.map((category: ICategoryWithLink) => category.id);
 
-    const dropdownCategoryData = categoriesWithLinksAll.map((category: any) => ({
+    const dropdownCategoryData = categoriesWithLinksAll.map((category: ICategoryWithLink) => ({
       label: category.title,
       value: category.id
     }))
@@ -319,7 +340,7 @@ const AdminCategories = () => {
       categoryIds,
       dropdownCategoryData
     }
-  }, [data?.groupedCategories, dataSubcategories]);
+  }, [data, dataSubcategories]);
 
 
   return (
@@ -371,21 +392,20 @@ const AdminCategories = () => {
             ]}
             onDragEnd={handleDragEnd}
           >
-            {categoriesWithLinks.map((category: any, index: number) => {
+            {categoriesWithLinks.map((category: ICategoryWithLink, index: number) => {
               const linkedSubcategory = category?.linkedSubcategory;
               const editingCurrent = editingStatus.isEditing && selectedCategoryRecord.id === category.id;
               const editingTrigger = editingStatus.isEditing && triggerEditId === category.id;
-              const currentSubcategories = category.subcategories.map((subcategory:any) => subcategory.id);
-              const dropdownOptions = (data?.options ?? []).filter((option: any) => !currentSubcategories.includes(option.id) && !(option.label)
-              .includes("Unassigned"))
-              .map((subcategory: any) => ({label: subcategory.label, value: subcategory.id}));
+              const currentSubcategories = category.subcategories.map((subcategory: ICategoryQueryGroupedCategorySubcategory) => subcategory.id);
+              const dropdownOptions: Array<IDropDownOption<number>> = (data?.options ?? []).filter((option: ICategoryQueryOption) => !currentSubcategories.includes(option.id) && !(option.label).includes("Unassigned"))
+              .map((subcategory: ICategoryQueryOption) => ({label: subcategory.label, value: subcategory.id}));
 
               return (
                 <SortableCategoryAccordion 
                   key={`category_wrapper_${category.id}`}
                   category={category}
                   index={index}
-                  headerRenderFn={(handleRef: any) => (
+                  headerRenderFn={(handleRef: (element: Element | null) => void) => (
                     <RowAccordion
                       key={`category_${category.id}`}
                       isInverse={category.order_index === -1}
@@ -399,8 +419,8 @@ const AdminCategories = () => {
                           title={<>
                             {editingCurrent && !editingTrigger
                             ? <RowInput
-                                value={editedCategoryRecord.title}
-                                setValue={(newValue) => setEditedCategoryRecord((prev: any) => ({...prev, title: newValue}))}
+                                value={editedCategoryRecord?.title ?? ""}
+                                setValue={(newValue) => setEditedCategoryRecord((prev: IEditedCategoryRecord) => ({...prev, title: newValue}))}
                                 isNew={false}
                                 inputItemLabel='Category'
                                 isDisabled={false}
@@ -417,7 +437,9 @@ const AdminCategories = () => {
                                   placeholder='Link subcategory'
                                   value={editedCategoryRecord.trigger_subcategory_id ? editedCategoryRecord.trigger_subcategory_id : category.trigger_subcategory_id}
                                   setValue={(newValue) => {
-                                    setEditedCategoryRecord((prev : any) => ({...prev, trigger_subcategory_id: newValue.value }))}}
+                                    const newValueInt = typeof newValue.value === "number" ? newValue.value : parseInt(newValue.value);
+
+                                    setEditedCategoryRecord((prev : IEditedCategoryRecord) => ({...prev, trigger_subcategory_id: newValueInt }))}}
                                   options={dropdownOptions}
                                   isDisabled={false}
                                 />
@@ -500,15 +522,7 @@ const AdminCategories = () => {
               <RowInput
                 value={editedCategoryRecord.isNew ? editedCategoryRecord.title : ""}
                 setValue={(newValue) => {
-                  if(!editingStatus.isEditingNewCategory) {
-                    setEditedCategoryRecord((prev: any) => (
-                      {...prev, 
-                        isNew: true, 
-                        title: newValue,
-                      }));
-                  } else {
-                    setEditedCategoryRecord((prev: any) => ({...prev, title: newValue}))
-                  }
+                  setEditedCategoryRecord(({...blankCategoryRecord, isNew: true, title: newValue}))
                 }}
                 isNew={true}
                 inputItemLabel='Category'
@@ -538,17 +552,16 @@ const AdminCategories = () => {
         showModal={showSubcategoryAddNew}
         setShowModal={setShowSubcategoryAddNew}
         dropdownData={dropdownCategoryData}
-        recordType='Subcategory'
         recordTypePlural='Subcategories'
-        onSave={(newRecords: any) => handleOnAddSubcategoryBulk(newRecords)}
+        onSave={(newRecords: Array<IAddedBulkRecord>) => handleOnAddSubcategoryBulk(newRecords)}
       />
 
       <AddCategoryModal
         isOpen={showCategoryAddNew}
         setIsOpen={setShowCategoryAddNew}
         triggerSubcategories={data?.options ?? []}
-        subcategories={dataSubcategories}
-        onSave={(newCategory: any) => {
+        subcategories={dataSubcategories ?? []}
+        onSave={(newCategory: IAddCategory) => {
           handleOnAdd(newCategory)
         }}
       />

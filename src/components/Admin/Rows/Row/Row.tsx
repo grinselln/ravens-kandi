@@ -13,11 +13,11 @@ interface IRow {
   isAccordion?: boolean;
   isOpen?: boolean;
   isNew?: boolean;
-  accordionToggle?: Function;
+  accordionToggle?: () => void;
   actionElements: React.ReactNode;
   isEditing?: boolean;
   isSimple?: boolean;
-  dragHandleRef?: any;
+  dragHandleRef?: (element: Element | null) => void;
 }
 
 

@@ -1,31 +1,27 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useMemo, useState } from 'react';
 import InputWrapper from '../InputWrapper/InputWrapper';
 import styles from './InputMultiSelect.module.scss';
-import { faChevronDown, faClose } from '@fortawesome/free-solid-svg-icons';
+import { faClose } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useDropDown } from '@/hooks/useDropDown';
 import DropDownList from '../DropDownList/DropDownList';
 import InputText from '../InputText/InputText';
+import { IDropDownOption } from '@/interfaces/IRecords';
 
-interface IOption {
-  label: string;
-  value: string;
-}
-
-interface IInputMultiSelect {
+interface IInputMultiSelect<T> {
   label: string;
   placeholder: string;
-  addSelection: (value: any) => void;
-  removeSelection: (value: number) => void;
-  options: IOption[];
-  selectedOptions: IOption[];
+  addSelection: (value: IDropDownOption<T>) => void;
+  removeSelection: (value: T) => void;
+  options: IDropDownOption<T>[];
+  selectedOptions: IDropDownOption<T>[];
 }
 
-const InputMultiSelect = ({label, placeholder, addSelection, removeSelection, options, selectedOptions}: IInputMultiSelect) => {
+const InputMultiSelect = <T,>({label, placeholder, addSelection, removeSelection, options, selectedOptions}: IInputMultiSelect<T>) => {
   const [searchText, setSearchText] = useState<string>("");
 
   const filteredOptions = useMemo(() => {
-    return options.filter((option: any) => {
+    return options.filter((option: IDropDownOption<T>) => {
       if(searchText === "") return option;
 
       const optionLabel = (option.label).toLowerCase();
@@ -43,7 +39,7 @@ const InputMultiSelect = ({label, placeholder, addSelection, removeSelection, op
     >
       {selectedOptions.length > 0 && (
         <div className={styles['selected-options-wrapper']}>
-          {selectedOptions.map((option: any) => (
+          {selectedOptions.map((option: IDropDownOption<T>) => (
             <button key={`tag_${option.value}`} className={styles['selected-option']} onClick={() => removeSelection(option.value)}>
               <span>{option.label}</span>
               <FontAwesomeIcon icon={faClose} />
@@ -70,9 +66,9 @@ const InputMultiSelect = ({label, placeholder, addSelection, removeSelection, op
           handleTriggerClick={handleTriggerClick}
           setValue={addSelection}
           triggerRef={inputRef}
-          onAddNew={(newSubcategory: any) => {
+          onAddNew={(newItem: IDropDownOption<T>) => {
             setSearchText("");
-            addSelection(newSubcategory)
+            addSelection(newItem)
           }}
           searchText={searchText}
         />

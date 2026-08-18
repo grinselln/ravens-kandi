@@ -21,11 +21,7 @@ import { ICategoryFilterCollection } from '@/interfaces/ICategories';
 import { IAdminBulkPhotoValidation, IAdminFilterPhoto, IAdminQueryPhoto, IPhoto, IPhotoAlerts, IUploadItem } from '@/interfaces/IPhotos';
 import { IPhotoType } from '@/interfaces/IPhotoTypes';
 import { IPhotoSubcategory } from '@/interfaces/ISubcategories';
-
-interface IOption {
-  label: string;
-  value: string;
-}
+import { IDropDownOption } from '@/interfaces/IRecords';
 
 type SortOption = "" | "alpha" | "viewsA" | "viewsD";
 
@@ -40,7 +36,7 @@ const AdminPhotos = () => {
   const baseUploadUrl = `${API_URL}/${API_UPLOAD_DIRECTORY}/`;
   const [searchText, setSearchText] = useState<string>("");
   const [selectedPhotoTypes, setSelectedPhotoTypes] = useState<Array<number>>([]);
-  const [selectedSortOption, setSelectedSortOption] = useState<IOption>({label: "", value: ""});
+  const [selectedSortOption, setSelectedSortOption] = useState<IDropDownOption<string>>({label: "", value: ""});
   const [selectedCategoryFilters, setSelectedCategoryFilters] = useState<ICategoryFilterCollection>({});
   const [selectedBulkEdit, setSelectedBulkEdit] = useState<Array<IUploadItem>>([]);
   const [selectedAlerts, setSelectedAlerts] = useState<IPhotoAlerts>({missingType: false, missingCategory: false, missingSubcategory: false})
@@ -48,7 +44,7 @@ const AdminPhotos = () => {
   const [selectedEditPhotos, setSelectedEditPhotos] = useState<Array<IAdminFilterPhoto>>([]);
   const [isBulkEdit, setIsBulkEdit] = useState<boolean>(false);
 
-  const sortOptions: Array<IOption> = [
+  const sortOptions: Array<IDropDownOption<string>> = [
     {
       label: "Alphabetical",
       value: "alpha"
@@ -310,7 +306,7 @@ const AdminPhotos = () => {
                   isInverseLight={true}
                   placeholder='Sort by'
                   value={selectedSortOption?.value ?? ""}
-                  setValue={(selectedOption) => { setSelectedSortOption(selectedOption)}}
+                  setValue={(selectedOption) => {setSelectedSortOption(selectedOption)}}
                   options={sortOptions}
                   isDisabled={false}
                   isMedium={true}

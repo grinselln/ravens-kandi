@@ -1,6 +1,6 @@
-export interface IDropDownOption {
+export interface IDropDownOption<T> {
   label: string;
-  value: string | number;
+  value: T;
 }
 
 export interface IAddedBulkRecord {
