@@ -3,9 +3,13 @@ import styles from "./ContactForm.module.scss"
 import InputText from '@/components/Input/InputText/InputText';
 import InputTextArea from "@/components/Input/InputTextArea/InputTextArea";
 import { useEffect, useMemo, useState } from 'react';
+import { useSearchParams } from "react-router-dom";
 
 export default function ContactForm() {
   const redirectUrl = window.location.origin + window.location.pathname;
+
+  const [searchParams] = useSearchParams();
+  const isSuccessful = searchParams.get('success');
 
   const [name, setName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
@@ -82,60 +86,65 @@ export default function ContactForm() {
   }, [isSendDisabled]);
 
   return (
-    <form id='contactForm' method="POST" action="https://formsubmit.co/4a005f989176c3e97d68a7bc21e9d46e" encType="multipart/form-data">
-      <input type="hidden" name="_next" value={`${redirectUrl}?success=true`} />
-      <input type="hidden" name="_replyto" value="email" />
-      <input type="hidden" name="_subject" value="New submission!"></input>
-      <input type="hidden" name="_template" value="table" />
-      
-      <div className={styles['form-wrapper']}>
-        <div className={styles['form-row']}>
-          <InputText
-            label='Name'
-            wrapperClass={errors.validName === false && !errors.allBlank ? "error" : ""}
-            fieldWrapperClass='field-light'
-            value={name}
-            setValue={(name) => setName(name)}
-            type="text"
-            name="name"
-            onBlur={() => onCheckErrors("name")}
-          />
-          <InputText
-            label='E-mail'
-            wrapperClass={errors.validEmail === false && !errors.allBlank ? "error" : ""}
-            fieldWrapperClass='field-light'
-            value={email}
-            setValue={(email) => setEmail(email)}
-            type="email"
-            name="email"
-            onBlur={() => onCheckErrors("email")}
-          />
+    <>
+      {isSuccessful && (
+        <p className={styles.success}>Your message was successfully sent. Talk soon!</p>
+      )}
+      <form id='contactForm' method="POST" action="https://formsubmit.co/4a005f989176c3e97d68a7bc21e9d46e" encType="multipart/form-data">
+        <input type="hidden" name="_next" value={`${redirectUrl}?success=true`} />
+        <input type="hidden" name="_replyto" value="email" />
+        <input type="hidden" name="_subject" value="New submission!"></input>
+        <input type="hidden" name="_template" value="table" />
+        
+        <div className={styles['form-wrapper']}>
+          <div className={styles['form-row']}>
+            <InputText
+              label='Name'
+              wrapperClass={errors.validName === false && !errors.allBlank ? "error" : ""}
+              fieldWrapperClass='field-light'
+              value={name}
+              setValue={(name) => setName(name)}
+              type="text"
+              name="name"
+              onBlur={() => onCheckErrors("name")}
+            />
+            <InputText
+              label='E-mail'
+              wrapperClass={errors.validEmail === false && !errors.allBlank ? "error" : ""}
+              fieldWrapperClass='field-light'
+              value={email}
+              setValue={(email) => setEmail(email)}
+              type="email"
+              name="email"
+              onBlur={() => onCheckErrors("email")}
+            />
+          </div>
+          <div className={styles['form-row']}>
+            <InputText
+              label='Subject'
+              wrapperClass={errors.validSubject === false && !errors.allBlank ? "error" : ""}
+              fieldWrapperClass='field-light'
+              value={subject}
+              setValue={(subject) => setSubject(subject)}
+              type="subject"
+              name="subject"
+              onBlur={() => onCheckErrors("subject")}
+            />
+          </div>
+          <div className={styles['form-row']}>
+            <InputTextArea
+              label='Message'
+              fieldWrapperClass='field-light'
+              wrapperClass={errors.validMessage === false && !errors.allBlank ? "error" : ""}
+              value={message}
+              setValue={(message) => setMessage(message)}
+              name="message"
+              onBlur={() => onCheckErrors("message")}
+            />
+          </div>
+          <Button onClick={() => {}} isDisabled={isSendDisabled} type="submit">Send</Button>
         </div>
-        <div className={styles['form-row']}>
-          <InputText
-            label='Subject'
-            wrapperClass={errors.validSubject === false && !errors.allBlank ? "error" : ""}
-            fieldWrapperClass='field-light'
-            value={subject}
-            setValue={(subject) => setSubject(subject)}
-            type="subject"
-            name="subject"
-            onBlur={() => onCheckErrors("subject")}
-          />
-        </div>
-        <div className={styles['form-row']}>
-          <InputTextArea
-            label='Message'
-            fieldWrapperClass='field-light'
-            wrapperClass={errors.validMessage === false && !errors.allBlank ? "error" : ""}
-            value={message}
-            setValue={(message) => setMessage(message)}
-            name="message"
-            onBlur={() => onCheckErrors("message")}
-          />
-        </div>
-        <Button onClick={() => {}} isDisabled={isSendDisabled} type="submit">Send</Button>
-      </div>
-  </form>
+      </form>
+    </>
   );
 }
