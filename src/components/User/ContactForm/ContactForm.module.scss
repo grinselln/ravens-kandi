@@ -1,5 +1,13 @@
 @use '_breakpoints' as *;
 
+.success {
+  text-align: center;
+  font-size: 1rem;
+  color: var(--color-primary) !important;
+  font-weight: 500;
+  margin-bottom: 2rem;
+}
+
 form {
   display: flex;
   justify-content: center;
