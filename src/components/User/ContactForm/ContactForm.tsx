@@ -61,13 +61,12 @@ export default function ContactForm() {
 
   const isSendDisabled = useMemo(() => {
     return !errors.validName || !errors.validEmail || !errors.validSubject || !errors.validMessage;
-  }, [name, email, subject, message]);
+  }, [errors]);
 
   useEffect(() => {
     const form = document.getElementById('contactForm');
 
     if(form) {
-
       const handleSubmit = (event: any) => {
         if(isSendDisabled) {
           event.preventDefault();
@@ -77,10 +76,10 @@ export default function ContactForm() {
       form.addEventListener('submit', handleSubmit);
   
       return () => {
-        window.removeEventListener("submit", handleSubmit);
+        form.removeEventListener("submit", handleSubmit);
       };
     }
-  }, []);
+  }, [isSendDisabled]);
 
   return (
     <form id='contactForm' method="POST" action="https://formsubmit.co/4a005f989176c3e97d68a7bc21e9d46e" encType="multipart/form-data">

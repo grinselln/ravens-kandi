@@ -54,7 +54,7 @@
     .input-wrapper {
       input, textarea {
         color: var(--color-text);
-        background-color: rgba(var(--color-accent-rgb), .08);
+        background-color: rgba(var(--color-primary-rgb), .08);
         border: none;
         border-bottom: 1.5px solid var(--color-accent);
         border-radius: 5px 5px 0px 0px;
@@ -74,7 +74,8 @@
     width: 100%;
 
     &.error input, &.error textarea {
-      border: 2px solid var(--color-alert);
+      border-bottom: 1.5px solid var(--color-alert);
+      background-color: rgba(var(--color-accent-rgb), .08)
     }
 
     &.row-input {
