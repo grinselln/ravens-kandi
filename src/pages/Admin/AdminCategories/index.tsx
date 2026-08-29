@@ -19,7 +19,6 @@ import RowLink from '@/components/Admin/Rows/RowLink/RowLink';
 import AddBulkModal from '@/components/Admin/Modals/AddBulkModal/AddBulkModal';
 import { faEdit, faTrashAlt } from '@fortawesome/free-regular-svg-icons';
 import InputDropDown from '@/components/Input/InputDropDown/InputDropDown';
-import { useDeleteConfirmation } from '@/components/Admin/Providers/DeleteModalProvider';
 import AddCategoryModal from '@/components/Admin/Modals/AddCategoryModal/AddCategoryModal';
 import {RestrictToVerticalAxis} from '@dnd-kit/abstract/modifiers';
 import SortableCategoryAccordion from '@/components/Admin/Rows/SortableCategoryAccordion/SortableCategoryAccordion';
@@ -28,8 +27,9 @@ import { isSortable } from '@dnd-kit/react/sortable';
 import { arrayMove } from '@dnd-kit/helpers';
 import { useWindowWidth } from '@/hooks/useWindowWidth';
 import { IAddCategory, ICategoriesQueryData, ICategoryQueryGroupedCategory, ICategoryQueryGroupedCategorySubcategory, ICategoryQueryOption, ICategoryWithLink, IEditedCategoryRecord, IExistingCategoryDraft, INewCategoryDraft, IReorderCategoryContext, IUpdateCategory } from '@/interfaces/ICategories';
-import { IBlankEditSubcategory, ISubcategory } from '@/interfaces/ISubcategories';
+import { IEditedSubcategoryRecord, ISubcategory } from '@/interfaces/ISubcategories';
 import { IAddedBulkRecord, IDropDownOption, IReorderRecord, IReorderResponse } from '@/interfaces/IRecords';
+import { useDeleteConfirmation } from '@/components/Admin/Providers/DeleteModalContext';
 
 const queryClient = new QueryClient()
 
@@ -60,18 +60,18 @@ const AdminCategories = () => {
     trigger_subcategory_id: null
   };
 
-  const blankSubcategoryRecord = {
-    isNew: false,
-    id: null,
+  /*const blankSubcategoryRecord = {
+    isNew: false as const,
+    id: "",
     title: "",
     order_index: null,
     category_id: null
-  };
+  };*/
 
   const [selectedCategoryRecord, setSelectedCategoryRecord] = useState<IEditedCategoryRecord>(blankCategoryRecord);
   const [editedCategoryRecord, setEditedCategoryRecord] = useState<IEditedCategoryRecord>(blankCategoryRecord);
-  const [selectedSubcategoryRecord, setSelectedSubcategoryRecord] = useState<IBlankEditSubcategory>(blankSubcategoryRecord);
-  const [editedSubcategoryRecord, setEditedSubcategoryRecord] = useState<IBlankEditSubcategory>(blankSubcategoryRecord);
+  const [selectedSubcategoryRecord, setSelectedSubcategoryRecord] = useState<IEditedSubcategoryRecord | null>(null);
+  const [editedSubcategoryRecord, setEditedSubcategoryRecord] = useState<IEditedSubcategoryRecord | null>(null);
   const [triggerEditId, setTriggerEditId] = useState<number | null>(null);
   
   const [showSubcategoryAddNew, setShowSubcategoryAddNew] = useState<boolean>(false);
@@ -296,14 +296,14 @@ const AdminCategories = () => {
   
   const editingStatus = useMemo(() => {
     return {
-      isEditing: editedCategoryRecord.id !== null || editedCategoryRecord.isNew || editedSubcategoryRecord.id !== null || triggerEditId !== null,
+      isEditing: editedCategoryRecord === null || editedCategoryRecord.id !== null || editedCategoryRecord.isNew || triggerEditId !== null,
       isEditingNewCategory: editedCategoryRecord.isNew,
-      isEditingNewSubcategory: typeof editedSubcategoryRecord.id === "string"
+      isEditingNewSubcategory: typeof editedSubcategoryRecord?.id === "string"
     }
   }, [editedCategoryRecord, editedSubcategoryRecord, triggerEditId]);
 
   const {categoriesWithLinks, categoriesWithLinksAll, unassignedCategory, dropdownCategoryData} = useMemo(() => {
-    const categoriesWithLinksAll = (data?.groupedCategories ?? []).map((category: ICategoryQueryGroupedCategory) => {
+    const categoriesWithLinksAll: ICategoryWithLink[] = (data?.groupedCategories ?? []).map((category: ICategoryQueryGroupedCategory) => {
       if(category.trigger_subcategory_id && dataSubcategories) {
         const triggerSubcategory = dataSubcategories.find((subcategory: ISubcategory) => subcategory.id === category.trigger_subcategory_id);
         const triggerSubcategoryCategory = (data?.groupedCategories ?? []).find((category: ICategoryQueryGroupedCategory) => category.id === triggerSubcategory?.category_id);
@@ -403,7 +403,7 @@ const AdminCategories = () => {
               return (
                 <SortableCategoryAccordion 
                   key={`category_wrapper_${category.id}`}
-                  category={category}
+                  categoryId={category.id}
                   index={index}
                   headerRenderFn={(handleRef: (element: Element | null) => void) => (
                     <RowAccordion
@@ -420,7 +420,7 @@ const AdminCategories = () => {
                             {editingCurrent && !editingTrigger
                             ? <RowInput
                                 value={editedCategoryRecord?.title ?? ""}
-                                setValue={(newValue) => setEditedCategoryRecord((prev: IEditedCategoryRecord) => ({...prev, title: newValue}))}
+                                setValue={(newValue) => setEditedCategoryRecord((prev: IEditedCategoryRecord) => ({...prev, isNew: false, title: newValue}))}
                                 isNew={false}
                                 inputItemLabel='Category'
                                 isDisabled={false}
@@ -437,9 +437,12 @@ const AdminCategories = () => {
                                   placeholder='Link subcategory'
                                   value={editedCategoryRecord.trigger_subcategory_id ? editedCategoryRecord.trigger_subcategory_id : category.trigger_subcategory_id}
                                   setValue={(newValue) => {
-                                    const newValueInt = typeof newValue.value === "number" ? newValue.value : parseInt(newValue.value);
+                                    setEditedCategoryRecord((prev : IEditedCategoryRecord) => {
+                                      if(newValue === null) return prev;
 
-                                    setEditedCategoryRecord((prev : IEditedCategoryRecord) => ({...prev, trigger_subcategory_id: newValueInt }))}}
+                                      const newValueInt = typeof newValue.value === "number" ? newValue.value : parseInt(newValue.value);
+                                      return ({...prev, trigger_subcategory_id: newValueInt })
+                                  })}}
                                   options={dropdownOptions}
                                   isDisabled={false}
                                 />

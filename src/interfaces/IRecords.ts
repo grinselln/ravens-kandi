@@ -5,7 +5,7 @@ export interface IDropDownOption<T> {
 
 export interface IAddedBulkRecord {
   title: string;
-  value: string | null;
+  value: number | null;
 }
 
 export interface IReorderRecord {
@@ -22,3 +22,9 @@ export type RecordObject = Record<string | number, string | number | boolean | n
 export type DynamicNestedObject = {
   [key: string | number]: string | number | boolean | DynamicNestedObject;
 };
+
+export interface IEditingStatus {
+  isEditing: boolean;
+  isEditingNewCategory: boolean;
+  isEditingNewSubcategory: boolean;
+}

@@ -183,7 +183,7 @@ const Creations = () => {
       <ViewPhotoModal
         isOpen={!!selectedPhoto}
         setIsOpen={() => setSelectedPhoto(null)}
-        photo={selectedPhoto}
+        selectedPhoto={selectedPhoto}
       />
     </Layout>
   );

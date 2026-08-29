@@ -1,9 +1,8 @@
 import InputWrapper from '../InputWrapper/InputWrapper';
-import styles from './InputText.module.scss';
 
 interface IInputText extends React.InputHTMLAttributes<HTMLInputElement> {
   ref?: React.Ref<HTMLInputElement>;
-  value: any;
+  value: string;
   setValue: (value: string) => void;
   label?: string;
   placeholder?: string;

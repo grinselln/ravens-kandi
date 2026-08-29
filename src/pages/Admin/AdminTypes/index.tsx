@@ -12,7 +12,6 @@ import RowsWrapper from '@/components/Admin/Rows/RowsWrapper/RowsWrapper';
 import Row from '@/components/Admin/Rows/Row/Row';
 import ActionButton from '@/components/Admin/Rows/ActionElements/ActionButton/ActionButton';
 import RowInput from '@/components/Admin/Rows/RowInput/RowInput';
-import { useDeleteConfirmation } from '@/components/Admin/Providers/DeleteModalProvider';
 import {DragDropProvider} from '@dnd-kit/react';
 import {isSortable } from '@dnd-kit/react/sortable';
 import {RestrictToVerticalAxis} from '@dnd-kit/abstract/modifiers';
@@ -21,6 +20,7 @@ import SortableTypeRow from '@/components/Admin/Rows/SortableTypeRow/SortableTyp
 import AddBulkModal from '@/components/Admin/Modals/AddBulkModal/AddBulkModal';
 import { IAddedBulkRecord, IReorderRecord, IReorderResponse } from '@/interfaces/IRecords';
 import { IReorderTypeContext, IPhotoType, IPhotoTypesQueryData, IUpdatePhotoType } from '@/interfaces/IPhotoTypes';
+import { useDeleteConfirmation } from '@/components/Admin/Providers/DeleteModalContext';
 
 
 
@@ -236,7 +236,6 @@ const AdminTypes = () => {
               <SortableTypeRow
                 key={`${photoType.id}_productType`}
                 photoType={photoType}
-                type={"type"}
                 index={index}
                 container={typeContainerRef}
                 isOrderingDisabled={selectedTypeEdit !== null}

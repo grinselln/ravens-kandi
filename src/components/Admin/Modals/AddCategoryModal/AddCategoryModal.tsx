@@ -83,7 +83,11 @@ const AddCategoryModal = ({ isOpen, setIsOpen, triggerSubcategories, subcategori
             label='Assign subcategories'
             placeholder='Search or create subcategory'
             addSelection={(selectedOption) => {
-              setSelectedSubcategories((prev: Array<IDropDownOption<number>>) => [...prev, selectedOption])
+              setSelectedSubcategories((prev: Array<IDropDownOption<number>>) => {
+                if(selectedOption === null) return prev;
+                
+                return [...prev, selectedOption]
+              })
             }}
             removeSelection={(selectedOptionValue) => setSelectedSubcategories((prevItems: Array<IDropDownOption<number>>) => prevItems.filter((prevItem: IDropDownOption<number>) => prevItem.value !== selectedOptionValue))}
             options={availableAssignSubcategories}

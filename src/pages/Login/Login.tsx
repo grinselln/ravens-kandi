@@ -1,5 +1,4 @@
 
-import Button from "@/components/Input/Button/Button";
 import styles from "./Login.module.scss";
 import { faDiamond } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";

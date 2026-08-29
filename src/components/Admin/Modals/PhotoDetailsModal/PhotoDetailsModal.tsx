@@ -2,7 +2,7 @@ import Modal from "@/components/Modal/Modal";
 import styles from "./PhotoDetailsModal.module.scss";
 import Button from "@/components/Input/Button/Button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCheck, faCheckSquare, faLink, faSpinner, faSquare, faSquareXmark } from "@fortawesome/free-solid-svg-icons";
+import { faCheck, faCheckSquare, faSpinner, faSquare, faSquareXmark } from "@fortawesome/free-solid-svg-icons";
 import InputText from "@/components/Input/InputText/InputText";
 import InputTextArea from "@/components/Input/InputTextArea/InputTextArea";
 import InputDropDown from "@/components/Input/InputDropDown/InputDropDown";
@@ -12,28 +12,20 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { addPhoto, updatePhoto } from "@/api/photos";
 import ActionButton from "../../Rows/ActionElements/ActionButton/ActionButton";
 import { useWindowWidth } from "@/hooks/useWindowWidth";
-
-interface IOption {
-  label: string;
-  value: string;
-}
-
-interface IUploadItem {
-  id: string;          // crypto.randomUUID() or index — something stable to key on
-  file: File;
-  previewUrl: string;
-  status: "pending" | "uploading" | "success" | "error";
-  errorMessage?: string;
-}
+import { IPhotoType, IPhotoTypesQueryData } from "@/interfaces/IPhotoTypes";
+import { ICategoryQueryGroupedCategory, ICategoryQueryGroupedCategorySubcategory, ICategoryWithLink, IPhotoCategory } from "@/interfaces/ICategories";
+import { ISubcategory } from "@/interfaces/ISubcategories";
+import { IAdminFilterPhoto, IUploadItemNew, IUploadItemUnion } from "@/interfaces/IPhotos";
+import { IDropDownOption } from "@/interfaces/IRecords";
 
 interface IPhotoDetailsModal {
   isOpen: boolean;
-  setIsOpen: Function;
-  photoTypes: Array<any>
-  categories: Array<any>
-  subcategories: Array<any>
-  selectedPhotos: any;
-  setSelectedPhotos: Function;
+  setIsOpen: (value: boolean) => void;
+  photoTypes: IPhotoTypesQueryData
+  categories: Array<ICategoryQueryGroupedCategory>
+  subcategories: Array<ISubcategory>
+  selectedPhotos: Array<IAdminFilterPhoto>;
+  setSelectedPhotos: (value: Array<IAdminFilterPhoto>) => void;
 }
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -41,11 +33,11 @@ const API_UPLOAD_DIRECTORY = import.meta.env.VITE_API_UPLOAD_DIRECTORY;
 
 const PhotoDetailsModal = ({selectedPhotos = [], setSelectedPhotos, isOpen, setIsOpen, photoTypes, categories, subcategories}: IPhotoDetailsModal) => {
   const baseUploadUrl = `${API_URL}/${API_UPLOAD_DIRECTORY}/`;
-  const containerRef = useRef(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const queryClient = useQueryClient();
   const { windowBreakPoints } = useWindowWidth();
 
-  const [uploadItems, setUploadItems] = useState<IUploadItem[]>([]);
+  const [uploadItems, setUploadItems] = useState<IUploadItemUnion[]>([]);
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -53,17 +45,20 @@ const PhotoDetailsModal = ({selectedPhotos = [], setSelectedPhotos, isOpen, setI
   const [photoSource, setPhotoSource] = useState<string>("");
   const [photoSourceError, setPhotoSourceError] = useState<boolean>(false);
   const [photoStory, setPhotoStory] = useState<string>("");
-  const [selectedPhotoType, setSelectedPhotoType] = useState<IOption>({label: "", value: ""});
+  const [selectedPhotoType, setSelectedPhotoType] = useState<IDropDownOption<number> | null>(null);
   const [selectedCategories, setSelectedCategories] = useState<Array<number>>([]);
   const [selectedSubcategories, setSelectedSubcategories] = useState<Array<number>>([]);
 
   const resetState = () => {
+    uploadItems.forEach(item => {
+      if (item.isNew || item.imageFile !== null) URL.revokeObjectURL(item.previewUrl);
+    });
     setSelectedPhotos([]);
     setUploadItems([]);
     setPhotoTitle("");
     setPhotoSource("");
     setPhotoStory("");
-    setSelectedPhotoType({label: "", value: ""});
+    setSelectedPhotoType(null);
     setSelectedCategories([]);
     setSelectedSubcategories([]);
   }
@@ -109,16 +104,24 @@ const PhotoDetailsModal = ({selectedPhotos = [], setSelectedPhotos, isOpen, setI
 
     const results = await Promise.allSettled(
       uploadItems.map(async (item) => {
+        if (item.imageFile === null) {
+          setUploadItems(prev => prev.map(i =>
+            i.id === item.id ? { ...i, status: "error", errorMessage: "File not present." } : i
+          ));
+
+          return;
+        }
+
         try {
           await addMutation.mutateAsync(
             {
               title: photoTitle,
               story: isSingle ? photoStory : "",
               source: "",
-              photo_type_id: selectedPhotoType.value ? Number(selectedPhotoType.value) : null,
+              photo_type_id: selectedPhotoType?.value ? Number(selectedPhotoType?.value) : null,
               categories: selectedCategories,
               subcategories: selectedSubcategories,
-              image: item.file,
+              image: item.imageFile,
             }
           );
           setUploadItems(prev => prev.map(i =>
@@ -154,21 +157,23 @@ const PhotoDetailsModal = ({selectedPhotos = [], setSelectedPhotos, isOpen, setI
 
     const results = await Promise.allSettled(
       uploadItems.map(async (item) => {
-        const selectedPhoto = selectedPhotos.find((photo: any) => photo.id === item.id);
+        if (item.isNew) return;
+
+        const selectedPhoto = selectedPhotos.find((photo: IAdminFilterPhoto) => photo.id === item.id);
         const isSingle = uploadItems.length === 1;
 
         try {
           await updateMutation.mutateAsync(
             {
-              id: parseInt(item.id),
+              id: item.id,
               updatedPhoto: {
-                title: isSingle ? photoTitle : selectedPhoto.title, 
-                story: isSingle ? photoStory : selectedPhoto.story,
-                source: isSingle ? photoSource : selectedPhoto.source,
-                photo_type_id: selectedPhotoType.value ? Number(selectedPhotoType.value) : null,
+                title: isSingle ? photoTitle : selectedPhoto?.title ?? "", 
+                story: isSingle ? photoStory : selectedPhoto?.story ?? "",
+                source: isSingle ? photoSource : selectedPhoto?.source ?? "",
+                photo_type_id: selectedPhotoType?.value ? selectedPhotoType?.value : null,
                 categories: selectedCategories,
                 subcategories: selectedSubcategories,
-                image: isSingle ? uploadItems[0].file : null
+                image: isSingle ? uploadItems[0].imageFile : null
               }
             }
           );
@@ -199,18 +204,19 @@ const PhotoDetailsModal = ({selectedPhotos = [], setSelectedPhotos, isOpen, setI
   };
 
   const photoTypeOptions =  useMemo(() => {
-    return photoTypes.map((type:any) => ({label: type.title, value: type.id}))
+    return photoTypes.map((type: IPhotoType) => ({label: type.title, value: type.id}))
   }, [photoTypes]);
 
-  const availableCategories = useMemo(() => {
-    return (categories).filter((category: any) => {
-      const hasTriggerSubcategory = !!category.trigger_subcategory_id;
+  const availableCategories: ICategoryWithLink[] = useMemo(() => {
+    return (categories).filter((category: ICategoryQueryGroupedCategory) => {
+      const triggerSubcategoryId = category.trigger_subcategory_id ?? -99;
+      const hasTriggerSubcategory = !!triggerSubcategoryId;
       
-      return category.id !== 1 && (selectedSubcategories.includes(category.trigger_subcategory_id) || !hasTriggerSubcategory)
-    }).map((category: any) => {
+      return category.id !== 1 && (selectedSubcategories.includes(triggerSubcategoryId) || !hasTriggerSubcategory)
+    }).map((category: ICategoryQueryGroupedCategory) => {
       if(category.trigger_subcategory_id && subcategories) {
-        const triggerSubcategory = subcategories.find((subcategory: any) => subcategory.id === category.trigger_subcategory_id);
-        const triggerSubcategoryCategory = categories.find((category: any) => category.id === triggerSubcategory?.category_id);
+        const triggerSubcategory = subcategories.find((subcategory: ISubcategory) => subcategory.id === category.trigger_subcategory_id);
+        const triggerSubcategoryCategory = categories.find((category: ICategoryQueryGroupedCategory) => category.id === triggerSubcategory?.category_id);
 
         if(triggerSubcategory && triggerSubcategoryCategory) {
           return {
@@ -242,11 +248,12 @@ const PhotoDetailsModal = ({selectedPhotos = [], setSelectedPhotos, isOpen, setI
     const restrictedFileList = Array.from(fileList)
       .slice(0, availableNewSlots);
 
-    const newItems: IUploadItem[] = restrictedFileList
+    const newItems: IUploadItemNew[] = restrictedFileList
       .filter(file => file.type.startsWith("image/"))
       .map(file => ({
+        isNew: true,
         id: crypto.randomUUID(),
-        file,
+        imageFile: file,
         previewUrl: URL.createObjectURL(file),
         status: "pending" as const,
       }));
@@ -254,11 +261,26 @@ const PhotoDetailsModal = ({selectedPhotos = [], setSelectedPhotos, isOpen, setI
     setUploadItems(prev => [...prev, ...newItems]);
   };
 
-  const removeItem = (id: string) => {
+  const removeItem = (id: string | number) => {
     setUploadItems(prev => {
       const target = prev.find(i => i.id === id);
-      if (target) URL.revokeObjectURL(target.previewUrl);
-      return prev.filter(i => i.id !== id);
+
+      if(!target) return prev;
+
+      if(target.isNew || target.imageFile !== null) URL.revokeObjectURL(target.previewUrl);
+
+      if (target.isNew) return prev.filter(i => i.id !== id);
+
+      return prev.map((photo) => {
+        if(photo.id !== target.id || photo.isNew) return photo;
+
+        return ({
+          ...photo,
+          imageFile: null,
+          previewUrl: "",
+          isRemoved: true
+        })
+      });
     });
   };
 
@@ -292,21 +314,21 @@ const PhotoDetailsModal = ({selectedPhotos = [], setSelectedPhotos, isOpen, setI
       setPhotoSource(url);
       setPhotoSourceError(false);
       return;
-    } catch (_) {
+    } catch {
       setPhotoSourceError(true);
       return;
     }
   }
 
   useEffect(() => {
-    const ref: any = containerRef?.current
+    const ref = containerRef?.current
   if (isOpen && ref) {
     ref.scrollTop = 0;
   }
 }, [isOpen]);
 
   useEffect(() => {
-    const ref: any = containerRef?.current;
+    const ref = containerRef?.current;
     const hasSelectedCatSub = selectedCategories.length > 0 || selectedSubcategories.length > 0;
 
     if(ref && hasSelectedCatSub && windowBreakPoints.isMobile) {
@@ -315,27 +337,27 @@ const PhotoDetailsModal = ({selectedPhotos = [], setSelectedPhotos, isOpen, setI
         behavior: 'smooth'
       });
     }
-  }, [selectedCategories, selectedSubcategories]);
-
-  useEffect(() => {
-  return () => {
-    uploadItems.forEach(item => URL.revokeObjectURL(item.previewUrl));
-    };
-  }, []);
+  }, [selectedCategories, selectedSubcategories, windowBreakPoints.isMobile]);
 
   useEffect(() => {
     if(selectedPhotos.length > 0) {
-      setPhotoTitle(selectedPhotos[0].title);
-      setUploadItems(selectedPhotos.map((photo: any) => ({
+      setPhotoTitle(selectedPhotos[0].title ?? "");
+      setUploadItems(selectedPhotos.map((photo: IAdminFilterPhoto) => ({
+        isNew: false,
         id: photo.id,
         previewUrl: `${baseUploadUrl}${photo.photo_filename}`,
         status: "pending",
+        imageFile: null,
+        isRemoved: false
       })));
-      setSelectedPhotoType({label: selectedPhotos[0].type_title ?? "", value: selectedPhotos[0].photo_type_id ?? ""});
-      setSelectedCategories(selectedPhotos[0].categories.map((category: any) => category.id));
-      setSelectedSubcategories(selectedPhotos[0].subcategories.map((subcategory: any) => subcategory.id));
+
+      const selectedPhotoType = selectedPhotos[0].photo_type_id !== null ? {label: selectedPhotos[0].type_title, value: selectedPhotos[0].photo_type_id} : null;
+
+      setSelectedPhotoType(selectedPhotoType);
+      setSelectedCategories(selectedPhotos[0].categories.map((category: IPhotoCategory) => category.id));
+      setSelectedSubcategories(selectedPhotos[0].subcategories.map((subcategory: IPhotoCategory) => subcategory.id));
     }
-  }, [selectedPhotos]);
+  }, [selectedPhotos, baseUploadUrl]);
 
   return (
     <Modal
@@ -446,7 +468,7 @@ const PhotoDetailsModal = ({selectedPhotos = [], setSelectedPhotos, isOpen, setI
           <InputDropDown
             label='Photo type'
             placeholder='Select photo type'
-            value={selectedPhotoType.value}
+            value={selectedPhotoType?.value}
             setValue={setSelectedPhotoType}
             options={photoTypeOptions}
             isDisabled={false}
@@ -455,7 +477,7 @@ const PhotoDetailsModal = ({selectedPhotos = [], setSelectedPhotos, isOpen, setI
           <div className={styles['accent-box-wrapper']}>
             <div className={styles['accent-box']}>
               <div className={styles['selection-wrapper']}>
-                {availableCategories.map((category: any, idx: number) => {
+                {availableCategories.map((category: ICategoryWithLink, idx: number) => {
                   const isCategorySelected = selectedCategories.includes(category.id);
 
                   return (
@@ -468,13 +490,13 @@ const PhotoDetailsModal = ({selectedPhotos = [], setSelectedPhotos, isOpen, setI
                           additionalClass="no-style"
                           onClick={() => {
                             if(isCategorySelected) {
-                              setSelectedCategories((prev: any) => prev.filter((prevItem: any) => prevItem !== category.id));
+                              setSelectedCategories((prev: number[]) => prev.filter((prevItem: number) => prevItem !== category.id));
 
-                              const categorySubcategories = category.subcategories.map((subcategory: any) => subcategory.id);
-                              setSelectedSubcategories((prev: any) => prev.filter((prevItem: any) => !categorySubcategories.includes(prevItem) && !selectedSubcategories.includes(prevItem)));
+                              const categorySubcategories = category.subcategories.map((subcategory: ICategoryQueryGroupedCategorySubcategory) => subcategory.id);
+                              setSelectedSubcategories((prev: number[]) => prev.filter((prevItem: number) => !categorySubcategories.includes(prevItem) && !selectedSubcategories.includes(prevItem)));
                             }
                             else {
-                              setSelectedCategories((prev: any) => [...prev, category.id]);
+                              setSelectedCategories((prev: number[]) => [...prev, category.id]);
                             }
                           }} 
                           isDisabled={false}
@@ -487,7 +509,7 @@ const PhotoDetailsModal = ({selectedPhotos = [], setSelectedPhotos, isOpen, setI
                       </div>
                       {isCategorySelected && (
                         <div className={styles['subcategory-selection-wrapper']}>
-                          {category.subcategories.map((subcategory: any) => {
+                          {category.subcategories.map((subcategory) => {
                             const isSubcategorySelected = selectedSubcategories.includes(subcategory.id);
 
                             return (
@@ -496,13 +518,13 @@ const PhotoDetailsModal = ({selectedPhotos = [], setSelectedPhotos, isOpen, setI
                                   const triggerCategory = categories.find((category) => category.trigger_subcategory_id === subcategory.id);
 
                                   if(isSubcategorySelected) {
-                                    if (triggerCategory) setSelectedCategories((prev: any) => prev.filter((prevItem: any) => prevItem !== triggerCategory.id));
+                                    if (triggerCategory) setSelectedCategories((prev) => prev.filter((prevItem) => prevItem !== triggerCategory.id));
                                     
-                                    setSelectedSubcategories((prev: any) => prev.filter((prevItem: any) => prevItem !== subcategory.id));
+                                    setSelectedSubcategories((prev) => prev.filter((prevItem) => prevItem !== subcategory.id));
                                   }
                                   else {
-                                    if (triggerCategory) setSelectedCategories((prev: any) => [...prev, triggerCategory.id]);
-                                    setSelectedSubcategories((prev: any) => [...prev, subcategory.id]);
+                                    if (triggerCategory) setSelectedCategories((prev) => [...prev, triggerCategory.id]);
+                                    setSelectedSubcategories((prev) => [...prev, subcategory.id]);
                                   }
                                 }} 
                                 isDisabled={false}

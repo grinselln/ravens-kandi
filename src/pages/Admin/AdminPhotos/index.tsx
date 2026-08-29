@@ -18,7 +18,7 @@ import ActionButton from '@/components/Admin/Rows/ActionElements/ActionButton/Ac
 import FilterDisplay from '@/components/Shared/FilterDisplay/FilterDisplay';
 import { useSearchParams } from 'react-router-dom';
 import { ICategoryFilterCollection } from '@/interfaces/ICategories';
-import { IAdminBulkPhotoValidation, IAdminFilterPhoto, IAdminQueryPhoto, IPhoto, IPhotoAlerts, IUploadItem } from '@/interfaces/IPhotos';
+import { IAdminBulkPhotoValidation, IAdminFilterPhoto, IAdminQueryPhoto, IPhoto, IPhotoAlerts, IUploadItemBulkEdit } from '@/interfaces/IPhotos';
 import { IPhotoType } from '@/interfaces/IPhotoTypes';
 import { IPhotoSubcategory } from '@/interfaces/ISubcategories';
 import { IDropDownOption } from '@/interfaces/IRecords';
@@ -38,7 +38,7 @@ const AdminPhotos = () => {
   const [selectedPhotoTypes, setSelectedPhotoTypes] = useState<Array<number>>([]);
   const [selectedSortOption, setSelectedSortOption] = useState<IDropDownOption<string>>({label: "", value: ""});
   const [selectedCategoryFilters, setSelectedCategoryFilters] = useState<ICategoryFilterCollection>({});
-  const [selectedBulkEdit, setSelectedBulkEdit] = useState<Array<IUploadItem>>([]);
+  const [selectedBulkEdit, setSelectedBulkEdit] = useState<Array<IUploadItemBulkEdit>>([]);
   const [selectedAlerts, setSelectedAlerts] = useState<IPhotoAlerts>({missingType: false, missingCategory: false, missingSubcategory: false})
   const [isAddModalOpen, setIsAddModalOpen] = useState<boolean>(false);
   const [selectedEditPhotos, setSelectedEditPhotos] = useState<Array<IAdminFilterPhoto>>([]);
@@ -120,7 +120,7 @@ const AdminPhotos = () => {
   const handleDelete = useCallback(async () => {
     if (selectedBulkEdit.length === 0) return;
 
-    setSelectedBulkEdit((prev : Array<IUploadItem>) => prev.map((item: IUploadItem) => ({ ...item, status: "deleting" })));
+    setSelectedBulkEdit((prev : Array<IUploadItemBulkEdit>) => prev.map((item) => ({ ...item, status: "deleting" })));
 
     const results = await Promise.allSettled(
       selectedBulkEdit.map(async (item) => {
@@ -130,7 +130,7 @@ const AdminPhotos = () => {
             i.id === item.id ? { ...i, status: "success" } : i
           ));
         } catch (err) {
-          setSelectedBulkEdit((prev: Array<IUploadItem>) => prev.map((i: IUploadItem) =>
+          setSelectedBulkEdit((prev: Array<IUploadItemBulkEdit>) => prev.map((i) =>
             i.id === item.id ? { ...i, status: "error", errorMessage: String(err) } : i
           ));
           throw err;
@@ -150,16 +150,10 @@ const AdminPhotos = () => {
     }
   }, [deleteMutation, queryClient, selectedBulkEdit]);
 
-  const handleBulkAdd = (photo: IUploadItem) => {
-    if (!photo || selectedBulkEdit.some((item: IUploadItem) => item.id === photo.id)) return;
+  const handleBulkAdd = (photo: IUploadItemBulkEdit) => {
+    if (!photo || selectedBulkEdit.some((item: IUploadItemBulkEdit) => item.id === photo.id)) return;
 
-    const pendingPhoto = {
-      id: photo.id,
-      status: "pending" as const,
-      isDelete: photo.isDelete,
-    }
-
-    setSelectedBulkEdit(prev => [...prev, pendingPhoto]);
+    setSelectedBulkEdit(prev => [...prev, photo]);
   };
 
   const { filteredPhotos, filteredPhotosMap } = useMemo(() => {
@@ -191,7 +185,7 @@ const AdminPhotos = () => {
 
   const selectedEditPhotosFull = useMemo(() => {
     return filteredPhotos.filter((photo: IPhoto) => 
-      selectedBulkEdit.some((bulkPhoto: IUploadItem) => 
+      selectedBulkEdit.some((bulkPhoto: IUploadItemBulkEdit) => 
         bulkPhoto.id === photo.id));
   }, [selectedBulkEdit, filteredPhotos]);
 
@@ -202,7 +196,7 @@ const AdminPhotos = () => {
   };
 
   const bulkEditValid = useMemo(() => {
-    const selectedBulkPhotos: Array<IAdminBulkPhotoValidation> = selectedBulkEdit.map((photo: IUploadItem) => {
+    const selectedBulkPhotos: Array<IAdminBulkPhotoValidation> = selectedBulkEdit.map((photo: IUploadItemBulkEdit) => {
       const selectedPhoto = filteredPhotosMap.get(photo.id);
     
       return {
@@ -229,7 +223,7 @@ const AdminPhotos = () => {
   }
 
   useEffect(() => {
-    if(selectedBulkEdit.length === 1 && selectedBulkEdit[0].isDelete && selectedBulkEdit[0].status === "pending") {
+    if(selectedBulkEdit.length === 1 && selectedBulkEdit[0].status === "pending") {
       handleDelete();
     }
   }, [selectedBulkEdit, handleDelete]);
@@ -306,7 +300,10 @@ const AdminPhotos = () => {
                   isInverseLight={true}
                   placeholder='Sort by'
                   value={selectedSortOption?.value ?? ""}
-                  setValue={(selectedOption) => {setSelectedSortOption(selectedOption)}}
+                  setValue={(selectedOption) => {
+                    if(selectedOption === null) return;
+                    setSelectedSortOption(selectedOption)
+                  }}
                   options={sortOptions}
                   isDisabled={false}
                   isMedium={true}
@@ -381,7 +378,7 @@ const AdminPhotos = () => {
             <div className={`grid ${styles.photos}`}>
               {filteredPhotos.map((photo: IAdminFilterPhoto) => {
                 const missingData = getMissingData(photo);
-                const bulkItemDetails = selectedBulkEdit.find((item: IUploadItem) => item.id === photo.id);
+                const bulkItemDetails = selectedBulkEdit.find((item: IUploadItemBulkEdit) => item.id === photo.id);
 
                 return (
                   <div className={`col-6 col-sm-4 col-xl-3 ${styles['photo-wrapper']}${missingData.hasMissingData ? ` ${styles.alert}` : ""}`} key={`photo_${photo.id}`}>
@@ -412,19 +409,19 @@ const AdminPhotos = () => {
                         <Button
                           additionalClass="no-style"
                           onClick={() => {
-                            if(selectedBulkEdit.some((item: IUploadItem) => item.id === photo.id)) {
-                              setSelectedBulkEdit((prev: Array<IUploadItem>) => prev.filter((prevItem: IUploadItem) => prevItem.id !== photo.id))
+                            if(selectedBulkEdit.some((item: IUploadItemBulkEdit) => item.id === photo.id)) {
+                              setSelectedBulkEdit((prev: Array<IUploadItemBulkEdit>) => prev.filter((prevItem: IUploadItemBulkEdit) => prevItem.id !== photo.id))
                             } else {
                               handleBulkAdd({
                                 id: photo.id,
-                                status: "pending"
+                                status: "pending",
                               });
                             }
                           }} 
                           isDisabled={false}
                           >
-                          <span className={`${styles['checkbox-select']}${selectedBulkEdit.some((item: IUploadItem) => item.id === photo.id) ? ` ${styles.selected}` : ""}`}>
-                            <FontAwesomeIcon icon={selectedBulkEdit.some((item: IUploadItem) => item.id === photo.id) ? faCheckSquare : faSquare} />
+                          <span className={`${styles['checkbox-select']}${selectedBulkEdit.some((item: IUploadItemBulkEdit) => item.id === photo.id) ? ` ${styles.selected}` : ""}`}>
+                            <FontAwesomeIcon icon={selectedBulkEdit.some((item: IUploadItemBulkEdit) => item.id === photo.id) ? faCheckSquare : faSquare} />
                           </span>
                         </Button>
                       )}
@@ -451,7 +448,7 @@ const AdminPhotos = () => {
                             handleBulkAdd({
                               id: photo.id,
                               status: "pending", 
-                              isDelete: true})
+                            })
                           }} isDisabled={false} />
                         </div>
                       </div>

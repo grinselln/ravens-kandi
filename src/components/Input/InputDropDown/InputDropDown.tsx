@@ -11,7 +11,7 @@ interface IInputDropDown<T> {
   label?: string | ReactNode;
   placeholder: string;
   value: number | string | null | undefined;
-  setValue: (value: IDropDownOption<T>) => void;
+  setValue: (value: IDropDownOption<T> | null) => void;
   options: IDropDownOption<T>[];
   isDisabled: boolean;
   isSmall?: boolean;

@@ -19,10 +19,13 @@ export interface IPublicPhotoFetchData {
 }
 
 export interface IPublicQueryPhoto extends IPhoto {
-  categories: {
-    category_name: string,
-    subcategory_names: Array<string>
-  }
+  type_title: string;
+  categories: IPublicQueryPhotoCategories[]
+}
+
+export interface IPublicQueryPhotoCategories {
+  category_name: string,
+  subcategory_names: Array<string>
 }
 
 export type IPublicPhotosQueryData = Array<IPublicQueryPhoto>;
@@ -38,12 +41,31 @@ export interface IAdminQueryPhoto extends IPhoto {
   missing_subcategory: boolean;
 }
 
-export interface IUploadItem {
-  id: number; 
-  status: "pending" | "deleting" | "success" | "error";
+export interface IUploadItem { 
+  status: "pending" | "uploading" | "deleting" | "success" | "error";
   errorMessage?: string;
-  isDelete?: boolean;
 }
+
+export interface IUploadItemBulkEdit extends IUploadItem { 
+  id: number;
+}
+
+export interface IUploadItemEdit extends IUploadItem {
+  isNew: false;
+  id: number;
+  previewUrl: string;
+  imageFile: File | null;
+  isRemoved: boolean;
+}
+
+export interface IUploadItemNew extends IUploadItem {
+  isNew: true;
+  id: string;
+  previewUrl: string;
+  imageFile: File;
+}
+
+export type IUploadItemUnion = IUploadItemNew | IUploadItemEdit;
 
 export type IAdminPhotosQueryData = Array<IAdminQueryPhoto>;
 

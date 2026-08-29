@@ -26,6 +26,12 @@ export interface ICategoryQueryGroupedCategorySubcategory {
   order_index: number;
 }
 
+export interface ICategoryQueryGroupedCategorySubcategoryCat extends ICategoryQueryGroupedCategorySubcategory {
+  category_id: number;
+  value: number;
+  label: string;
+}
+
 export interface ICategoryQueryTriggerSubcategory {
   triggered_category_id: number;
   triggered_category_title: string;

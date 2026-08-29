@@ -3,7 +3,7 @@ import styles from './Row.module.scss';
 import { faChevronRight, faGrip } from '@fortawesome/free-solid-svg-icons';
 import ActionButton from '../ActionElements/ActionButton/ActionButton';
 
-interface IRow {
+export interface IRow {
   additionalClass?: string;
   title: React.ReactNode;
   order: number | null;

@@ -11,7 +11,7 @@ export default function ContactForm() {
   const [email, setEmail] = useState<string>("");
   const [subject, setSubject] = useState<string>("");
   const [message, setMessage] = useState<string>("");
-  const [errors, setErrors] = useState<any>({
+  const [errors, setErrors] = useState<Record<string, boolean | null>>({
     validName: null,
     validEmail: null,
     validSubject: null,
@@ -33,13 +33,13 @@ export default function ContactForm() {
     };
 
     let fieldValidation = {};
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/; 
 
     switch (field) {
       case "name":
         fieldValidation = {validName: name !== ""};
         break;
       case "email":
-        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/; 
         fieldValidation = {validEmail: emailRegex.test(email)};
         break;
       case "subject":
@@ -61,14 +61,13 @@ export default function ContactForm() {
 
   const isSendDisabled = useMemo(() => {
     return !errors.validName || !errors.validEmail || !errors.validSubject || !errors.validMessage;
-  }, [name, email, subject, message]);
+  }, [errors]);
 
   useEffect(() => {
     const form = document.getElementById('contactForm');
 
     if(form) {
-
-      const handleSubmit = (event: any) => {
+      const handleSubmit = (event: SubmitEvent) => {
         if(isSendDisabled) {
           event.preventDefault();
         }
@@ -80,7 +79,7 @@ export default function ContactForm() {
         window.removeEventListener("submit", handleSubmit);
       };
     }
-  }, []);
+  }, [isSendDisabled]);
 
   return (
     <form id='contactForm' method="POST" action="https://formsubmit.co/4a005f989176c3e97d68a7bc21e9d46e" encType="multipart/form-data">

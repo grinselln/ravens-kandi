@@ -12,7 +12,7 @@ interface IAddBulkModal {
   showModal: boolean;
   setShowModal: (value: boolean) => void;
   recordTypePlural?: string;
-  dropdownData?: Array<IDropDownOption>;
+  dropdownData?: Array<IDropDownOption<number>>;
   onSave: (value: Array<IAddedBulkRecord>) => void;
 }
 
@@ -94,7 +94,13 @@ const AddBulkModal = ({ recordTypePlural, dropdownData, showModal, setShowModal,
                 placeholder='Category'
                 label='Assign category'
                 value={newAddedRecord?.value}
-                setValue={(newValues) => setNewAddedRecord((prev: IAddedBulkRecord) => ({...prev, value: newValues.value}))}
+                setValue={(newValues) => {
+                  setNewAddedRecord((prev: IAddedBulkRecord) => {
+                    if (newValues === null) return prev;
+                    
+                    return ({...prev, value: newValues.value})
+                  })
+                }}
                 options={dropdownData}
                 isDisabled={false}
               />

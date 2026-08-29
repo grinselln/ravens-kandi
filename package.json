@@ -4,11 +4,13 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "node src/scripts/generate-breakpoints.mjs && vite",
+    "dev": "node src/scripts/generate-breakpoints.mjs && tsc --noEmit && vite",
     "build": "node src/scripts/generate-breakpoints.mjs && vite build",
     "deploy": "yarn build && node deploy.js",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "type-check": "tsc --noEmit --watch",
+    "lint:watch": "nodemon --watch src --ext ts,tsx --exec \"eslint src --format stylish || exit 1\""
   },
   "dependencies": {
     "@capsizecss/core": "^4.1.3",
@@ -23,10 +25,13 @@
     "@tanstack/react-query": "^5.101.2",
     "browser-image-compression": "^2.0.2",
     "clsx": "^2.1.1",
+    "jiti": "^2.7.0",
+    "nodemon": "^3.1.14",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
     "react-router-dom": "^7.18.1",
-    "sass": "^1.101.0"
+    "sass": "^1.101.0",
+    "vite-plugin-checker": "^0.14.5"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

@@ -8,20 +8,20 @@ import DropDownList from '../DropDownList/DropDownList';
 import InputText from '../InputText/InputText';
 import { IDropDownOption } from '@/interfaces/IRecords';
 
-interface IInputMultiSelect<T> {
+interface IInputMultiSelect {
   label: string;
   placeholder: string;
-  addSelection: (value: IDropDownOption<T>) => void;
-  removeSelection: (value: T) => void;
-  options: IDropDownOption<T>[];
-  selectedOptions: IDropDownOption<T>[];
+  addSelection: (value: IDropDownOption<number> | null) => void;
+  removeSelection: (value: number) => void;
+  options: IDropDownOption<number>[];
+  selectedOptions: IDropDownOption<number>[];
 }
 
-const InputMultiSelect = <T,>({label, placeholder, addSelection, removeSelection, options, selectedOptions}: IInputMultiSelect<T>) => {
+const InputMultiSelect = ({label, placeholder, addSelection, removeSelection, options, selectedOptions}: IInputMultiSelect) => {
   const [searchText, setSearchText] = useState<string>("");
 
   const filteredOptions = useMemo(() => {
-    return options.filter((option: IDropDownOption<T>) => {
+    return options.filter((option: IDropDownOption<number>) => {
       if(searchText === "") return option;
 
       const optionLabel = (option.label).toLowerCase();
@@ -39,7 +39,7 @@ const InputMultiSelect = <T,>({label, placeholder, addSelection, removeSelection
     >
       {selectedOptions.length > 0 && (
         <div className={styles['selected-options-wrapper']}>
-          {selectedOptions.map((option: IDropDownOption<T>) => (
+          {selectedOptions.map((option) => (
             <button key={`tag_${option.value}`} className={styles['selected-option']} onClick={() => removeSelection(option.value)}>
               <span>{option.label}</span>
               <FontAwesomeIcon icon={faClose} />
@@ -66,7 +66,7 @@ const InputMultiSelect = <T,>({label, placeholder, addSelection, removeSelection
           handleTriggerClick={handleTriggerClick}
           setValue={addSelection}
           triggerRef={inputRef}
-          onAddNew={(newItem: IDropDownOption<T>) => {
+          onAddNew={(newItem: IDropDownOption<number>) => {
             setSearchText("");
             addSelection(newItem)
           }}

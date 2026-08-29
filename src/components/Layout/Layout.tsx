@@ -6,12 +6,12 @@ import { faArrowRightFromBracket, faDiamond } from '@fortawesome/free-solid-svg-
 import { faBars } from '@fortawesome/free-solid-svg-icons'
 import { faClose } from '@fortawesome/free-solid-svg-icons'
 import { useEffect, useRef, useState } from 'react'
-import { useSessionStore } from '../Admin/Providers/SessionProvider'
 import Modal from '../Modal/Modal'
 import Button from '../Input/Button/Button'
 import { useAuth } from '@/hooks/useAuth'
 import ActionButton from '../Admin/Rows/ActionElements/ActionButton/ActionButton'
 import { getMe, logout } from '@/api/auth';
+import { useSessionStore } from '../Admin/Providers/SessionContext'
 
 const API_URL = import.meta.env.VITE_API_URL;
 const API_URL_ORIGIN = new URL(API_URL).origin;
