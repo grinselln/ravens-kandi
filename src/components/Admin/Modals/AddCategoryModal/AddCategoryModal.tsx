@@ -45,7 +45,7 @@ const AddCategoryModal = ({ isOpen, setIsOpen, triggerSubcategories, subcategori
 
     return {
       title: categoryName,
-      subcategories: subcategoryIds,
+      subcategoryIds: subcategoryIds,
       newSubcategoryTitles,
       trigger_subcategory_id: selectedTriggerSubcategory?.value ?? null
     }

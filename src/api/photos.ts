@@ -51,12 +51,24 @@ export const addPhoto = async (data: {title: string, story: string, source: stri
 }
 
 export const updatePhoto = async (id: number, data: IUpdatePhoto) => {
+  const formData = new FormData();
+  formData.append("title", data.title);
+  formData.append("story", data.story);
+  formData.append("source", data.source);
+  data.categories.forEach((id) => formData.append("categories", String(id)));
+  data.subcategories.forEach((id) => formData.append("subcategories", String(id)));
+
+  if (data.photo_type_id !== null) {
+    formData.append("photo_type_id", String(data.photo_type_id));
+  }
+
+  if (data.image !== null) {
+    formData.append("image", data.image);
+  }
+
   return apiFetch(`${API_URL}/photos/${id}`, {requiresAuth: true}, {
     method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(data),
+    body: formData,
   })
 }
 

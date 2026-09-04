@@ -1,5 +1,6 @@
 import { IDropDownOption } from '@/interfaces/IRecords';
 import styles from './DropDownList.module.scss';
+import clsx from 'clsx';
 
 interface IDropDownList<T> {
   isSmall?: boolean;
@@ -21,6 +22,8 @@ interface IDropDownList<T> {
 }
 
 const DropDownList = <T,>({ isSmall, isMedium, isInverse, isInverseLight, isOpen, activeIndex, setActiveIndex, value, options, handleTriggerClick, setValue, triggerRef, onAddNew, searchText, allowRemoval, placeholder }: IDropDownList<T>) => {
+  
+
   return (
     isOpen && (
       <ul role="listbox" className={`${styles['dropdown-list']}${isSmall ? ` ${styles.small}` : ""}
@@ -76,9 +79,9 @@ const DropDownList = <T,>({ isSmall, isMedium, isInverse, isInverseLight, isOpen
           <li
             id={`listboxOption_-1`}
             role="option"
-            className={activeIndex === 0
-              ? styles.active
-              : ""}
+            className={clsx(
+              activeIndex === 0 && styles.active
+            )}
             onClick={(e) => {
               handleTriggerClick(e);
               onAddNew({value: (Math.floor(Math.random() * 1000) + 1) * -1, label: searchText ?? ""});

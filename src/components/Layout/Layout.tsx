@@ -123,6 +123,7 @@ function Layout({ children, darkNav = false, isAdmin = false }: LayoutProps) {
       </nav>
       <main>{children}</main>
       <Modal
+        additionalClass={["session"]}
         visibility={isSessionExpired}
         title='Session Expired'
         modalButtons={

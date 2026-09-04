@@ -63,7 +63,7 @@ export interface INewCategoryDraft {
   isNew: boolean;
   id: null;
   title: string;
-  subcategories: number[];
+  subcategoryIds: number[];
   newSubcategoryTitles: string[]; 
   order_index: null;
   trigger_subcategory_id: number | null;
@@ -75,7 +75,7 @@ export interface IExistingCategoryDraft extends ICategoryWithLink {
 
 export interface IAddCategory {
   title: string;
-  subcategories: Array<number>;
+  subcategoryIds: Array<number>;
   newSubcategoryTitles: Array<string>;
   trigger_subcategory_id: number | null;
 }

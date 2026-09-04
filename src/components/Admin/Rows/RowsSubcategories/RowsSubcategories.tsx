@@ -99,13 +99,13 @@ const RowsSubcategories = ({ categories, subcategories, parentCategory, selected
     });
   };
 
-  const handleOnEdit = (subcategoryRecord: IEditedSubcategoryRecord) => { 
+  const handleOnEdit = (subcategoryRecord: IEditedSubcategoryRecord) => {    
     setSelectedSubcategoryRecord(subcategoryRecord);
     setEditedSubcategoryRecord(subcategoryRecord);
   };
 
   const handleOnSave = () => {
-    if(editedSubcategoryRecord === null || typeof editedSubcategoryRecord.id === "string" || editedSubcategoryRecord.category_id === null) return;
+    if(editedSubcategoryRecord === null || !!editedSubcategoryRecord?.isNew || editedSubcategoryRecord.category_id === null) return;
 
     updateMutation.mutate({
       id: editedSubcategoryRecord.id,
@@ -159,7 +159,7 @@ const RowsSubcategories = ({ categories, subcategories, parentCategory, selected
         const linkedCategory = categories.find((category) => category.trigger_subcategory_id === subcategory.id);
 
         const rowProps: IRow = {
-          isOrderingDisabled: selectedSubcategoryRecord !== null && ((selectedSubcategoryRecord.id !== null && !selectedSubcategoryRecord.isNew) || selectedSubcategoryRecord.isNew || (editingStatus.isEditing && !isEditingCurrent)),
+          isOrderingDisabled: editingStatus.isEditing,
           isOrderingHidden: parentCategory.order_index === -1,
           title: <>
             {isEditingCurrent

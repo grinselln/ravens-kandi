@@ -54,7 +54,7 @@ const AdminCategories = () => {
     isNew: false,
     id: null,
     title: "",
-    subcategories: [],
+    subcategoryIds: [],
     newSubcategoryTitles: [],
     order_index: null,
     trigger_subcategory_id: null
@@ -68,8 +68,8 @@ const AdminCategories = () => {
     category_id: null
   };*/
 
-  const [selectedCategoryRecord, setSelectedCategoryRecord] = useState<IEditedCategoryRecord>(blankCategoryRecord);
-  const [editedCategoryRecord, setEditedCategoryRecord] = useState<IEditedCategoryRecord>(blankCategoryRecord);
+  const [selectedCategoryRecord, setSelectedCategoryRecord] = useState<IEditedCategoryRecord | null>(null);
+  const [editedCategoryRecord, setEditedCategoryRecord] = useState<IEditedCategoryRecord | null>(null);
   const [selectedSubcategoryRecord, setSelectedSubcategoryRecord] = useState<IEditedSubcategoryRecord | null>(null);
   const [editedSubcategoryRecord, setEditedSubcategoryRecord] = useState<IEditedSubcategoryRecord | null>(null);
   const [triggerEditId, setTriggerEditId] = useState<number | null>(null);
@@ -95,8 +95,8 @@ const AdminCategories = () => {
         queryClient.invalidateQueries({ queryKey: ['categories'] }),
         queryClient.invalidateQueries({ queryKey: ['subcategories'] })
       ])
-      setSelectedCategoryRecord(blankCategoryRecord);
-      setEditedCategoryRecord(blankCategoryRecord);
+      setSelectedCategoryRecord(null);
+      setEditedCategoryRecord(null);
     },
     onError: (error) => {
       console.error('Update failed:', error);
@@ -120,8 +120,8 @@ const AdminCategories = () => {
     mutationFn: (updates: {id: number, updatedCategory: IUpdateCategory}) => updateCategory(updates.id, updates.updatedCategory),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['categories'] });
-      setSelectedCategoryRecord(blankCategoryRecord);
-      setEditedCategoryRecord(blankCategoryRecord);
+      setSelectedCategoryRecord(null);
+      setEditedCategoryRecord(null);
       setTriggerEditId(null);
     },
     onError: (error) => {
@@ -212,7 +212,7 @@ const AdminCategories = () => {
   const handleOnAdd = (newRecordData?: IAddCategory) => {
     const source = newRecordData ?? editedCategoryRecord;
 
-    if (source.title === "") return;
+    if (source === null || source.title === "") return;
 
     addMutation.mutate(source);
   };
@@ -237,11 +237,9 @@ const AdminCategories = () => {
   };
 
   const handleOnSave = (recordOverride: ICategoryWithLink | null = null) => {
-    if(editedCategoryRecord === null) return;
-
     const editedRecord = recordOverride ? recordOverride : editedCategoryRecord;
 
-    if (editedRecord.id === null) return;
+    if(editedRecord === null || editedRecord.id === null) return;
 
     updateMutation.mutate({
       id: editedRecord.id,
@@ -296,9 +294,9 @@ const AdminCategories = () => {
   
   const editingStatus = useMemo(() => {
     return {
-      isEditing: editedCategoryRecord === null || editedCategoryRecord.id !== null || editedCategoryRecord.isNew || triggerEditId !== null,
-      isEditingNewCategory: editedCategoryRecord.isNew,
-      isEditingNewSubcategory: typeof editedSubcategoryRecord?.id === "string"
+      isEditing: editedCategoryRecord !== null || editedSubcategoryRecord !== null || triggerEditId !== null,
+      isEditingNewCategory: !!editedCategoryRecord?.isNew,
+      isEditingNewSubcategory: !!editedSubcategoryRecord?.isNew,
     }
   }, [editedCategoryRecord, editedSubcategoryRecord, triggerEditId]);
 
@@ -341,7 +339,6 @@ const AdminCategories = () => {
       dropdownCategoryData
     }
   }, [data, dataSubcategories]);
-
 
   return (
     <LayoutAdmin>
@@ -394,7 +391,7 @@ const AdminCategories = () => {
           >
             {categoriesWithLinks.map((category: ICategoryWithLink, index: number) => {
               const linkedSubcategory = category?.linkedSubcategory;
-              const editingCurrent = editingStatus.isEditing && selectedCategoryRecord.id === category.id;
+              const editingCurrent = editingStatus.isEditing && selectedCategoryRecord?.id === category.id;
               const editingTrigger = editingStatus.isEditing && triggerEditId === category.id;
               const currentSubcategories = category.subcategories.map((subcategory: ICategoryQueryGroupedCategorySubcategory) => subcategory.id);
               const dropdownOptions: Array<IDropDownOption<number>> = (data?.options ?? []).filter((option: ICategoryQueryOption) => !currentSubcategories.includes(option.id) && !(option.label).includes("Unassigned"))
@@ -414,13 +411,17 @@ const AdminCategories = () => {
                         <Row
                           dragHandleRef={handleRef}
                           isEditing={editingCurrent}
-                          isOrderingDisabled={editingStatus.isEditing && (!editingCurrent || !editingTrigger)}
+                          isOrderingDisabled={editingStatus.isEditing}
                           isOrderingHidden={category.order_index === -1}
                           title={<>
                             {editingCurrent && !editingTrigger
                             ? <RowInput
                                 value={editedCategoryRecord?.title ?? ""}
-                                setValue={(newValue) => setEditedCategoryRecord((prev: IEditedCategoryRecord) => ({...prev, isNew: false, title: newValue}))}
+                                setValue={(newValue) => setEditedCategoryRecord((prev) =>{ 
+                                  if(prev === null) return prev;
+
+                                  return ({...prev, isNew: false, title: newValue})
+                                })}
                                 isNew={false}
                                 inputItemLabel='Category'
                                 isDisabled={false}
@@ -435,13 +436,13 @@ const AdminCategories = () => {
                                 <InputDropDown
                                   isSmall={true}
                                   placeholder='Link subcategory'
-                                  value={editedCategoryRecord.trigger_subcategory_id ? editedCategoryRecord.trigger_subcategory_id : category.trigger_subcategory_id}
+                                  value={editedCategoryRecord?.trigger_subcategory_id ? editedCategoryRecord.trigger_subcategory_id : category.trigger_subcategory_id}
                                   setValue={(newValue) => {
-                                    setEditedCategoryRecord((prev : IEditedCategoryRecord) => {
-                                      if(newValue === null) return prev;
+                                    setEditedCategoryRecord((prev) => {
+                                      if(newValue === null || prev === null) return prev;
 
                                       const newValueInt = typeof newValue.value === "number" ? newValue.value : parseInt(newValue.value);
-                                      return ({...prev, trigger_subcategory_id: newValueInt })
+                                      return ({...prev, isNew: false, trigger_subcategory_id: newValueInt })
                                   })}}
                                   options={dropdownOptions}
                                   isDisabled={false}
@@ -489,7 +490,7 @@ const AdminCategories = () => {
                                     )
                                   ) : (
                                     <ActionButton variant='alert' icon={faClose} isDisabled={updateMutation.isPending} onAction={() => {
-                                      setSelectedCategoryRecord(blankCategoryRecord); setEditedCategoryRecord(blankCategoryRecord); setTriggerEditId(null)
+                                      setSelectedCategoryRecord(null); setEditedCategoryRecord(null); setTriggerEditId(null)
                                     }} />
                                   )}
                                   
@@ -523,7 +524,7 @@ const AdminCategories = () => {
             isOrderingDisabled={true}
             title={
               <RowInput
-                value={editedCategoryRecord.isNew ? editedCategoryRecord.title : ""}
+                value={editedCategoryRecord?.isNew ? editedCategoryRecord.title : ""}
                 setValue={(newValue) => {
                   setEditedCategoryRecord(({...blankCategoryRecord, isNew: true, title: newValue}))
                 }}
@@ -540,10 +541,10 @@ const AdminCategories = () => {
               ) : (
                 <ActionButton variant={!editingStatus.isEditingNewCategory ? "default" : 'confirm'} 
                 icon={faPlus} 
-                isDisabled={(editingStatus.isEditing && !editingStatus.isEditingNewCategory) || (editingStatus.isEditingNewCategory && editedCategoryRecord.title === "") || !editingStatus.isEditing} onAction={() => handleOnAdd()} />
+                isDisabled={(editingStatus.isEditing && !editingStatus.isEditingNewCategory) || (editingStatus.isEditingNewCategory && editedCategoryRecord?.title === "") || !editingStatus.isEditing} onAction={() => handleOnAdd()} />
               )}
               {editingStatus.isEditingNewCategory && (
-                <ActionButton variant={"alert"} icon={faClose} onAction={() => setEditedCategoryRecord(blankCategoryRecord) } isDisabled={false} />
+                <ActionButton variant={"alert"} icon={faClose} onAction={() => setEditedCategoryRecord(null) } isDisabled={false} />
               )}
               </>
             }

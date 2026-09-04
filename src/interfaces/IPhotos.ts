@@ -88,12 +88,13 @@ export interface IPhotoAlerts {
 }
 
 export interface IUpdatePhoto {
-  title: string | null;
-  story: string | null;
-  source: string | null;
+  title: string;
+  story: string;
+  source: string;
   photo_type_id: number | null,
   categories: Array<number>;
   subcategories: Array<number>;
+  image: File | null;
 }
 
 export interface IPhotoCategoryViews {

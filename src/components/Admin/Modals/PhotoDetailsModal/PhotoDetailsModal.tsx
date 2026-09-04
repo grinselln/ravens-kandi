@@ -117,7 +117,7 @@ const PhotoDetailsModal = ({selectedPhotos = [], setSelectedPhotos, isOpen, setI
             {
               title: photoTitle,
               story: isSingle ? photoStory : "",
-              source: "",
+              source: isSingle ? photoSource : "",
               photo_type_id: selectedPhotoType?.value ? Number(selectedPhotoType?.value) : null,
               categories: selectedCategories,
               subcategories: selectedSubcategories,
@@ -203,15 +203,21 @@ const PhotoDetailsModal = ({selectedPhotos = [], setSelectedPhotos, isOpen, setI
     }
   };
 
-  const photoTypeOptions =  useMemo(() => {
+  const showPhotoPlaceholder = useMemo(() => {
+    const isEmptyNewPhotoState = uploadItems.length === 0;
+    const isEmptyEditPhotoState = uploadItems.length === 1 && !uploadItems[0].isNew && uploadItems[0].isRemoved;
+    
+    return isEmptyNewPhotoState || isEmptyEditPhotoState
+  }, [uploadItems])
+
+  const photoTypeOptions = useMemo(() => {
     return photoTypes.map((type: IPhotoType) => ({label: type.title, value: type.id}))
   }, [photoTypes]);
 
   const availableCategories: ICategoryWithLink[] = useMemo(() => {
     return (categories).filter((category: ICategoryQueryGroupedCategory) => {
       const triggerSubcategoryId = category.trigger_subcategory_id ?? -99;
-      const hasTriggerSubcategory = !!triggerSubcategoryId;
-      
+      const hasTriggerSubcategory = triggerSubcategoryId !== -99;
       return category.id !== 1 && (selectedSubcategories.includes(triggerSubcategoryId) || !hasTriggerSubcategory)
     }).map((category: ICategoryQueryGroupedCategory) => {
       if(category.trigger_subcategory_id && subcategories) {
@@ -248,7 +254,21 @@ const PhotoDetailsModal = ({selectedPhotos = [], setSelectedPhotos, isOpen, setI
     const restrictedFileList = Array.from(fileList)
       .slice(0, availableNewSlots);
 
-    const newItems: IUploadItemNew[] = restrictedFileList
+    if (fileList.length === 1, uploadItems.length === 1 && !uploadItems[0].isNew && uploadItems[0].isRemoved) {
+      const replacementPhotoFile = restrictedFileList[0];
+
+      const replacedUploadItem = {
+        ...uploadItems[0],
+        imageFile: replacementPhotoFile,
+        previewUrl: URL.createObjectURL(replacementPhotoFile),
+        status: "pending" as const,
+        isRemoved: false
+      }
+
+      setUploadItems([replacedUploadItem]);
+    }
+    else {
+      const newItems: IUploadItemNew[] = restrictedFileList
       .filter(file => file.type.startsWith("image/"))
       .map(file => ({
         isNew: true,
@@ -258,7 +278,8 @@ const PhotoDetailsModal = ({selectedPhotos = [], setSelectedPhotos, isOpen, setI
         status: "pending" as const,
       }));
 
-    setUploadItems(prev => [...prev, ...newItems]);
+      setUploadItems(prev => [...prev, ...newItems]);
+    }
   };
 
   const removeItem = (id: string | number) => {
@@ -341,10 +362,11 @@ const PhotoDetailsModal = ({selectedPhotos = [], setSelectedPhotos, isOpen, setI
 
   useEffect(() => {
     if(selectedPhotos.length > 0) {
-      setPhotoTitle(selectedPhotos[0].title ?? "");
       setUploadItems(selectedPhotos.map((photo: IAdminFilterPhoto) => ({
         isNew: false,
         id: photo.id,
+        story: photo.story,
+        source: photo.source,
         previewUrl: `${baseUploadUrl}${photo.photo_filename}`,
         status: "pending",
         imageFile: null,
@@ -353,9 +375,15 @@ const PhotoDetailsModal = ({selectedPhotos = [], setSelectedPhotos, isOpen, setI
 
       const selectedPhotoType = selectedPhotos[0].photo_type_id !== null ? {label: selectedPhotos[0].type_title, value: selectedPhotos[0].photo_type_id} : null;
 
+      setPhotoTitle(selectedPhotos[0].title ?? "");
       setSelectedPhotoType(selectedPhotoType);
       setSelectedCategories(selectedPhotos[0].categories.map((category: IPhotoCategory) => category.id));
       setSelectedSubcategories(selectedPhotos[0].subcategories.map((subcategory: IPhotoCategory) => subcategory.id));
+
+      if(selectedPhotos.length === 1) {
+        setPhotoSource(selectedPhotos[0].source ?? "");
+        setPhotoStory(selectedPhotos[0].story ?? "");
+      }
     }
   }, [selectedPhotos, baseUploadUrl]);
 
@@ -380,7 +408,7 @@ const PhotoDetailsModal = ({selectedPhotos = [], setSelectedPhotos, isOpen, setI
             }} 
             isDisabled={false}>Cancel</Button>
           <Button onClick={() => selectedPhotos.length !== 0 ? handleSaveEdit() : handleSaveNew()}
-            isDisabled={uploadItems.length === 0
+            isDisabled={showPhotoPlaceholder
             || photoSourceError}>Save Photo</Button>
         </>
       }
@@ -422,14 +450,14 @@ const PhotoDetailsModal = ({selectedPhotos = [], setSelectedPhotos, isOpen, setI
                     )}
                     {item.status === "uploading" && <FontAwesomeIcon className={styles['status-badge-loading']} icon={faSpinner} spin />}
                     {item.status === "success" && <FontAwesomeIcon className={styles['status-badge-success']} icon={faCheck} />}
-                    {item.status !== "uploading" && uploadItems.length === 1 && (
+                    {item.status !== "uploading" && uploadItems.length === 1 && !showPhotoPlaceholder && (
                       <ActionButton icon={faSquareXmark} variant="alert" onAction={(e) => { e.stopPropagation(); removeItem(item.id); }} isDisabled={false} />
                     )}
                   </div>
                 ))}
               </div>
             )}
-            {uploadItems.length === 0 && (
+            {showPhotoPlaceholder && (
               <>
                 <FontAwesomeIcon className={styles['image-placeholder']} icon={faImages} />
                 <p>Click or drag to upload image</p>

@@ -33,6 +33,14 @@ const InputMultiSelect = ({label, placeholder, addSelection, removeSelection, op
 
   const {isOpen, inputRef, wrapperRef, activeIndex, setActiveIndex, handleTriggerClick, onInputFocus} = useDropDown({options: filteredOptions, value: null, setValue: addSelection});
 
+  const showAdd = useMemo(() => {
+    return options.length === 0 && searchText !== "";
+  }, [options, searchText]);
+  
+  const isDropdownOpen = useMemo(() => {
+    return isOpen && (options.length > 0 || showAdd)
+  }, [isOpen, showAdd, options]);
+
   return (
     <InputWrapper
       label={label}
@@ -48,7 +56,7 @@ const InputMultiSelect = ({label, placeholder, addSelection, removeSelection, op
         </div>
       )}
       <div className={`${styles['multi-select']}`} ref={wrapperRef}>
-        <div className={`${styles['multi-field-wrapper']}${isOpen ? ` ${styles.open}` : ""}`}>
+        <div className={`${styles['multi-field-wrapper']}${isDropdownOpen ? ` ${styles.open}` : ""}`}>
           <InputText
             ref={inputRef}
             placeholder={placeholder}
@@ -58,7 +66,7 @@ const InputMultiSelect = ({label, placeholder, addSelection, removeSelection, op
           />
         </div>
         <DropDownList
-          isOpen={isOpen}
+          isOpen={isDropdownOpen}
           activeIndex={activeIndex}
           setActiveIndex={setActiveIndex}
           value={null}
