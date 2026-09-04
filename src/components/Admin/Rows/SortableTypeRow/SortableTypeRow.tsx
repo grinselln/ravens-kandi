@@ -1,8 +1,15 @@
 
-import Row from "../Row/Row";
+import Row, { IRow } from "../Row/Row";
 import { CollisionDetector, CollisionPriority, CollisionType } from '@dnd-kit/abstract';
 import { useSortable } from "@dnd-kit/react/sortable";
 import { RestrictToElement } from '@dnd-kit/dom/modifiers';
+import { IPhotoType } from "@/interfaces/IPhotoTypes";
+
+interface ISortableTypeRow extends IRow {
+  photoType: IPhotoType;
+  index: number;
+  container: React.RefObject<HTMLDivElement | null>
+}
 
 const verticalEdgeDetector: CollisionDetector = ({ dragOperation, droppable }) => {
     const { shape, source } = dragOperation;
@@ -33,7 +40,7 @@ const verticalEdgeDetector: CollisionDetector = ({ dragOperation, droppable }) =
     return null;
   };
 
-const SortableTypeRow = ({photoType, index, container, ...rowProps}: any) => {
+const SortableTypeRow = ({photoType, index, container, ...rowProps}: ISortableTypeRow) => {
  const { ref, handleRef } = useSortable({
     id: photoType.id,
     index,

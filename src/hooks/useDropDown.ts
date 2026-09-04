@@ -1,12 +1,13 @@
+import { IDropDownOption } from '@/interfaces/IRecords';
 import { useState, useEffect, useRef } from 'react';
 
-interface IUseDropDown {
-  options: any;
-  value: any;
-  setValue: any;
+interface IUseDropDown<T> {
+  options: IDropDownOption<T>[];
+  value: number | string | null | undefined;
+  setValue: (value: IDropDownOption<T> | null) => void;
 }
 
-export const useDropDown = ({options, value, setValue}: IUseDropDown) => {
+export const useDropDown = <T,>({options, value, setValue}: IUseDropDown<T>) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [activeIndex, setActiveIndex] = useState<number>(-1);
 
@@ -16,7 +17,7 @@ export const useDropDown = ({options, value, setValue}: IUseDropDown) => {
 
   const onOpenDropdown = () => {
     setIsOpen(true);
-    const currentIndex = options.findIndex((option: any) => option.value === value);
+    const currentIndex = options.findIndex((option: IDropDownOption<T>) => option.value === value);
     setActiveIndex(currentIndex);
   }
 

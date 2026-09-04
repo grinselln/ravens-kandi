@@ -1,54 +1,47 @@
 import { useSortable } from "@dnd-kit/react/sortable";
 import { CollisionDetector, CollisionPriority, CollisionType } from '@dnd-kit/abstract';
+import { ReactElement } from "react";
 
+type SortableType = 'category' | 'subcategory';
 
-  type SortableType = 'category' | 'subcategory';
+interface ISortableCategoryAccordion {
+  categoryId: number;
+  headerRenderFn: (handleRef: (element: Element | null) => void) => ReactElement
+  index: number;
+}
 
-  interface Category {
-    id: number;
-    name: string;
-    subcategories: Subcategory[];
-  }
+const verticalEdgeDetector: CollisionDetector = ({ dragOperation, droppable }) => {
+  const { shape, source } = dragOperation;
 
-  interface Subcategory {
-    id: number;
-    name: string;
-  }
-
-  const verticalEdgeDetector: CollisionDetector = ({ dragOperation, droppable }) => {
-    const { shape, source } = dragOperation;
-
-    if (!shape || !droppable.shape || droppable.id === source?.id) {
-      return null;
-    }
-
-    const activeRect = shape.current.boundingRectangle;
-    const initialRect = shape.initial.boundingRectangle;
-    const targetRect = droppable.shape.boundingRectangle;
-    const targetMidpoint = (targetRect.top + targetRect.bottom) / 2;
-
-    const isMovingDown = activeRect.top > initialRect.top;
-
-    if (isMovingDown) {
-      if (activeRect.bottom >= targetMidpoint && activeRect.top < targetMidpoint) {
-        const value = activeRect.bottom - targetMidpoint;
-        return { id: droppable.id, value, type: CollisionType.Collision, priority: CollisionPriority.Normal };
-      }
-    } else {
-      if (activeRect.top <= targetMidpoint && activeRect.bottom > targetMidpoint) {
-        const value = targetMidpoint - activeRect.top;
-        return { id: droppable.id, value, type: CollisionType.Collision, priority: CollisionPriority.Normal };
-      }
-    }
-
+  if (!shape || !droppable.shape || droppable.id === source?.id) {
     return null;
-  };
+  }
 
-const SortableCategoryAccordion = ({ category, headerRenderFn, index }: any) => {
-  
+  const activeRect = shape.current.boundingRectangle;
+  const initialRect = shape.initial.boundingRectangle;
+  const targetRect = droppable.shape.boundingRectangle;
+  const targetMidpoint = (targetRect.top + targetRect.bottom) / 2;
 
+  const isMovingDown = activeRect.top > initialRect.top;
+
+  if (isMovingDown) {
+    if (activeRect.bottom >= targetMidpoint && activeRect.top < targetMidpoint) {
+      const value = activeRect.bottom - targetMidpoint;
+      return { id: droppable.id, value, type: CollisionType.Collision, priority: CollisionPriority.Normal };
+    }
+  } else {
+    if (activeRect.top <= targetMidpoint && activeRect.bottom > targetMidpoint) {
+      const value = targetMidpoint - activeRect.top;
+      return { id: droppable.id, value, type: CollisionType.Collision, priority: CollisionPriority.Normal };
+    }
+  }
+
+  return null;
+};
+
+const SortableCategoryAccordion = ({ categoryId, headerRenderFn, index }: ISortableCategoryAccordion) => {
   const { ref, handleRef } = useSortable({
-    id: category.id,
+    id: categoryId,
     index,
     type: 'category' satisfies SortableType,
     accept: 'category' satisfies SortableType,

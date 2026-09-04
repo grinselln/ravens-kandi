@@ -1,16 +1,18 @@
+import { IAddCategory, ICategoriesQueryData, IEditedCategoryRecord, IPhotoCategoriesQueryData, IUpdateCategory } from "@/interfaces/ICategories";
 import { apiFetch } from "./apiFetch";
+import { IReorderRecord } from "@/interfaces/IRecords";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
-export const fetchCategories = async () => {
+export const fetchCategories = async (): Promise<ICategoriesQueryData> => {
   return apiFetch(`${API_URL}/categories`, {requiresAuth: false});
 };
 
-export const fetchPhotoCategories = async () => {
+export const fetchPhotoCategories = async (): Promise<IPhotoCategoriesQueryData> => {
   return apiFetch(`${API_URL}/categories/photoCategories`, {requiresAuth: true});
 };
 
-export const addCategory = async (data: {title: string; subcategories: any; newSubcategoryTitles: any; triggerSubcategoryId: any}) => {
+export const addCategory = async (data: IAddCategory | IEditedCategoryRecord) => {
   return apiFetch(`${API_URL}/categories`, {requiresAuth: true}, {
     method: 'POST',
     headers: {
@@ -20,7 +22,7 @@ export const addCategory = async (data: {title: string; subcategories: any; newS
   })
 }
 
-export const updateCategory = async (id: number, data: {title: string; triggerSubcategoryId: number, order: number, views: number}) => {
+export const updateCategory = async (id: number, data: IUpdateCategory) => {
   return apiFetch(`${API_URL}/categories/${id}`, {requiresAuth: true}, {
     method: 'PUT',
     headers: {
@@ -30,7 +32,7 @@ export const updateCategory = async (id: number, data: {title: string; triggerSu
   })
 }
 
-export const reorderCategories = async (categories: any) => {
+export const reorderCategories = async (categories: Array<IReorderRecord>) => {
   return apiFetch(`${API_URL}/categories/reorder`, {requiresAuth: true}, {
     method: 'POST',
     headers: {

@@ -1,12 +1,14 @@
+import { IPhotoSubcategoriesQueryData, ISubcategory, ISubcategoryUpdateFetchData } from "@/interfaces/ISubcategories";
 import { apiFetch } from "./apiFetch";
+import { IAddedBulkRecord, IReorderRecord } from "@/interfaces/IRecords";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
-export const fetchSubcategories = async () => {
+export const fetchSubcategories = async (): Promise<Array<ISubcategory>> => {
   return apiFetch(`${API_URL}/subcategories`, {requiresAuth: false});
 };
 
-export const fetchPhotoSubcategories = async () => {
+export const fetchPhotoSubcategories = async (): Promise<IPhotoSubcategoriesQueryData> => {
   return apiFetch(`${API_URL}/subcategories/photoSubcategories`, {requiresAuth: true});
 };
 
@@ -20,7 +22,7 @@ export const addSubcategory = async (data: {category: number; title: string; ord
   })
 }
 
-export const addSubcategories = async (records: any) => {
+export const addSubcategories = async (records: IAddedBulkRecord[]) => {
   return apiFetch(`${API_URL}/subcategories/bulk`, {requiresAuth: true}, {
     method: 'POST',
     headers: {
@@ -30,17 +32,17 @@ export const addSubcategories = async (records: any) => {
   })
 }
 
-export const updateSubcategory = async (id: number, data : any) => {
-  return apiFetch(`${API_URL}/subcategories/${id}`, {requiresAuth: true}, {
+export const updateSubcategory = async (data: ISubcategoryUpdateFetchData) => {
+  return apiFetch(`${API_URL}/subcategories/${data.id}`, {requiresAuth: true}, {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify(data),
+    body: JSON.stringify(data.updatedSubcategory),
   })
 }
 
-export const reorderSubcategories = async (categoryId: number, subcategories: any) => {
+export const reorderSubcategories = async (categoryId: number, subcategories: Array<IReorderRecord>) => {
   return apiFetch(`${API_URL}/subcategories/${categoryId}/reorder`, {requiresAuth: true}, {
     method: 'POST',
     headers: {

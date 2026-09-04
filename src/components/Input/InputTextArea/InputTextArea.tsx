@@ -2,7 +2,7 @@ import InputWrapper from '../InputWrapper/InputWrapper';
 import styles from './InputTextArea.module.scss';
 
 interface IInputTextArea extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
-  value: any;
+  value: string;
   setValue: (value: string) => void;
   label?: string;
   placeholder?: string;

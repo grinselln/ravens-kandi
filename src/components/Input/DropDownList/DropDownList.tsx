@@ -1,17 +1,19 @@
+import { IDropDownOption } from '@/interfaces/IRecords';
 import styles from './DropDownList.module.scss';
+import clsx from 'clsx';
 
-interface IDropDownList {
+interface IDropDownList<T> {
   isSmall?: boolean;
   isInverse?: boolean;
   isOpen: boolean;
   activeIndex: number;
-  setActiveIndex: Function;
-  value: any;
-  options: any;
-  handleTriggerClick: Function;
-  setValue: Function;
-  triggerRef: any
-  onAddNew?: Function;
+  setActiveIndex: React.Dispatch<React.SetStateAction<number>>;
+  value: number | string | null | undefined;
+  options: IDropDownOption<T>[];
+  handleTriggerClick: (e: React.MouseEvent) => void;
+  setValue: (value: IDropDownOption<T> | null) => void;
+  triggerRef: React.RefObject<HTMLButtonElement | HTMLInputElement | null>;
+  onAddNew?: (newItem: IDropDownOption<number>) => void;
   searchText?: string;
   allowRemoval?: boolean;
   placeholder?: string;
@@ -19,8 +21,9 @@ interface IDropDownList {
   isMedium?: boolean;
 }
 
-const DropDownList = ({ isSmall, isMedium, isInverse, isInverseLight, isOpen, activeIndex, setActiveIndex, value, options, 
-  handleTriggerClick, setValue, triggerRef, onAddNew, searchText, allowRemoval, placeholder }: IDropDownList) => {
+const DropDownList = <T,>({ isSmall, isMedium, isInverse, isInverseLight, isOpen, activeIndex, setActiveIndex, value, options, handleTriggerClick, setValue, triggerRef, onAddNew, searchText, allowRemoval, placeholder }: IDropDownList<T>) => {
+  
+
   return (
     isOpen && (
       <ul role="listbox" className={`${styles['dropdown-list']}${isSmall ? ` ${styles.small}` : ""}
@@ -46,13 +49,13 @@ const DropDownList = ({ isSmall, isMedium, isInverse, isInverseLight, isOpen, ac
             {placeholder}
           </li>
         )}
-        {options.map((option: any, idx: number) => {
+        {options.map((option, idx: number) => {
           const index = allowRemoval ? idx + 1 : idx;
 
           return (
           <li
             id={`listboxOption_${option.value}`}
-            key={option.value}
+            key={`${option.value}`}
             role="option"
             aria-selected={option.value === value}
             className={option.value === value 
@@ -76,12 +79,12 @@ const DropDownList = ({ isSmall, isMedium, isInverse, isInverseLight, isOpen, ac
           <li
             id={`listboxOption_-1`}
             role="option"
-            className={activeIndex === 0
-              ? styles.active
-              : ""}
+            className={clsx(
+              activeIndex === 0 && styles.active
+            )}
             onClick={(e) => {
               handleTriggerClick(e);
-              onAddNew({value: (Math.floor(Math.random() * 1000) + 1) * -1, label: searchText});
+              onAddNew({value: (Math.floor(Math.random() * 1000) + 1) * -1, label: searchText ?? ""});
               triggerRef.current?.focus();
             }}
             onMouseEnter={() => {

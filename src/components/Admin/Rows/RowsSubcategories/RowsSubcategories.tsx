@@ -1,6 +1,6 @@
 import { useMemo, useRef } from 'react';
 import RowsWrapper from '../RowsWrapper/RowsWrapper';
-import Row from '../Row/Row';
+import Row, { IRow } from '../Row/Row';
 import RowInput from '../RowInput/RowInput';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheck, faClose, faDiamond, faPlus } from '@fortawesome/free-solid-svg-icons';
@@ -9,20 +9,23 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { addSubcategory, deleteSubcategory, updateSubcategory } from '@/api/subcategories';
 import InputDropDown from '@/components/Input/InputDropDown/InputDropDown';
 import { faEdit, faTrashCan } from '@fortawesome/free-regular-svg-icons';
-import { useDeleteConfirmation } from '../../Providers/DeleteModalProvider';
 import RowLink from '../RowLink/RowLink';
 import SortableSubcategoryRow from '../SortableSubcategoryRow/SortableSubcategoryRow';
+import { ICategoryQueryGroupedCategorySubcategory, ICategoryQueryGroupedCategorySubcategoryCat, ICategoryWithLink } from '@/interfaces/ICategories';
+import { IEditedSubcategoryRecord, ISubcategoryUpdateFetchData } from '@/interfaces/ISubcategories';
+import { IEditingStatus } from '@/interfaces/IRecords';
+import { useDeleteConfirmation } from '../../Providers/DeleteModalContext';
 
 
 interface IRowsSubcategories {
-  categories: any;
-  subcategories: any;
-  parentCategory: any;
-  selectedSubcategoryRecord: any;
-  setSelectedSubcategoryRecord: Function;
-  editedSubcategoryRecord: any; 
-  setEditedSubcategoryRecord: Function;
-  editingStatus: any;
+  categories: ICategoryWithLink[];
+  subcategories: ICategoryQueryGroupedCategorySubcategory[];
+  parentCategory: ICategoryWithLink;
+  selectedSubcategoryRecord: IEditedSubcategoryRecord | null;
+  setSelectedSubcategoryRecord: (value: IEditedSubcategoryRecord | null) => void;
+  editedSubcategoryRecord: IEditedSubcategoryRecord | null; 
+  setEditedSubcategoryRecord: React.Dispatch<React.SetStateAction<IEditedSubcategoryRecord | null>>;
+  editingStatus: IEditingStatus;
 }
 
 
@@ -33,23 +36,21 @@ const RowsSubcategories = ({ categories, subcategories, parentCategory, selected
   setEditedSubcategoryRecord, editingStatus } : IRowsSubcategories) => {
     const queryClient = useQueryClient();
     const {pendingDeleteId, warningMessage, onDismissWarningMessage, assignWarningMessage, assignRecordType, assignOnConfirm, assignPendingDeleteId} = useDeleteConfirmation();
-    
-    const RowTag = parentCategory.order_index === -1 ? Row : SortableSubcategoryRow;
 
     const blankSubcategoryRecord = {
-    id: null,
-    isNew: false,
-    title: "",
-    order_index: null,
-    category_id: null
-  };
+      id: "",
+      isNew: false,
+      title: "",
+      order_index: null,
+      category_id: null
+    };
 
   const addMutation = useMutation({
     mutationFn: (newSubcategory: {title: string; category: number; order: number | null}) => addSubcategory(newSubcategory),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['categories'] });
-      setSelectedSubcategoryRecord(blankSubcategoryRecord);
-      setEditedSubcategoryRecord(blankSubcategoryRecord);
+      setSelectedSubcategoryRecord(null);
+      setEditedSubcategoryRecord(null);
     },
     onError: (error) => { 
       console.error('Update failed:', error);
@@ -57,11 +58,11 @@ const RowsSubcategories = ({ categories, subcategories, parentCategory, selected
   });
 
   const updateMutation = useMutation({
-    mutationFn: (updates: {id: number, updatedSubcategory: any}) => updateSubcategory(updates.id, updates.updatedSubcategory),
+    mutationFn: (updates: ISubcategoryUpdateFetchData) => updateSubcategory(updates),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['categories'] });
-      setSelectedSubcategoryRecord(blankSubcategoryRecord);
-      setEditedSubcategoryRecord(blankSubcategoryRecord);
+      setSelectedSubcategoryRecord(null);
+      setEditedSubcategoryRecord(null);
     },
     onError: (error) => {
       console.error('Update failed:', error);
@@ -89,7 +90,7 @@ const RowsSubcategories = ({ categories, subcategories, parentCategory, selected
   }
 
   const handleOnAdd = () => {
-    if(editedSubcategoryRecord.id === null) return;
+    if(editedSubcategoryRecord === null || editedSubcategoryRecord.id === null || editedSubcategoryRecord.category_id === null) return;
 
     addMutation.mutate({
       title: editedSubcategoryRecord.title,
@@ -98,19 +99,19 @@ const RowsSubcategories = ({ categories, subcategories, parentCategory, selected
     });
   };
 
-  const handleOnEdit = (subcategoryRecord: any) => { 
+  const handleOnEdit = (subcategoryRecord: IEditedSubcategoryRecord) => {    
     setSelectedSubcategoryRecord(subcategoryRecord);
     setEditedSubcategoryRecord(subcategoryRecord);
   };
 
   const handleOnSave = () => {
-    if(editedSubcategoryRecord === null) return;
+    if(editedSubcategoryRecord === null || !!editedSubcategoryRecord?.isNew || editedSubcategoryRecord.category_id === null) return;
 
     updateMutation.mutate({
       id: editedSubcategoryRecord.id,
       updatedSubcategory: {
         title: editedSubcategoryRecord.title,
-        category: editedSubcategoryRecord.category_id,
+        category_id: editedSubcategoryRecord.category_id,
         order: editedSubcategoryRecord.order_index
       }
     })
@@ -124,11 +125,11 @@ const RowsSubcategories = ({ categories, subcategories, parentCategory, selected
   }
 
   const isEditingCurrentSubcategoryNew = useMemo(() => {
-    return editingStatus.isEditingNewSubcategory && editedSubcategoryRecord.id === `${parentCategory.id}_-1`;
+    return editingStatus.isEditingNewSubcategory && editedSubcategoryRecord !== null && editedSubcategoryRecord.id === `${parentCategory.id}_-1`;
   }, [editingStatus.isEditingNewSubcategory, editedSubcategoryRecord, parentCategory]);
 
-  const subcategoriesWithCategory = useMemo(() => {
-    return subcategories.map((subcategory: any) => {
+  const subcategoriesWithCategory  = useMemo(() => {
+    return subcategories.map<ICategoryQueryGroupedCategorySubcategoryCat>((subcategory) => {
       return(
       {
         ...subcategory,
@@ -140,7 +141,7 @@ const RowsSubcategories = ({ categories, subcategories, parentCategory, selected
   }, [subcategories, parentCategory]);
 
   const dropdownOptions = useMemo(() => {
-    return categories.map((category: any) => ({
+    return categories.map((category) => ({
       label: category.title,
       value: category.id
     }))
@@ -152,63 +153,94 @@ const RowsSubcategories = ({ categories, subcategories, parentCategory, selected
       additionalClass={"subcategories"}
       ref={subcategoryContainerRef}
     >
-      {subcategoriesWithCategory.map((subcategory: any, index: number) => {
+      {subcategoriesWithCategory.map((subcategory, index: number) => {
         const isEditingCurrent = editingStatus.isEditing && subcategory.id === selectedSubcategoryRecord?.id;
         const isEditingNotSelected = editingStatus.isEditing && subcategory.id !== selectedSubcategoryRecord?.id;
-        const linkedCategory = categories.find((category: any) => category.trigger_subcategory_id === subcategory.id);
+        const linkedCategory = categories.find((category) => category.trigger_subcategory_id === subcategory.id);
 
-        return (
-          <RowTag
-            {...(parentCategory.order_index !== -1 && {subcategory: subcategory, categoryId: parentCategory.id, index, container: subcategoryContainerRef})}
-            isOrderingDisabled={(selectedSubcategoryRecord.id !== null && !selectedSubcategoryRecord.isNew) || selectedSubcategoryRecord.isNew || (editingStatus.isEditing && !isEditingCurrent)}
-            isOrderingHidden={parentCategory.order_index === -1}
-            key={`subcategory-row_${subcategory.id}`}
-            title={<>
-              {isEditingCurrent
-                ? <RowInput
-                    value={editedSubcategoryRecord.title}
-                    setValue={(newValue) => setEditedSubcategoryRecord((prev: any) => ({...prev, title: newValue}))}
-                    isNew={false}
-                    inputItemLabel='Type'
-                    isDisabled={false}
-                  />
-                : <h3>{subcategory.title}</h3>}
-              {linkedCategory && !isEditingCurrent && (
-                <RowLink title={linkedCategory.title} />
-              )}
-              </>
-            }
-            order={parentCategory.order_index === -1 ? null : subcategory.order_index}
-            actionElements={isEditingCurrent ? (
-              <>
-              <InputDropDown
-                isSmall={true}
-                placeholder='Assign to Category'
-                value={linkedCategory.id}
-                setValue={(newValue) => setEditedSubcategoryRecord((prev : any) => ({...prev, category_id: newValue.value }))}
-                options={dropdownOptions}
-                isDisabled={false}
-              />
-              {updateMutation.isPending ? (
+        const rowProps: IRow = {
+          isOrderingDisabled: editingStatus.isEditing,
+          isOrderingHidden: parentCategory.order_index === -1,
+          title: <>
+            {isEditingCurrent
+              ? <RowInput
+                  value={editedSubcategoryRecord?.title ?? ""}
+                  setValue={(newValue) => {
+            
+                    setEditedSubcategoryRecord(prev => {
+                      if (prev === null) return ({
+                        id: subcategory.id, 
+                        isNew: false, 
+                        title: newValue,
+                        order_index: subcategory.order_index,
+                        category_id: subcategory.category_id
+                      });
+                      
+                      if (prev.isNew) return prev;
+
+                      return ({...prev, title: newValue});
+                    })
+                  }}
+                  isNew={false}
+                  inputItemLabel='Type'
+                  isDisabled={false}
+                />
+              : <h3>{subcategory.title}</h3>}
+            {linkedCategory && !isEditingCurrent && (
+              <RowLink title={linkedCategory.title} />
+            )}
+          </>,
+          order: parentCategory.order_index === -1 ? null : subcategory.order_index,
+          actionElements: isEditingCurrent ? (
+            <>
+            <InputDropDown
+              isSmall={true}
+              placeholder='Assign to Category'
+              value={linkedCategory?.id}
+              setValue={(newValue) => setEditedSubcategoryRecord((prev) => {
+                if (prev === null || newValue === null) return prev;
+
+                return ({...prev, category_id: newValue.value })
+              })}
+              options={dropdownOptions}
+              isDisabled={false}
+            />
+            {updateMutation.isPending ? (
+              <FontAwesomeIcon icon={faDiamond} spin />
+            ) : (
+              <ActionButton variant='confirm' icon={faCheck} isDisabled={false} onAction={() => {handleOnSave()}} />
+            )}
+            <ActionButton variant='alert' icon={faClose} isDisabled={updateMutation.isPending} onAction={() => {
+              setSelectedSubcategoryRecord(null);
+              setEditedSubcategoryRecord(null);
+            }} />
+            </>
+          ) : (
+            <>
+              <ActionButton variant='default' icon={faEdit} isDisabled={isEditingNotSelected} onAction={() => {handleOnEdit({...subcategory, isNew: false})}} />
+              {(deleteMutation.isPending || warningMessage !== null) && subcategory.id == pendingDeleteId ? (
                 <FontAwesomeIcon icon={faDiamond} spin />
               ) : (
-                <ActionButton variant='confirm' icon={faCheck} isDisabled={false} onAction={() => {handleOnSave()}} />
+                <ActionButton variant='alert' icon={faTrashCan} isDisabled={isEditingNotSelected} onAction={() => { assignPendingDeleteId(subcategory.id); handleOnDelete(subcategory.id, true); }} />
               )}
-              <ActionButton variant='alert' icon={faClose} isDisabled={updateMutation.isPending} onAction={() => {
-                setSelectedSubcategoryRecord(blankSubcategoryRecord); setEditedSubcategoryRecord(blankSubcategoryRecord)
-              }} />
-              </>
-            ) : (
-              <>
-                <ActionButton variant='default' icon={faEdit} isDisabled={isEditingNotSelected} onAction={() => {handleOnEdit(subcategory)}} />
-                {(deleteMutation.isPending || warningMessage !== null) && subcategory.id == pendingDeleteId ? (
-                  <FontAwesomeIcon icon={faDiamond} spin />
-                ) : (
-                  <ActionButton variant='alert' icon={faTrashCan} isDisabled={isEditingNotSelected} onAction={() => { assignPendingDeleteId(subcategory.id); handleOnDelete(subcategory.id, true); }} />
-                )}
-              </>
-            )}
-            isInverse={parentCategory.order_index !== -1}
+            </>
+          ),
+          isInverse: parentCategory.order_index !== -1
+        }
+
+        return parentCategory.order_index === -1 ?(
+          <Row
+            key={`subcategory-row_${subcategory.id}`}
+            {...rowProps}
+          />
+        ) : (
+          <SortableSubcategoryRow
+            key={`subcategory-row_${subcategory.id}`}
+            subcategoryId={subcategory.id}
+            categoryId={parentCategory.id}
+            index={index}
+            container={subcategoryContainerRef}
+            {...rowProps}
           />
         )
       })}
@@ -219,18 +251,22 @@ const RowsSubcategories = ({ categories, subcategories, parentCategory, selected
         isOrderingHidden={parentCategory.order_index === -1}
         title={
           <RowInput
-            value={isEditingCurrentSubcategoryNew ? editedSubcategoryRecord.title : ""}
+            value={isEditingCurrentSubcategoryNew ? editedSubcategoryRecord?.title ?? "" : ""}
             setValue={(newValue) => {
               if(!isEditingCurrentSubcategoryNew) {
-                setEditedSubcategoryRecord((prev: any) => (
-                  {...prev, 
+                setEditedSubcategoryRecord((
+                  {...blankSubcategoryRecord, 
                     id: `${parentCategory.id}_-1`, 
                     isNew: true, 
                     title: newValue,
                     category_id: parentCategory.id 
                   }));
               } else {
-                setEditedSubcategoryRecord((prev: any) => ({...prev, title: newValue}))
+                setEditedSubcategoryRecord(prev => {
+                  if(prev === null || !prev.isNew) return prev;
+
+                  return ({...prev, title: newValue})
+                })
               }
             }}
             isNew={true}
@@ -254,7 +290,7 @@ const RowsSubcategories = ({ categories, subcategories, parentCategory, selected
             onAction={() => handleOnAdd()} />
           )}
           {isEditingCurrentSubcategoryNew && (
-            <ActionButton variant={"alert"} icon={faClose} onAction={() => setEditedSubcategoryRecord(blankSubcategoryRecord) } isDisabled={false} />
+            <ActionButton variant={"alert"} icon={faClose} onAction={() => setEditedSubcategoryRecord(null) } isDisabled={false} />
           )}
           </>
         }

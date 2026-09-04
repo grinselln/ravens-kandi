@@ -1,31 +1,27 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useMemo, useState } from 'react';
 import InputWrapper from '../InputWrapper/InputWrapper';
 import styles from './InputMultiSelect.module.scss';
-import { faChevronDown, faClose } from '@fortawesome/free-solid-svg-icons';
+import { faClose } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useDropDown } from '@/hooks/useDropDown';
 import DropDownList from '../DropDownList/DropDownList';
 import InputText from '../InputText/InputText';
-
-interface IOption {
-  label: string;
-  value: string;
-}
+import { IDropDownOption } from '@/interfaces/IRecords';
 
 interface IInputMultiSelect {
   label: string;
   placeholder: string;
-  addSelection: (value: any) => void;
+  addSelection: (value: IDropDownOption<number> | null) => void;
   removeSelection: (value: number) => void;
-  options: IOption[];
-  selectedOptions: IOption[];
+  options: IDropDownOption<number>[];
+  selectedOptions: IDropDownOption<number>[];
 }
 
 const InputMultiSelect = ({label, placeholder, addSelection, removeSelection, options, selectedOptions}: IInputMultiSelect) => {
   const [searchText, setSearchText] = useState<string>("");
 
   const filteredOptions = useMemo(() => {
-    return options.filter((option: any) => {
+    return options.filter((option: IDropDownOption<number>) => {
       if(searchText === "") return option;
 
       const optionLabel = (option.label).toLowerCase();
@@ -37,13 +33,21 @@ const InputMultiSelect = ({label, placeholder, addSelection, removeSelection, op
 
   const {isOpen, inputRef, wrapperRef, activeIndex, setActiveIndex, handleTriggerClick, onInputFocus} = useDropDown({options: filteredOptions, value: null, setValue: addSelection});
 
+  const showAdd = useMemo(() => {
+    return options.length === 0 && searchText !== "";
+  }, [options, searchText]);
+  
+  const isDropdownOpen = useMemo(() => {
+    return isOpen && (options.length > 0 || showAdd)
+  }, [isOpen, showAdd, options]);
+
   return (
     <InputWrapper
       label={label}
     >
       {selectedOptions.length > 0 && (
         <div className={styles['selected-options-wrapper']}>
-          {selectedOptions.map((option: any) => (
+          {selectedOptions.map((option) => (
             <button key={`tag_${option.value}`} className={styles['selected-option']} onClick={() => removeSelection(option.value)}>
               <span>{option.label}</span>
               <FontAwesomeIcon icon={faClose} />
@@ -52,7 +56,7 @@ const InputMultiSelect = ({label, placeholder, addSelection, removeSelection, op
         </div>
       )}
       <div className={`${styles['multi-select']}`} ref={wrapperRef}>
-        <div className={`${styles['multi-field-wrapper']}${isOpen ? ` ${styles.open}` : ""}`}>
+        <div className={`${styles['multi-field-wrapper']}${isDropdownOpen ? ` ${styles.open}` : ""}`}>
           <InputText
             ref={inputRef}
             placeholder={placeholder}
@@ -62,7 +66,7 @@ const InputMultiSelect = ({label, placeholder, addSelection, removeSelection, op
           />
         </div>
         <DropDownList
-          isOpen={isOpen}
+          isOpen={isDropdownOpen}
           activeIndex={activeIndex}
           setActiveIndex={setActiveIndex}
           value={null}
@@ -70,9 +74,9 @@ const InputMultiSelect = ({label, placeholder, addSelection, removeSelection, op
           handleTriggerClick={handleTriggerClick}
           setValue={addSelection}
           triggerRef={inputRef}
-          onAddNew={(newSubcategory: any) => {
+          onAddNew={(newItem: IDropDownOption<number>) => {
             setSearchText("");
-            addSelection(newSubcategory)
+            addSelection(newItem)
           }}
           searchText={searchText}
         />

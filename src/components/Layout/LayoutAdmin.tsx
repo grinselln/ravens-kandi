@@ -1,12 +1,11 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import styles from './LayoutAdmin.module.scss'
 import Layout from "@/components/Layout/Layout";
-import { faHouse, faImage, faTableCellsLarge, faTableList, faTag } from '@fortawesome/free-solid-svg-icons';
+import { faHouse, faImage, faTableCellsLarge, faTag } from '@fortawesome/free-solid-svg-icons';
 import { Link } from 'react-router-dom';
-import { useState } from 'react';
 import Modal from '../Modal/Modal';
 import Button from '../Input/Button/Button';
-import { useDeleteConfirmation } from '../Admin/Providers/DeleteModalProvider';
+import { useDeleteConfirmation } from '../Admin/Providers/DeleteModalContext';
 
 interface ILayoutAdmin {
   children: React.ReactNode;
@@ -72,7 +71,4 @@ const LayoutAdmin = ({children}: ILayoutAdmin) => {
 };
 
 export default LayoutAdmin;
-function useSatate<T>(DASHBOARD: string): [any, any] {
-  throw new Error('Function not implemented.');
-}
 

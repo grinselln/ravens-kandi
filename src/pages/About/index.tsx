@@ -1,4 +1,3 @@
-import Button from '@/components/Input/Button/Button';
 import styles from './About.module.scss'
 import Layout from "@/components/Layout/Layout";
 import PageHeader from "@/components/User/PageHeader/PageHeader";
