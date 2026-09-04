@@ -1,22 +1,18 @@
-import { ReactNode, useEffect, useMemo, useRef, useState } from 'react';
+import { ReactNode, useMemo } from 'react';
 import InputWrapper from '../InputWrapper/InputWrapper';
 import styles from './InputDropDown.module.scss';
 import { faChevronDown } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useDropDown } from '@/hooks/useDropDown';
 import DropDownList from '../DropDownList/DropDownList';
+import { IDropDownOption } from '@/interfaces/IRecords';
 
-interface IOption {
-  label: string;
-  value: string;
-}
-
-interface IInputDropDown {
+interface IInputDropDown<T> {
   label?: string | ReactNode;
   placeholder: string;
-  value: string | null;
-  setValue: (value: IOption) => void;
-  options: IOption[];
+  value: number | string | null | undefined;
+  setValue: (value: IDropDownOption<T> | null) => void;
+  options: IDropDownOption<T>[];
   isDisabled: boolean;
   isSmall?: boolean;
   isMedium?: boolean;
@@ -25,14 +21,14 @@ interface IInputDropDown {
   allowRemoval?: boolean;
 }
 
-const InputDropDown = ({label, placeholder, value, setValue, options, isDisabled, isSmall, isMedium, isInverse, isInverseLight, allowRemoval}: IInputDropDown) => {
+const InputDropDown = <T,>({label, placeholder, value, setValue, options, isDisabled, isSmall, isMedium, isInverse, isInverseLight, allowRemoval}: IInputDropDown<T>) => {
   const {isOpen, triggerRef, wrapperRef, activeIndex, setActiveIndex, handleTriggerClick, handleKeyDown} = useDropDown({options, value, setValue});
 
   const displayLabel = useMemo(() => {  
     const selectedOption = options.find(option => option.value === value);
     
     return selectedOption?.label ?? placeholder; 
-  }, [value, options]);
+  }, [value, options, placeholder]);
 
   return (
     <InputWrapper

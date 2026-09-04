@@ -1,9 +1,10 @@
+import { IReorderRecord } from "@/interfaces/IRecords";
 import { apiFetch } from "./apiFetch";
-import { ApiError } from "./errors";
+import { IPhotoTypesQueryData } from "@/interfaces/IPhotoTypes";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
-export const fetchPhotoTypes = async () => {
+export const fetchPhotoTypes = async (): Promise<IPhotoTypesQueryData> => {
   return apiFetch(`${API_URL}/types`, {requiresAuth: false});
 };
 
@@ -42,7 +43,7 @@ export const updatePhotoType = async (id: number, data : IUpdatePhotoType) => {
   })
 }
 
-export const reorderPhotoTypes = async (types: any) => {
+export const reorderPhotoTypes = async (types: Array<IReorderRecord>) => {
   return apiFetch(`${API_URL}/types/reorder`, {requiresAuth: true}, {
     method: 'POST',
     headers: {

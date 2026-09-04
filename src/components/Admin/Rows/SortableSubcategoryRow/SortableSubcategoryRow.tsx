@@ -1,10 +1,17 @@
 
-import Row from "../Row/Row";
+import Row, { IRow } from "../Row/Row";
 import { CollisionDetector, CollisionPriority, CollisionType } from '@dnd-kit/abstract';
 import { useSortable } from "@dnd-kit/react/sortable";
 import { RestrictToElement } from '@dnd-kit/dom/modifiers';
 
-  type SortableType = 'category' | 'subcategory';
+type SortableType = 'category' | 'subcategory';
+
+interface ISortableSubcategoryRow extends IRow {
+  subcategoryId: number;
+  categoryId: number;
+  index: number;
+  container: React.RefObject<HTMLDivElement | null>
+}
 
 const verticalEdgeDetector: CollisionDetector = ({ dragOperation, droppable }) => {
     const { shape, source } = dragOperation;
@@ -35,9 +42,9 @@ const verticalEdgeDetector: CollisionDetector = ({ dragOperation, droppable }) =
     return null;
   };
 
-const SortableSubcategoryRow = ({subcategory, categoryId, index, container, ...rowProps}: any) => {
+const SortableSubcategoryRow = ({subcategoryId, categoryId, index, container, ...rowProps}: ISortableSubcategoryRow) => {
  const { ref, handleRef } = useSortable({
-    id: subcategory.id,
+    id: subcategoryId,
     index,
     type: 'subcategory' satisfies SortableType,
     accept: 'subcategory' satisfies SortableType,
@@ -45,7 +52,7 @@ const SortableSubcategoryRow = ({subcategory, categoryId, index, container, ...r
     collisionDetector: verticalEdgeDetector,
     modifiers: [
       RestrictToElement.configure({
-        element: () => container.current,
+        element: () => container?.current,
       })
     ],
     transition: {

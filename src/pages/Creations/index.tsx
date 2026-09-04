@@ -1,18 +1,19 @@
 import { fetchPhotoTypes } from "@/api/photoTypes";
-import Layout from "@/components/Layout/Layout";
 import PageHeader from "@/components/User/PageHeader/PageHeader";
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import styles from './Creations.module.scss';
 import Button from "@/components/Input/Button/Button";
 import { fetchCategories } from "@/api/categories";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import FilterDisplay from "@/components/Shared/FilterDisplay/FilterDisplay";
 import { fetchPhotos, updateViews } from "@/api/photos";
 import ViewPhotoModal from "@/components/User/ViewPhotoModal/ViewPhotoModal";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faChevronDown, faChevronUp, faDiamond, faDiamondTurnRight, faSpinner, faSquare } from "@fortawesome/free-solid-svg-icons";
+import { faSpinner } from "@fortawesome/free-solid-svg-icons";
 import { useWindowWidth } from "@/hooks/useWindowWidth";
-import ActionButton from "@/components/Admin/Rows/ActionElements/ActionButton/ActionButton";
+import Layout from "@/components/Layout/Layout";
+import { IPublicQueryPhoto, ISelectedPhoto } from "@/interfaces/IPhotos";
+import { ICategoryFilterCollection } from "@/interfaces/ICategories";
 
 interface IPhotoType {
   id: number;
@@ -30,8 +31,9 @@ const Creations = () => {
 
   const [selectedPhotoTypes, setSelectedPhotoTypes] = useState<Array<number>>([]);
   //const [selectedSortOption, setSelectedSortOption] = useState<IOption>({label: "", value: ""});
-  const [selectedCategoryFilters, setSelectedCategoryFilters] = useState<any>({});
-  const [selectedPhoto, setSelectedPhoto] = useState<any>(null);
+  const [selectedCategoryFilters, setSelectedCategoryFilters] = useState<ICategoryFilterCollection>({});
+  const [selectedPhoto, setSelectedPhoto] = useState<ISelectedPhoto | null>(null);
+  const [activeId, setActiveId] = useState<number | null>(null);
 
   const { data: photos, isLoading: photoLoading } = useQuery({
     queryKey: ['photos', selectedPhotoTypes, selectedCategoryFilters/*, selectedSortOption?.value ?? ""*/],
@@ -51,14 +53,14 @@ const Creations = () => {
     placeholderData: keepPreviousData,
   });
 
-  const { data, isLoading, isError, error } = useQuery({
+  const { data } = useQuery({
     queryKey: ['photoTypes'], 
     queryFn: fetchPhotoTypes,
   });
 
   const { data: categoryData } = useQuery({
     queryKey: ['categories'], 
-    queryFn: fetchCategories,
+    queryFn: fetchCategories,//ICategoriesQueryData
   });
 
   const updateMutation = useMutation({
@@ -73,17 +75,14 @@ const Creations = () => {
 
   const noFiltersSelected = useMemo(() => {
     return Object.keys(selectedCategoryFilters).length === 0
-  }, [selectedPhotoTypes, selectedCategoryFilters]);
+  }, [selectedCategoryFilters]);
 
-  const [activeId, setActiveId] = useState<number | null>(null);
+  const isMobileOverlayActive = useCallback((photoId: number) => {
+    return activeId !== null && windowBreakPoints.isMobile && activeId === photoId;
+  }, [activeId, windowBreakPoints.isMobile]);
 
   useEffect(() => {
     if (activeId === null) return;
-
-    if (!windowBreakPoints.isMobile) {
-      setActiveId(null);
-      return;
-    }
 
     const handleDropDownMouseDown = (e: MouseEvent) => { 
       const target = e.target as HTMLElement;
@@ -116,10 +115,10 @@ const Creations = () => {
             <Button key={`photoType_${photoType.id}`} additionalClass={isSelected ? "accent" : "accent-outline"} isDisabled={false}
               onClick={() => {
                 if(isSelected) {
-                  setSelectedPhotoTypes((prev: any) => prev.filter((prevItem: any) => prevItem !== photoType.id))
+                  setSelectedPhotoTypes((prev: Array<number>) => prev.filter((prevItem: number) => prevItem !== photoType.id))
                 }
                 else {
-                  setSelectedPhotoTypes((prev: any) => [...prev, photoType.id])}}
+                  setSelectedPhotoTypes((prev: Array<number>) => [...prev, photoType.id])}}
                 }
               >
               {photoType.title}
@@ -152,10 +151,10 @@ const Creations = () => {
               </span>
             </div>
           ) : (
-            (photos ?? []).map((photo: any, idx: number) => {
+            (photos ?? []).map((photo: IPublicQueryPhoto, idx: number) => {
 
               return (
-                <div className={`col col-sm-6 col-md-4 col-xl-3 ${styles['photo-wrapper']}${activeId === photo.id ? ` ${styles.active}` : ''}`} key={`photo_${photo.id}`}
+                <div className={`col col-sm-6 col-md-4 col-xl-3 ${styles['photo-wrapper']}${isMobileOverlayActive(photo.id) ? ` ${styles.active}` : ''}`} key={`photo_${photo.id}`}
                 data-card-id={photo.id}  
                 onClick={() => {
                     if (windowBreakPoints.isMobile) { 
@@ -184,7 +183,7 @@ const Creations = () => {
       <ViewPhotoModal
         isOpen={!!selectedPhoto}
         setIsOpen={() => setSelectedPhoto(null)}
-        photo={selectedPhoto}
+        selectedPhoto={selectedPhoto}
       />
     </Layout>
   );

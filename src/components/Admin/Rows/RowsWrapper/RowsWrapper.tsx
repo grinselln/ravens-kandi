@@ -1,9 +1,10 @@
+import { Ref } from 'react';
 import styles from './RowsWrapper.module.scss';
 
 interface IRowsWrapper {
   additionalClass?:string;
   children: React.ReactNode;
-  ref?: any;
+  ref?: Ref<HTMLDivElement>;
 }
 
 const RowsWrapper = ({ additionalClass, children, ref } : IRowsWrapper) => {

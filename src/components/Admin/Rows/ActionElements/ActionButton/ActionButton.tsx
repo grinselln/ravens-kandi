@@ -2,14 +2,15 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import styles from './ActionButton.module.scss';
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
 import clsx from 'clsx';
+import { Ref } from 'react';
 
 interface IActionButton extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   additionalClass?: string[];
   icon: IconProp;
-  onAction: (e: any) => void;
+  onAction: (e: React.MouseEvent) => void;
   variant: "default" | "action" | "confirm" | "alert";
   isDisabled: boolean;
-  ref?: any;
+  ref?: ((element: Element | null) => void) | Ref<HTMLButtonElement> | undefined;
 }
 
 const ActionButton = ({ ref, additionalClass, variant, onAction, icon, isDisabled, ...rest } : IActionButton) => {
@@ -19,7 +20,7 @@ const ActionButton = ({ ref, additionalClass, variant, onAction, icon, isDisable
       styles['action-button'],
       ...(additionalClass ?? []).map((cls: string) => styles[cls])
     )}
-    onClick={(e) => {
+    onClick={(e: React.MouseEvent) => {
       e.stopPropagation();
       onAction(e)
     }} 

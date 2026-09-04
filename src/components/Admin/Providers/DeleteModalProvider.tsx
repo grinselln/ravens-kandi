@@ -1,18 +1,6 @@
-import { createContext, useCallback, useContext, useMemo, useState } from "react";
-
-interface IDeleteModalContext {
-  pendingDeleteId: number | null;
-  assignPendingDeleteId: (recordId: number) => void;
-  recordType: string | null;
-  assignRecordType: (type: string | null) => void;
-  warningMessage: string | null;
-  assignWarningMessage: (message: string) => void;
-  onConfirmWarning: Function | null;
-  assignOnConfirm: (confirmFunc: Function) => void;
-  onDismissWarningMessage: () => void;
-}
-
-const DeleteModalContext = createContext<IDeleteModalContext | undefined>(undefined);
+import { useCallback, useMemo, useState } from "react";
+import { IDeleteModalContext } from "./IDeleteModalContext";
+import { DeleteModalContext } from "./DeleteModalContext";
 
 export const DeleteModalProvider: React.FC<{
   children: React.ReactNode;
@@ -20,7 +8,7 @@ export const DeleteModalProvider: React.FC<{
   const [recordType, setRecordType] = useState<string | null>(null);
   const [pendingDeleteId, setPendingDeleteId] = useState<number | null>(null);
   const [warningMessage, setWarningMessage] = useState<string | null>(null);
-  const [onConfirmWarning, setOnConfirmWarning] = useState<Function | null>(null)
+  const [onConfirmWarning, setOnConfirmWarning] = useState<(() => void) | null>(null)
 
   const assignRecordType = useCallback((type: string | null) => {
     setRecordType(type);
@@ -34,7 +22,7 @@ export const DeleteModalProvider: React.FC<{
     setWarningMessage(message);
   }, []);
 
-  const assignOnConfirm = useCallback((onWarningConfirm: Function) => {
+  const assignOnConfirm = useCallback((onWarningConfirm: (() => void)) => {
     setOnConfirmWarning(() => onWarningConfirm);
   }, []);
 
@@ -65,11 +53,3 @@ export const DeleteModalProvider: React.FC<{
     </DeleteModalContext.Provider>
   )
 }
-
-export const useDeleteConfirmation = (): IDeleteModalContext => {
-  const context = useContext(DeleteModalContext);
-  if (!context) {
-    throw new Error("useDeleteConfirmation must be used within DeleteModalProvider");
-  }
-  return context;
-};

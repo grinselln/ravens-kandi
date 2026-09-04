@@ -1,18 +1,18 @@
 import { ApiError } from "@/api/errors";
 import { MutationCache, QueryCache, QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { createContext, useCallback, useContext, useMemo, useState } from "react";
-
-interface ISessionContext {
-  isSessionExpired: boolean;
-  triggerSessionExpired: () => void;
-  dismissSessionExpired: () => void;
-}
-
-const SessionContext = createContext<ISessionContext | undefined>(undefined);
+import { useCallback, useMemo, useState } from "react";
+import { ISessionContext } from "./ISession";
+import { SessionContext } from "./SessionContext";
 
 export const SessionProvider: React.FC<{
   children: React.ReactNode;
 }> = ({ children }) => {
+  const [isSessionExpired, setIsSessionExpired] = useState<boolean>(false);
+
+  const triggerSessionExpired = useCallback(() => {
+    setIsSessionExpired(true)
+  }, []);
+
   const [queryClient] = useState(() => new QueryClient({
     queryCache: new QueryCache({
       onError: (error) => {
@@ -29,12 +29,6 @@ export const SessionProvider: React.FC<{
       }
     })
   }));
-
-  const [isSessionExpired, setIsSessionExpired] = useState<boolean>(false);
-
-  const triggerSessionExpired = useCallback(() => {
-    setIsSessionExpired(true)
-  }, []);
 
   const dismissSessionExpired = useCallback(() => {
     setIsSessionExpired(false);
@@ -54,11 +48,3 @@ export const SessionProvider: React.FC<{
     </QueryClientProvider>
   )
 }
-
-export const useSessionStore = (): ISessionContext => {
-  const context = useContext(SessionContext);
-  if (!context) {
-    throw new Error("useSessionStore must be used within SessionProvider");
-  }
-  return context;
-};

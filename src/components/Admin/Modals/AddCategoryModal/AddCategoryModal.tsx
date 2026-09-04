@@ -7,46 +7,49 @@ import { useMemo, useState } from 'react';
 import InputDropDown from '@/components/Input/InputDropDown/InputDropDown';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faLink } from '@fortawesome/free-solid-svg-icons';
+import { IAddCategory, ICategoryQueryOption } from '@/interfaces/ICategories';
+import { ISubcategory } from '@/interfaces/ISubcategories';
+import { IDropDownOption } from '@/interfaces/IRecords';
 
 interface IAddCategoryModal {
   isOpen: boolean;
   setIsOpen: (value: boolean) => void;
-  triggerSubcategories: any;
-  subcategories: any;
-  onSave: Function;
+  triggerSubcategories: Array<ICategoryQueryOption>;
+  subcategories: Array<ISubcategory>;
+  onSave: (newCategory: IAddCategory) => void;
 }
 
 const AddCategoryModal = ({ isOpen, setIsOpen, triggerSubcategories, subcategories, onSave }: IAddCategoryModal) => {
   const [categoryName, setCategoryName] = useState<string>("");
-  const [selectedSubcategories, setSelectSubcategories] = useState<any>([]);
-  const [selectedTriggerSubcategory, setSelectedTriggerSubcategory] = useState<any>(null);
+  const [selectedSubcategories, setSelectedSubcategories] = useState<Array<IDropDownOption<number>>>([]);
+  const [selectedTriggerSubcategory, setSelectedTriggerSubcategory] = useState<IDropDownOption<number> | null>(null);
 
   const { availableAssignSubcategories, availableTriggerSubcategories } = useMemo(() => {
-    const selectedIds = selectedSubcategories.map((subcategory: any) => subcategory.value);
+    const selectedIds = selectedSubcategories.map((subcategory: IDropDownOption<number>) => subcategory.value);
 
-    const availableAssignSubcategories = (subcategories ?? []).filter((subcategory: any) => subcategory.category_id === 1 && !selectedIds.includes(subcategory.id))
-    .map((subcategory: any) => ({label: subcategory.title, value: subcategory.id}));
+    const availableAssignSubcategories: Array<IDropDownOption<number>> = (subcategories ?? []).filter((subcategory: ISubcategory) => subcategory.category_id === 1 && !selectedIds.includes(subcategory.id))
+    .map((subcategory: ISubcategory) => ({label: subcategory.title, value: subcategory.id}));
 
-    const availableTriggerSubcategories = triggerSubcategories.filter((subcategory: any) => subcategory.category_id !== 1 && subcategory.trigger_details === undefined)
-    .map((subcategory: any) => ({label: subcategory.label, value: subcategory.id}))
+    const availableTriggerSubcategories: Array<IDropDownOption<number>> = triggerSubcategories.filter((subcategory: ICategoryQueryOption) => subcategory.category_id !== 1 && subcategory.trigger_details === undefined)
+    .map((subcategory: ICategoryQueryOption) => ({label: subcategory.label, value: subcategory.id}))
     
     return {
       availableAssignSubcategories,
       availableTriggerSubcategories
     }
-  }, [subcategories, selectedSubcategories]);
+  }, [subcategories, selectedSubcategories, triggerSubcategories]);
 
-  const formattedRecord = useMemo(() => {
-    const subcategoryIds = selectedSubcategories.filter((subcategory: any) => subcategory.value > -1).map((subcategory: any) => subcategory.value);
-    const newSubcategoryTitles = selectedSubcategories.filter((subcategory: any) => subcategory.value < 0).map((subcategory: any) => subcategory.label);
+  const formattedRecord: IAddCategory = useMemo(() => {
+    const subcategoryIds = selectedSubcategories.filter((subcategory: IDropDownOption<number>) => subcategory.value > -1).map((subcategory: IDropDownOption<number>) => subcategory.value);
+    const newSubcategoryTitles = selectedSubcategories.filter((subcategory: IDropDownOption<number>) => subcategory.value < 0).map((subcategory: IDropDownOption<number>) => subcategory.label);
 
     return {
       title: categoryName,
-      subcategoryIds,
+      subcategoryIds: subcategoryIds,
       newSubcategoryTitles,
-      triggerSubcategoryId: selectedTriggerSubcategory?.value ?? null
+      trigger_subcategory_id: selectedTriggerSubcategory?.value ?? null
     }
-  }, [selectedSubcategories, selectedTriggerSubcategory])
+  }, [selectedSubcategories, selectedTriggerSubcategory, categoryName])
 
   return (
     <Modal
@@ -55,16 +58,16 @@ const AddCategoryModal = ({ isOpen, setIsOpen, triggerSubcategories, subcategori
         setVisibility={() => {
           setIsOpen(false);
           setCategoryName(""); 
-          setSelectSubcategories([]);
+          setSelectedSubcategories([]);
           setSelectedTriggerSubcategory(null);
         }}
         title="Add Category"
         modalButtons={
           <>
-            <Button additionalClass="outline-muted" onClick={() => {setIsOpen(false); setCategoryName(""); setSelectSubcategories([]); setSelectedTriggerSubcategory(null)}} isDisabled={false}>Cancel</Button>
+            <Button additionalClass="outline-muted" onClick={() => {setIsOpen(false); setCategoryName(""); setSelectedSubcategories([]); setSelectedTriggerSubcategory(null)}} isDisabled={false}>Cancel</Button>
             <Button onClick={() => {
               onSave(formattedRecord);
-              setIsOpen(false); setCategoryName(""); setSelectSubcategories([]); setSelectedTriggerSubcategory(null)
+              setIsOpen(false); setCategoryName(""); setSelectedSubcategories([]); setSelectedTriggerSubcategory(null)
              } } isDisabled={categoryName === ""}>Save Category</Button>
           </>
         }
@@ -80,9 +83,13 @@ const AddCategoryModal = ({ isOpen, setIsOpen, triggerSubcategories, subcategori
             label='Assign subcategories'
             placeholder='Search or create subcategory'
             addSelection={(selectedOption) => {
-              setSelectSubcategories((prev: any) => [...prev, selectedOption])
+              setSelectedSubcategories((prev: Array<IDropDownOption<number>>) => {
+                if(selectedOption === null) return prev;
+                
+                return [...prev, selectedOption]
+              })
             }}
-            removeSelection={(selectedOptionValue) => setSelectSubcategories((prevItems: any) => prevItems.filter((prevItem: any) => prevItem.value !== selectedOptionValue))}
+            removeSelection={(selectedOptionValue) => setSelectedSubcategories((prevItems: Array<IDropDownOption<number>>) => prevItems.filter((prevItem: IDropDownOption<number>) => prevItem.value !== selectedOptionValue))}
             options={availableAssignSubcategories}
             selectedOptions={selectedSubcategories}
           />

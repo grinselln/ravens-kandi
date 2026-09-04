@@ -183,8 +183,21 @@
   }
 
   &.delete-confirm {
-    width: 40%;
-    max-width: 550px;
+    width: 100%;
+
+    @include bp-md {
+      width: 40%;
+      max-width: 550px;
+    }
+  }
+
+  &.session {
+    width: 100%;
+
+    @include bp-md {
+      width: 40%;
+      max-width: 550px;
+    }
   }
 }
 
