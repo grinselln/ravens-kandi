@@ -5,6 +5,7 @@
   
   &:disabled {
     opacity: .25;
+    cursor: default;
   }
 
   &.grip, &.new-grip {

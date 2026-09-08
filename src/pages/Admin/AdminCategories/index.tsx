@@ -402,6 +402,7 @@ const AdminCategories = () => {
                   key={`category_wrapper_${category.id}`}
                   categoryId={category.id}
                   index={index}
+                  isOrderingDisabled={editingStatus.isEditing}
                   headerRenderFn={(handleRef: (element: Element | null) => void) => (
                     <RowAccordion
                       key={`category_${category.id}`}
