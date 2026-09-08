@@ -8,6 +8,7 @@ interface ISortableCategoryAccordion {
   categoryId: number;
   headerRenderFn: (handleRef: (element: Element | null) => void) => ReactElement
   index: number;
+  isOrderingDisabled: boolean;
 }
 
 const verticalEdgeDetector: CollisionDetector = ({ dragOperation, droppable }) => {
@@ -39,13 +40,14 @@ const verticalEdgeDetector: CollisionDetector = ({ dragOperation, droppable }) =
   return null;
 };
 
-const SortableCategoryAccordion = ({ categoryId, headerRenderFn, index }: ISortableCategoryAccordion) => {
+const SortableCategoryAccordion = ({ categoryId, headerRenderFn, index, isOrderingDisabled }: ISortableCategoryAccordion) => {
   const { ref, handleRef } = useSortable({
     id: categoryId,
     index,
     type: 'category' satisfies SortableType,
     accept: 'category' satisfies SortableType,
     collisionDetector: verticalEdgeDetector,
+    disabled: isOrderingDisabled,
     transition: {
       duration: 0,
       easing: 'ease-out',
