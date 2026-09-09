@@ -3,6 +3,9 @@ import { breakpoints } from "@/styles/breakpoints";
 
 export function useWindowWidth() {
   const [width, setWidth] = useState(window.innerWidth);
+  const [height, setHeight] = useState(() => 
+    typeof window !== 'undefined' ? window.innerHeight : 0
+  );
 
   function convertRemToPixels(rem: string) {    
     // Get the computed font size of the <html> element
@@ -10,7 +13,7 @@ export function useWindowWidth() {
     
     // Multiply the rem value by the root font size
     return parseInt(rem) * rootFontSize;
-}
+  }
 
   const windowBreakPoints = useMemo(() => {
     const isXS = width < convertRemToPixels(breakpoints.bpSM);
@@ -34,7 +37,10 @@ export function useWindowWidth() {
   }, [width]);
 
   useEffect(() => {
-    const handleResize = () => setWidth(window.innerWidth);
+    const handleResize = () => {
+      setWidth(window.innerWidth);
+      setHeight(window.innerHeight);
+    }
     
     window.addEventListener('resize', handleResize);
     
@@ -42,5 +48,5 @@ export function useWindowWidth() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  return { width, windowBreakPoints };
+  return { width, height, windowBreakPoints };
 }

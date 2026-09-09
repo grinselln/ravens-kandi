@@ -1,19 +1,21 @@
 @use '_breakpoints' as *;
 
 .dropdown-list {
-    position: absolute;
-    top: 100%;
-    left: 0;
+    position: fixed;
     width: 100%;
-    z-index: 10;
+    z-index: 1001;
     list-style: none;
     background-color: var(--color-admin-bg);
     border: 1px solid var(--color-admin-border);
-    border-top: none;
     border-radius: 0px 0px 5px 5px;
     font-size: 0.85rem;
     max-height: 150px;
     overflow-y: auto;
+    scrollbar-color: var(--color-admin-light) transparent;
+
+    &.display-up {
+      border-radius: 5px 5px 0px 0px;
+    }
 
     &.inverse {
       background-color: var(--color-admin-mid);
