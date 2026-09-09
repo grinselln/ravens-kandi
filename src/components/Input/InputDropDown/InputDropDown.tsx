@@ -1,4 +1,4 @@
-import { ReactNode, useMemo } from 'react';
+import { ReactNode, useMemo, useState } from 'react';
 import InputWrapper from '../InputWrapper/InputWrapper';
 import styles from './InputDropDown.module.scss';
 import { faChevronDown } from '@fortawesome/free-solid-svg-icons';
@@ -22,7 +22,9 @@ interface IInputDropDown<T> {
 }
 
 const InputDropDown = <T,>({label, placeholder, value, setValue, options, isDisabled, isSmall, isMedium, isInverse, isInverseLight, allowRemoval}: IInputDropDown<T>) => {
-  const {isOpen, triggerRef, wrapperRef, activeIndex, setActiveIndex, handleTriggerClick, handleKeyDown} = useDropDown({options, value, setValue});
+  const {isOpen, triggerRef, wrapperRef, listRef, activeIndex, setActiveIndex, handleTriggerClick, handleKeyDown} = useDropDown({options, value, setValue});
+
+  const [isInverseDisplay, setIsInverseDisplay] = useState<boolean>(false);
 
   const displayLabel = useMemo(() => {  
     const selectedOption = options.find(option => option.value === value);
@@ -37,11 +39,15 @@ const InputDropDown = <T,>({label, placeholder, value, setValue, options, isDisa
       isSmall={isSmall}
       isMedium={isMedium}
     >
-      <div className={`${styles.dropdown}${isSmall ? ` ${styles.small}` : ""}${isMedium ? ` ${styles.medium}` : ""}${isInverse ? ` ${styles.inverse}` : ""}${isInverseLight ? ` ${styles['inverse-light']}` : ""}`} ref={wrapperRef}>
+      <div className={`${styles.dropdown}${isSmall ? ` ${styles.small}` : ""}
+      ${isMedium ? ` ${styles.medium}` : ""}${isInverse ? ` ${styles.inverse}` : ""}
+      ${isInverseLight ? ` ${styles['inverse-light']}` : ""}
+      
+      `} ref={wrapperRef}>
         <button
           ref={triggerRef}
           type="button"
-          className={isOpen ? styles.open : ""}
+          className={`${isOpen ? styles.open : ""}${isInverseDisplay ? ` ${styles['display-up']}` : ""}`}
           aria-haspopup="listbox"
           aria-expanded={isOpen}
           aria-activedescendant={isOpen && activeIndex >= 0 ? `listboxOption_${options[activeIndex]?.value}` : undefined}
@@ -67,6 +73,8 @@ const InputDropDown = <T,>({label, placeholder, value, setValue, options, isDisa
           triggerRef={triggerRef}
           allowRemoval={allowRemoval}
           placeholder={placeholder}
+          onPositionChange={(inverse: boolean) => setIsInverseDisplay(inverse)}
+          listRef={listRef}
         />
       </div>
     </InputWrapper>

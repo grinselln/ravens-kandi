@@ -19,6 +19,7 @@ interface IInputMultiSelect {
 
 const InputMultiSelect = ({label, placeholder, addSelection, removeSelection, options, selectedOptions}: IInputMultiSelect) => {
   const [searchText, setSearchText] = useState<string>("");
+  const [isInverseDisplay, setIsInverseDisplay] = useState<boolean>(false);
 
   const filteredOptions = useMemo(() => {
     return options.filter((option: IDropDownOption<number>) => {
@@ -31,7 +32,7 @@ const InputMultiSelect = ({label, placeholder, addSelection, removeSelection, op
     })
   }, [searchText, options]);
 
-  const {isOpen, inputRef, wrapperRef, activeIndex, setActiveIndex, handleTriggerClick, onInputFocus} = useDropDown({options: filteredOptions, value: null, setValue: addSelection});
+  const {isOpen, inputRef, wrapperRef, listRef, activeIndex, setActiveIndex, handleTriggerClick, onInputFocus} = useDropDown({options: filteredOptions, value: null, setValue: addSelection});
 
   const showAdd = useMemo(() => {
     return options.length === 0 && searchText !== "";
@@ -63,6 +64,7 @@ const InputMultiSelect = ({label, placeholder, addSelection, removeSelection, op
             value={searchText}
             setValue={(newValue) => setSearchText(newValue)}
             onFocus={() => onInputFocus()}
+            className={isInverseDisplay ? ` ${styles['display-up']}` : ""}
           />
         </div>
         <DropDownList
@@ -79,6 +81,8 @@ const InputMultiSelect = ({label, placeholder, addSelection, removeSelection, op
             addSelection(newItem)
           }}
           searchText={searchText}
+          onPositionChange={(inverse: boolean) => setIsInverseDisplay(inverse)}
+          listRef={listRef}
         />
       </div>
     </InputWrapper>

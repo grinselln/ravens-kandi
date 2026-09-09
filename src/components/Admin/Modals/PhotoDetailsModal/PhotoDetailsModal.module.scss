@@ -5,8 +5,6 @@
   flex-direction: column;
   gap: .75rem;
   flex: 1;
-  overflow-y: auto;
-  scrollbar-color: var(--color-admin-light) transparent;
 
   @include bp-md {
     gap: 1.5rem;

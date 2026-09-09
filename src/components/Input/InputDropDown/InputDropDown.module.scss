@@ -23,6 +23,12 @@
 
     &.open {
       border-radius: 5px 5px 0px 0px !important;
+      border-bottom-color: transparent !important;
+
+      &.display-up {
+        border-radius: 0px 0px 5px 5px !important;
+        border-top-color: transparent !important;
+      }
     }
 
     svg path {

@@ -196,7 +196,7 @@ const RowsSubcategories = ({ categories, subcategories, parentCategory, selected
             <InputDropDown
               isSmall={true}
               placeholder='Assign to Category'
-              value={linkedCategory?.id}
+              value={editedSubcategoryRecord?.category_id}
               setValue={(newValue) => setEditedSubcategoryRecord((prev) => {
                 if (prev === null || newValue === null) return prev;
 
