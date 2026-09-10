@@ -267,7 +267,7 @@ const AdminPhotos = () => {
           <div className={styles['top-filters']}>
             <div className={styles.search}>
               <InputText
-                wrapperClass='inverse'
+                wrapperClass={['inverse']}
                 placeholder='Search by title...'
                 value={searchText}
                 setValue={(newValue) => setSearchText(newValue)}

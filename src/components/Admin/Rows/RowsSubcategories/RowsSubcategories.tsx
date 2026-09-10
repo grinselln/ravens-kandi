@@ -162,30 +162,27 @@ const RowsSubcategories = ({ categories, subcategories, parentCategory, selected
           isOrderingDisabled: editingStatus.isEditing,
           isOrderingHidden: parentCategory.order_index === -1,
           title: <>
-            {isEditingCurrent
-              ? <RowInput
-                  value={editedSubcategoryRecord?.title ?? ""}
-                  setValue={(newValue) => {
-            
-                    setEditedSubcategoryRecord(prev => {
-                      if (prev === null) return ({
-                        id: subcategory.id, 
-                        isNew: false, 
-                        title: newValue,
-                        order_index: subcategory.order_index,
-                        category_id: subcategory.category_id
-                      });
-                      
-                      if (prev.isNew) return prev;
+            <RowInput
+              value={isEditingCurrent ? editedSubcategoryRecord?.title ?? "" : subcategory.title}
+              setValue={(newValue) => { 
+                setEditedSubcategoryRecord(prev => {
+                  if (prev === null) return ({
+                    id: subcategory.id, 
+                    isNew: false, 
+                    title: newValue,
+                    order_index: subcategory.order_index,
+                    category_id: subcategory.category_id
+                  });
+                  
+                  if (prev.isNew) return prev;
 
-                      return ({...prev, title: newValue});
-                    })
-                  }}
-                  isNew={false}
-                  inputItemLabel='Type'
-                  isDisabled={false}
-                />
-              : <h3>{subcategory.title}</h3>}
+                  return ({...prev, title: newValue});
+                })
+              }}
+              isNew={false}
+              inputItemLabel='Type'
+              isDisabled={!isEditingCurrent}
+            />
             {linkedCategory && !isEditingCurrent && (
               <RowLink title={linkedCategory.title} />
             )}
@@ -251,6 +248,7 @@ const RowsSubcategories = ({ categories, subcategories, parentCategory, selected
         isOrderingHidden={parentCategory.order_index === -1}
         title={
           <RowInput
+            wrapperClasses={['new']}
             value={isEditingCurrentSubcategoryNew ? editedSubcategoryRecord?.title ?? "" : ""}
             setValue={(newValue) => {
               if(!isEditingCurrentSubcategoryNew) {

@@ -415,19 +415,17 @@ const AdminCategories = () => {
                           isOrderingDisabled={editingStatus.isEditing}
                           isOrderingHidden={category.order_index === -1}
                           title={<>
-                            {editingCurrent && !editingTrigger
-                            ? <RowInput
-                                value={editedCategoryRecord?.title ?? ""}
-                                setValue={(newValue) => setEditedCategoryRecord((prev) =>{ 
-                                  if(prev === null) return prev;
+                            <RowInput
+                              value={editingCurrent ? editedCategoryRecord?.title ?? "" : category.title}
+                              setValue={(newValue) => setEditedCategoryRecord((prev) =>{ 
+                                if(prev === null) return prev;
 
-                                  return ({...prev, isNew: false, title: newValue})
-                                })}
-                                isNew={false}
-                                inputItemLabel='Category'
-                                isDisabled={false}
-                              />
-                            : <h3>{category.title}</h3>}
+                                return ({...prev, isNew: false, title: newValue})
+                              })}
+                              isNew={false}
+                              inputItemLabel='Category'
+                              isDisabled={!editingCurrent || editingTrigger}
+                            />
                             {linkedSubcategory && !editingTrigger && !windowBreakPoints.isXS && (
                               <RowLink
                                 title={`${linkedSubcategory.triggerSubcategoryCategory.title} > ${linkedSubcategory.triggerSubcategory.title}`}
@@ -525,6 +523,7 @@ const AdminCategories = () => {
             isOrderingDisabled={true}
             title={
               <RowInput
+                wrapperClasses={['new']}
                 value={editedCategoryRecord?.isNew ? editedCategoryRecord.title : ""}
                 setValue={(newValue) => {
                   setEditedCategoryRecord(({...blankCategoryRecord, isNew: true, title: newValue}))
