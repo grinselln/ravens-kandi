@@ -4,16 +4,12 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: .85rem .75rem;
+  padding: .75rem .75rem;
   background-color: var(--color-admin-bg-mid);
   border: 1px solid var(--color-admin-border);
   border-radius: 5px;
   transition: border-radius .25s;
   transition-delay: .20s;
-
-  @include bp-lg {
-    padding: .75rem .75rem;
-  }
 
   &.inverse {
     background-color: var(--color-admin-bg);
@@ -135,7 +131,7 @@
     .icons {
       display: flex;
       align-items: center;
-      gap: .15rem;
+      gap: .25rem;
 
       @include bp-lg {
         gap: .75rem;
@@ -143,7 +139,7 @@
 
       .count {
         color: var(--color-admin-light);
-        font-size: .8rem;
+        font-size: .85rem;
         display: flex;
 
         @include bp-lg {
@@ -197,7 +193,7 @@
   .row-right {
     display: flex;
     align-items: center;
-    gap: .5rem;
+    gap: .6rem;
 
     @include bp-md {
       gap: .75rem;
