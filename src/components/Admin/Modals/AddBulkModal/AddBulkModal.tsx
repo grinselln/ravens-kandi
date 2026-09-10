@@ -54,7 +54,7 @@ const AddBulkModal = ({ recordTypePlural, dropdownData, showModal, setShowModal,
             <div className={styles['add-record']} key={`addedRecord_${addedRecord.title}`}>
               <div className={styles['field-wrapper']}>
                 <InputText
-                  wrapperClass='bulk-record-input'
+                  wrapperClass={['bulk-record-input']}
                   label='Name'
                   value={addedRecord.title}
                   setValue={() => null }
@@ -81,7 +81,7 @@ const AddBulkModal = ({ recordTypePlural, dropdownData, showModal, setShowModal,
         <div className={styles['add-record']}>
           <div className={styles['field-wrapper']}>
             <InputText
-              wrapperClass='bulk-record-input'
+              wrapperClass={['bulk-record-input']}
               label='Title'
               value={newAddedRecord?.title}
               placeholder={`${recordTypePlural} title`}

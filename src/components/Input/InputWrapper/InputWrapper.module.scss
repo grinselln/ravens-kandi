@@ -82,14 +82,20 @@
       display: flex;
       width: 150px;
 
+      &.new input:disabled {
+        opacity: .75;
+        border-bottom-color: var(--color-admin-light);
+      }
+
       @include bp-md {
         width: 200px;
       }
 
       input {
-        height: 18px;
+        height: 22px;
         font-family: var(--font-body);
         padding: 0px;
+        padding-top: 1px;
         font-size: .9rem;
         font-weight: 400;
         letter-spacing: 3%;
@@ -100,7 +106,7 @@
         border-radius: 0px;
 
         @include bp-lg {
-          font-size: 1rem;
+          font-size: 1.1rem;
         }
 
         &::placeholder {
@@ -110,6 +116,11 @@
           position: relative;
           top: 0px;
           letter-spacing: 3%;
+        }
+
+        &:disabled {
+          opacity: 1;
+          border-bottom-color: transparent;
         }
       }
     }

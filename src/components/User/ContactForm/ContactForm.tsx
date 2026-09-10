@@ -71,7 +71,7 @@ export default function ContactForm() {
     const form = document.getElementById('contactForm');
 
     if(form) {
-      const handleSubmit = (event: any) => {
+      const handleSubmit = (event: SubmitEvent) => {
         if(isSendDisabled) {
           event.preventDefault();
         }
@@ -100,8 +100,8 @@ export default function ContactForm() {
           <div className={styles['form-row']}>
             <InputText
               label='Name'
-              wrapperClass={errors.validName === false && !errors.allBlank ? "error" : ""}
-              fieldWrapperClass='field-light'
+              wrapperClass={[errors.validName === false && !errors.allBlank ? "error" : ""]}
+              fieldWrapperClass={['field-light']}
               value={name}
               setValue={(name) => setName(name)}
               type="text"
@@ -110,8 +110,8 @@ export default function ContactForm() {
             />
             <InputText
               label='E-mail'
-              wrapperClass={errors.validEmail === false && !errors.allBlank ? "error" : ""}
-              fieldWrapperClass='field-light'
+              wrapperClass={[errors.validEmail === false && !errors.allBlank ? "error" : ""]}
+              fieldWrapperClass={['field-light']}
               value={email}
               setValue={(email) => setEmail(email)}
               type="email"
@@ -122,8 +122,8 @@ export default function ContactForm() {
           <div className={styles['form-row']}>
             <InputText
               label='Subject'
-              wrapperClass={errors.validSubject === false && !errors.allBlank ? "error" : ""}
-              fieldWrapperClass='field-light'
+              wrapperClass={[errors.validSubject === false && !errors.allBlank ? "error" : ""]}
+              fieldWrapperClass={['field-light']}
               value={subject}
               setValue={(subject) => setSubject(subject)}
               type="subject"
@@ -134,8 +134,8 @@ export default function ContactForm() {
           <div className={styles['form-row']}>
             <InputTextArea
               label='Message'
-              fieldWrapperClass='field-light'
-              wrapperClass={errors.validMessage === false && !errors.allBlank ? "error" : ""}
+              fieldWrapperClass={['field-light']}
+              wrapperClass={[errors.validMessage === false && !errors.allBlank ? "error" : ""]}
               value={message}
               setValue={(message) => setMessage(message)}
               name="message"

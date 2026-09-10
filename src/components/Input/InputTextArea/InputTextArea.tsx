@@ -6,8 +6,8 @@ interface IInputTextArea extends React.TextareaHTMLAttributes<HTMLTextAreaElemen
   setValue: (value: string) => void;
   label?: string;
   placeholder?: string;
-  fieldWrapperClass?: string;
-  wrapperClass?: string;
+  fieldWrapperClass?: string[];
+  wrapperClass?: string[];
 }
 
 const InputTextArea = ({value, setValue, label, placeholder, fieldWrapperClass, wrapperClass, ...rest}: IInputTextArea) => {

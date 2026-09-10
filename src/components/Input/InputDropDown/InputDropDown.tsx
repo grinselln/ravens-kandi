@@ -35,9 +35,8 @@ const InputDropDown = <T,>({label, placeholder, value, setValue, options, isDisa
   return (
     <InputWrapper
       label={label}
-      wrapperClass='faux-input'
-      isSmall={isSmall}
-      isMedium={isMedium}
+      wrapperClass={['faux-input']}
+      fieldWrapperClass={[isSmall ? 'small' : "", isMedium ? "medium" : ""]}
     >
       <div className={`${styles.dropdown}${isSmall ? ` ${styles.small}` : ""}
       ${isMedium ? ` ${styles.medium}` : ""}${isInverse ? ` ${styles.inverse}` : ""}
