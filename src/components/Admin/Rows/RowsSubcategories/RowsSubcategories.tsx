@@ -15,6 +15,7 @@ import { ICategoryQueryGroupedCategorySubcategory, ICategoryQueryGroupedCategory
 import { IEditedSubcategoryRecord, ISubcategoryUpdateFetchData } from '@/interfaces/ISubcategories';
 import { IEditingStatus } from '@/interfaces/IRecords';
 import { useDeleteConfirmation } from '../../Providers/DeleteModalContext';
+import { useWindowWidth } from '@/hooks/useWindowWidth';
 
 
 interface IRowsSubcategories {
@@ -35,6 +36,7 @@ const RowsSubcategories = ({ categories, subcategories, parentCategory, selected
   editedSubcategoryRecord,
   setEditedSubcategoryRecord, editingStatus } : IRowsSubcategories) => {
     const queryClient = useQueryClient();
+    const { windowBreakPoints } = useWindowWidth();
     const {pendingDeleteId, warningMessage, onDismissWarningMessage, assignWarningMessage, assignRecordType, assignOnConfirm, assignPendingDeleteId} = useDeleteConfirmation();
 
     const blankSubcategoryRecord = {
@@ -183,25 +185,28 @@ const RowsSubcategories = ({ categories, subcategories, parentCategory, selected
               inputItemLabel='Type'
               isDisabled={!isEditingCurrent}
             />
-            {linkedCategory && !isEditingCurrent && (
+            {linkedCategory && !isEditingCurrent && !windowBreakPoints.isXS && (
               <RowLink title={linkedCategory.title} />
             )}
           </>,
           order: parentCategory.order_index === -1 ? null : subcategory.order_index,
           actionElements: isEditingCurrent ? (
             <>
-            <InputDropDown
-              isSmall={true}
-              placeholder='Assign to Category'
-              value={editedSubcategoryRecord?.category_id}
-              setValue={(newValue) => setEditedSubcategoryRecord((prev) => {
-                if (prev === null || newValue === null) return prev;
+            {!windowBreakPoints.isXS && (
+              <InputDropDown
+                isSmall={true}
+                placeholder='Assign to Category'
+                value={editedSubcategoryRecord?.category_id}
+                setValue={(newValue) => setEditedSubcategoryRecord((prev) => {
+                  if (prev === null || newValue === null) return prev;
 
-                return ({...prev, category_id: newValue.value })
-              })}
-              options={dropdownOptions}
-              isDisabled={false}
-            />
+                  return ({...prev, category_id: newValue.value })
+                })}
+                options={dropdownOptions}
+                isDisabled={false}
+              />
+            )}
+            
             {updateMutation.isPending ? (
               <FontAwesomeIcon icon={faDiamond} spin />
             ) : (
