@@ -8,7 +8,7 @@ import InputDropDown from '@/components/Input/InputDropDown/InputDropDown';
 import DashboardHeader from '@/components/Admin/DashboardHeader/DashboardHeader';
 import Button from '@/components/Input/Button/Button';
 import { fetchPhotoTypes } from '@/api/photoTypes';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import PhotoDetailsModal from '@/components/Admin/Modals/PhotoDetailsModal/PhotoDetailsModal';
 import { fetchCategories, fetchPhotoCategories } from '@/api/categories';
 import { fetchPhotoSubcategories, fetchSubcategories } from '@/api/subcategories';
@@ -83,6 +83,7 @@ const AdminPhotos = () => {
         count: null
       })
     },
+    placeholderData: keepPreviousData,
   });
 
   const { data: photoCategories } = useQuery({

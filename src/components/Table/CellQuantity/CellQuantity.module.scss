@@ -12,7 +12,7 @@
     .control button {
       position: relative;
       z-index: 0;
-      
+
       &::before {
         content: "";
         position: absolute;
@@ -35,11 +35,19 @@
 }
 
 .count {
-  padding-left: .75rem;
-  padding-right: .75rem;
+  padding-right: 30px;
   display: flex;
   align-items: center;
   font-size: 1rem;
+
+  @include bp-md {
+    padding: 0px;
+  }
+
+  @include bp-xl {
+    padding-left: .75rem;
+    padding-right: .75rem;
+  }
 
   svg {
     height: 1.5rem;

@@ -2,12 +2,17 @@
 
 .table-filters {
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  align-items: flex-end;
   justify-content: flex-end;
-  gap: 2rem;
+  gap: .5rem;
+  margin-bottom: .5rem;
 
-  .search {
-    width: 300px
+  @include bp-md {
+    flex-direction: row;
+    align-items: center;
+    gap: 2rem;
+    margin-bottom: 0rem;
   }
 
   .controls {
@@ -24,7 +29,11 @@
   display: flex;
   flex-direction: column;
   min-height: 0;
-  gap: 1rem;
+  gap: .5rem;
+
+  @include bp-md {
+    gap: 1rem;
+  }
 
   .inventory-table {
     flex: 1;
@@ -65,9 +74,43 @@
       }
 
       tr {
-        display: block;
+        display: grid;
+        grid-template-columns: 125px 1fr;
+        grid-template-areas:
+          "img title"
+          "img f1"
+          "img f2"
+          "img f3"
+          "img f4"
+          "img f5"
+          "img f6";
+        gap: .5rem .5rem;
+        padding: 1rem .5rem;
+        //margin-bottom: 1rem;
+        //border-radius: 5px;
+        //border: 1px solid var(--color-admin-border);
 
-        @include bp-lg {
+        @include bp-sm {
+          grid-template-columns: 125px 1fr 1fr;
+          grid-template-areas:
+            "img title title"
+            "img f1    f2"
+            "img f3    f4"
+            "img f5    f6 ";
+          gap: .5rem 1rem;
+          padding: 1rem;
+        }
+
+        @include bp-md {
+          grid-template-columns: 125px 1fr 1fr 1fr;
+          grid-template-areas:
+            "img title title title"
+            "img f1    f2    f3"
+            "img f4    f5    f6";
+            gap: .5rem 1.25rem;
+        }
+
+        @include bp-xl {
           display: table-row;
         }
 
@@ -79,7 +122,7 @@
       thead {
         display: none;
 
-        @include bp-lg {
+        @include bp-xl {
           display: table-header-group;
         }
 
@@ -97,7 +140,7 @@
           letter-spacing: 0.05rem;
           font-weight: 500;
 
-          @include bp-lg {
+          @include bp-xl {
             display: table-cell;
           }
 
@@ -113,34 +156,96 @@
       tbody {
         display: block;
 
-        @include bp-lg {
+        &.empty {
+          height: 250px;
+        }
+
+        @include bp-xl {
           display: table-row-group;
         }
 
+        p {
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          font-size: 1.1rem;
+        }
+
         td {
-          display: flex;
+          /*display: flex;
           justify-content: space-between;
           position: relative;
-          padding: 10px 15px;
+          padding: 10px 15px;*/
+          position: relative;
           color: var(--color-admin-light);
           font-size: 1rem;
 
-          @include bp-lg {
+          @include bp-xl {
             display: table-cell;
+            padding: 10px 15px;
           }
 
           &::before {
             content: attr(data-label);
 
-            @include bp-lg {
+            @include bp-xl {
               display: none;
             }
           }
 
+          &:nth-child(1) {
+            grid-area: img;
+          }
+
+          // Title (2nd column)
+          &:nth-child(2) {
+            grid-area: title;
+            font-weight: 600;
+            align-self: start;
+          }
+
+          &:nth-child(3) { grid-area: f1; }
+          &:nth-child(4) { grid-area: f2; }
+          &:nth-child(5) { grid-area: f3; }
+          &:nth-child(6) { grid-area: f4; }
+          &:nth-child(7) { grid-area: f5; }
+          &:nth-child(8) { grid-area: f6; }
+
           &.fit {
-            width: 1%;
-            white-space: nowrap;
-            max-width: unset;
+            //width: fit-content;
+            display: inline-flex;
+            justify-content: space-between;
+
+            @include bp-xl {
+              width: 1%;
+              white-space: nowrap;
+              max-width: unset;
+              display: table-cell;
+            }
+          }
+
+          &.image {
+            //display: inline-flex;
+            justify-content: unset;
+
+            @include bp-xl {
+              display: table-cell;
+            }
+          }
+
+          &.title {
+            //display: inline-flex;
+            //width: calc(100% - 155px);
+            //gap: 2rem;
+            font-size: 1.2rem;
+
+            @include bp-xl {
+              font-size: 1rem;
+              font-weight: 500;
+              white-space: nowrap;
+              display: table-cell;
+            }
           }
 
           img {
@@ -153,8 +258,8 @@
 
           .total {
             position: absolute;
-            top: 10px;
-            left: 15px;
+            top: 0px;
+            left: 0px;
             background-color: var(--color-admin-light);
             color: var(--color-text);
             border: 1px solid var(--color-admin-mid);
@@ -163,6 +268,11 @@
             padding: .5rem .75rem;
             font-size: .7rem;
             border-radius: 3px 0px 3px 0px;
+
+            @include bp-xl {
+              top: 10px;
+              left: 15px;
+            }
 
             &.alert {
               background-color: var(--color-alert);

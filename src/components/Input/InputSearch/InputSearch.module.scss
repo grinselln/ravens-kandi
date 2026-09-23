@@ -3,8 +3,13 @@
 .search {
   position: relative;
   color: var(--color-admin-light);
+  width: 100%;
 
   @include bp-lg {
+    width: 40%;
+  }
+
+  @include bp-xl {
     width: 30%;
   }
 

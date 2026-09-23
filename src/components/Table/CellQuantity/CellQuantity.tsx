@@ -2,7 +2,9 @@ import styles from "./CellQuantity.module.scss";
 import ActionButton from "@/components/Admin/Rows/ActionElements/ActionButton/ActionButton";
 import Button from "@/components/Input/Button/Button";
 import { formatClsxClassString } from "@/helpers/dataManipulation";
-import { faMinusSquare, faPlusSquare } from "@fortawesome/free-solid-svg-icons";
+import { useWindowWidth } from "@/hooks/useWindowWidth";
+import { faClose, faMinusSquare, faPlusSquare } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import clsx from "clsx";
 
 interface ICellQuantity {
@@ -17,6 +19,8 @@ interface ICellQuantity {
 
 const CellQuantity = (props: ICellQuantity) => {
   const { classes, isEditing, originalQuantity, quantity, onQuantityChange, minusDisabled, plusDisabled } = props;
+
+  const { windowBreakPoints } = useWindowWidth();
 
   return (
     <div className={clsx(
@@ -49,7 +53,7 @@ const CellQuantity = (props: ICellQuantity) => {
           additionalClass={['alert', 'quantity-revert']} 
           onClick={() => onQuantityChange({value: originalQuantity, originalValue: originalQuantity, changeSource: 0})} 
           isDisabled={false}>
-            Revert
+            {windowBreakPoints.isMobile ? <FontAwesomeIcon icon={faClose} /> : "Revert"}
         </Button>
       )}
     </div>
