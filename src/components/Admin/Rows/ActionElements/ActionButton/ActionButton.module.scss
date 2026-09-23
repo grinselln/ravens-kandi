@@ -5,6 +5,7 @@
   
   &:disabled {
     opacity: .25;
+    cursor: default;
   }
 
   &.grip, &.new-grip {
@@ -14,6 +15,11 @@
 
   &.new-grip {
     opacity: .25
+  }
+
+  &.hidden {
+    opacity: 0;
+    pointer-events: none;
   }
 
   .grip {
@@ -32,7 +38,7 @@
   }
 
   svg {
-    height: 14px;
+    //height: 14px;
 
     @include bp-md {
       height: 15px;

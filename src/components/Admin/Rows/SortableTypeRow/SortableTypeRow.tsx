@@ -47,6 +47,7 @@ const SortableTypeRow = ({photoType, index, container, ...rowProps}: ISortableTy
     type: 'type',
     accept: 'type',
     collisionDetector: verticalEdgeDetector,
+    disabled: rowProps.isOrderingDisabled,
     modifiers: [
       RestrictToElement.configure({
         element: () => container.current,

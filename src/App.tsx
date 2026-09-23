@@ -10,6 +10,7 @@ import AdminCategories from './pages/Admin/AdminCategories';
 import AdminTypes from './pages/Admin/AdminTypes';
 import { useEffect } from 'react';
 import Login from './pages/Login/Login';
+import AdminInventory from './pages/Admin/AdminInventory';
 
 function App() {
   useEffect(() => {
@@ -46,6 +47,7 @@ function App() {
       <Route path="/login" element={<Login />} />
       <Route path="/admin" element={<RequireAuth><Admin /></RequireAuth>} />
       <Route path="/admin/photos" element={<RequireAuth><AdminPhotos /></RequireAuth>} />
+      <Route path="/admin/inventory" element={<RequireAuth><AdminInventory /></RequireAuth>} />
       <Route path="/admin/categories" element={<RequireAuth><AdminCategories /></RequireAuth>} />
       <Route path="/admin/types" element={<RequireAuth><AdminTypes /></RequireAuth>} />
     </Routes>

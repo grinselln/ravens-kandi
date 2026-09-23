@@ -1,7 +1,7 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import styles from './LayoutAdmin.module.scss'
 import Layout from "@/components/Layout/Layout";
-import { faHouse, faImage, faTableCellsLarge, faTag } from '@fortawesome/free-solid-svg-icons';
+import { faBoxesStacked, faHouse, faImage, faTableCellsLarge, faTag } from '@fortawesome/free-solid-svg-icons';
 import { Link } from 'react-router-dom';
 import Modal from '../Modal/Modal';
 import Button from '../Input/Button/Button';
@@ -17,6 +17,7 @@ const LayoutAdmin = ({children}: ILayoutAdmin) => {
   const links = {
     DASHBOARD: "",
     PHOTOS: "photos",
+    INVENTORY: "inventory",
     CATEGORIES: "categories",
     TYPES: "types"
   }
@@ -35,6 +36,11 @@ const LayoutAdmin = ({children}: ILayoutAdmin) => {
             <li>
               <Link to="/admin/photos" className={currentPage === links.PHOTOS ? styles.active : ""}>
                 <FontAwesomeIcon icon={faImage} /> Photos
+              </Link>
+            </li>
+            <li>
+              <Link to="/admin/inventory" className={currentPage === links.INVENTORY ? styles.active : ""}>
+                <FontAwesomeIcon icon={faBoxesStacked} /> Inventory
               </Link>
             </li>
             <li>
@@ -59,8 +65,8 @@ const LayoutAdmin = ({children}: ILayoutAdmin) => {
           title={`Confirm ${recordType} Deletion`}
           modalButtons={
             <>
-              <Button additionalClass="outline-muted" onClick={() => onDismissWarningMessage()} isDisabled={false}>Cancel</Button>
-              <Button additionalClass="alert" onClick={() => onConfirmWarning ? onConfirmWarning() : null} isDisabled={false}>Delete</Button>
+              <Button additionalClass={["outline-muted"]} onClick={() => onDismissWarningMessage()} isDisabled={false}>Cancel</Button>
+              <Button additionalClass={["alert"]} onClick={() => onConfirmWarning ? onConfirmWarning() : null} isDisabled={false}>Delete</Button>
             </>
           }
         >

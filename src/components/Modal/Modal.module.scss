@@ -60,13 +60,13 @@
   .body-wrapper {
     flex: 1;
     overflow-y: auto;
+    scrollbar-color: var(--color-admin-light) transparent;
   }
 
   .body {
     padding: 1.3rem .65rem;
     flex: 1;
     min-height: 0;
-    overflow: hidden;
     display: flex;
 
     &> div {

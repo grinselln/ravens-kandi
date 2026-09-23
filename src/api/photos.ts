@@ -1,4 +1,4 @@
-import { IAdminPhotosQueryData, IPublicPhotoFetchData, IPublicPhotosQueryData, IUpdatePhoto } from "@/interfaces/IPhotos";
+import { IAdminPhotosQueryData, IPhotoInventory, IPhotoQuantities, IPublicPhotoFetchData, IPublicPhotosQueryData, IUpdatePhoto } from "@/interfaces/IPhotos";
 import { apiFetch } from "./apiFetch";
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -21,7 +21,8 @@ export const fetchPhotosAdmin = async (data: {
   missingType: boolean | null,
   missingCategory: boolean | null,
   missingSubcategory: boolean | null,
-  sort: "" | "alpha" | "viewsA" | "viewsD"
+  sort: "" | "alpha" | "viewsA" | "viewsD",
+  count: number | null,
 }): Promise<IAdminPhotosQueryData> => {
   return apiFetch(`${API_URL}/photos/admin`, { requiresAuth: true }, {
     method: 'POST',
@@ -30,7 +31,11 @@ export const fetchPhotosAdmin = async (data: {
   });
 };
 
-export const addPhoto = async (data: {title: string, story: string, source: string, photo_type_id: number | null, categories: Array<number>, subcategories: Array<number>, image: File}) => {
+export const addPhoto = async (data: {
+  title: string, story: string, source: string, photo_type_id: number | null, 
+  categories: Array<number>, subcategories: Array<number>, image: File,
+  inventory: IPhotoInventory
+}) => {
   const formData = new FormData();
   formData.append("image", data.image);
   formData.append("title", data.title);
@@ -39,6 +44,10 @@ export const addPhoto = async (data: {title: string, story: string, source: stri
 
   if (data.photo_type_id !== null) {
     formData.append("photo_type_id", String(data.photo_type_id));
+  }
+
+  if (data.inventory !== null) {
+    formData.append('inventory', JSON.stringify(data.inventory));
   }
 
   data.categories.forEach((id) => formData.append("categories", String(id)));
@@ -66,9 +75,23 @@ export const updatePhoto = async (id: number, data: IUpdatePhoto) => {
     formData.append("image", data.image);
   }
 
+  if (data.inventory !== null) {
+    formData.append('inventory', JSON.stringify(data.inventory));
+  }
+
   return apiFetch(`${API_URL}/photos/${id}`, {requiresAuth: true}, {
     method: 'PUT',
     body: formData,
+  })
+}
+
+export const updatePhotoQuantities = async (id: number, data: Partial<IPhotoQuantities>) => {
+  return apiFetch(`${API_URL}/photos/${id}/quantities`, {requiresAuth: true}, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(data),
   })
 }
 

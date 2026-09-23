@@ -6,8 +6,8 @@ interface IInputText extends React.InputHTMLAttributes<HTMLInputElement> {
   setValue: (value: string) => void;
   label?: string;
   placeholder?: string;
-  fieldWrapperClass?: string;
-  wrapperClass?: string;
+  fieldWrapperClass?: string[];
+  wrapperClass?: string[];
   isDisabled?: boolean;
 }
 

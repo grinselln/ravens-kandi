@@ -1,23 +1,29 @@
 import { ReactNode } from 'react';
 import styles from './InputWrapper.module.scss';
+import clsx from 'clsx';
+import { formatClsxClassString } from '@/helpers/dataManipulation';
 
 interface IInputWrapper {
   label?: string | ReactNode;
-  wrapperClass?: string;
-  fieldWrapperClass?: string;
-  isSmall?: boolean;
-  isMedium?: boolean;
+  wrapperClass?: string[];
+  fieldWrapperClass?: string[];
   children: React.ReactNode;
 }
 
-const InputWrapper = ({fieldWrapperClass, label, wrapperClass, children, isSmall, isMedium}: IInputWrapper) => {
+const InputWrapper = ({fieldWrapperClass, label, wrapperClass, children}: IInputWrapper) => {
   return (
-    <div className={`${styles['input-field-wrapper']}${fieldWrapperClass ? ` ${styles[fieldWrapperClass]}` : ""}${isSmall ? ` ${styles.small}` : ""}${isMedium ? ` ${styles.medium}` : ""}`}>
+    <div className={clsx(
+      styles['input-field-wrapper'],
+      ...formatClsxClassString(fieldWrapperClass, styles)
+    )}>
       {label && (
         <label>{label}</label>
       )}
       
-      <div className={`${styles['input-wrapper']}${wrapperClass ? ` ${styles[wrapperClass]}` : ""}`}>
+      <div className={clsx(
+        styles['input-wrapper'],
+        ...formatClsxClassString(wrapperClass, styles)
+      )}>
         {children}
       </div>
     </div>

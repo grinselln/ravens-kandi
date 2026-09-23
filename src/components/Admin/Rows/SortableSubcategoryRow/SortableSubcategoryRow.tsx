@@ -50,6 +50,7 @@ const SortableSubcategoryRow = ({subcategoryId, categoryId, index, container, ..
     accept: 'subcategory' satisfies SortableType,
     group: categoryId,
     collisionDetector: verticalEdgeDetector,
+    disabled: rowProps.isOrderingDisabled, 
     modifiers: [
       RestrictToElement.configure({
         element: () => container?.current,

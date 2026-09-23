@@ -14,6 +14,7 @@ export const useDropDown = <T,>({options, value, setValue}: IUseDropDown<T>) => 
   const wrapperRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const listRef = useRef<HTMLUListElement>(null);
 
   const onOpenDropdown = () => {
     setIsOpen(true);
@@ -88,7 +89,10 @@ export const useDropDown = <T,>({options, value, setValue}: IUseDropDown<T>) => 
   useEffect(() => {
     if(isOpen) {
       const handleDropDownMouseDown = (e: MouseEvent) => {
-        if(wrapperRef.current && !wrapperRef.current?.contains(e.target as Node)) {
+        if (
+          wrapperRef.current && !wrapperRef.current.contains(e.target as Node) &&
+          listRef.current && !listRef.current.contains(e.target as Node)
+        ) {
           onCloseDropdown();
         }
       }
@@ -105,6 +109,7 @@ export const useDropDown = <T,>({options, value, setValue}: IUseDropDown<T>) => 
     isOpen,
     triggerRef,
     inputRef,
+    listRef,
     wrapperRef,
     activeIndex,
     setActiveIndex,

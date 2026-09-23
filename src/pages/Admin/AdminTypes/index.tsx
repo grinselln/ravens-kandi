@@ -31,7 +31,7 @@ const AdminTypes = () => {
 
   const [selectedTypeEdit, setSelectedTypeEdit] = useState<IPhotoType | null>(null);
   const [editRecordValue, setEditRecordValue] = useState<string>("");
-  const [newRecordValue, setNewRecordValue] = useState<string>("");
+  const [newRecordValue, setNewRecordValue] = useState<string | null>(null);
 
   const [showAddNew, setShowAddNew] = useState<boolean>(false);
   
@@ -45,7 +45,7 @@ const AdminTypes = () => {
     mutationFn: (title: string) => addPhotoType(title),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['photoTypes'] });
-      setNewRecordValue("");
+      setNewRecordValue(null);
     },
     onError: (error) => {
       console.error('Update failed:', error);
@@ -132,7 +132,7 @@ const AdminTypes = () => {
   });
 
   const handleOnAdd = () => {
-    if(newRecordValue === "") return;
+    if(newRecordValue === "" || newRecordValue === null) return;
 
     addMutation.mutate(newRecordValue);
   };
@@ -238,16 +238,15 @@ const AdminTypes = () => {
                 photoType={photoType}
                 index={index}
                 container={typeContainerRef}
-                isOrderingDisabled={selectedTypeEdit !== null}
-                title={isEditing
-                  ? <RowInput
-                      value={editRecordValue}
-                      setValue={(newValue) => setEditRecordValue(newValue)}
-                      isNew={false}
-                      inputItemLabel='Type'
-                      isDisabled={false}
-                    />
-                  : <h3>{photoType.title}</h3>
+                isOrderingDisabled={selectedTypeEdit !== null || newRecordValue !== null}
+                title={
+                  <RowInput
+                    value={isEditing ? editRecordValue : photoType.title}
+                    setValue={(newValue) => setEditRecordValue(newValue)}
+                    isNew={false}
+                    inputItemLabel='Type'
+                    isDisabled={!isEditing}
+                  />
                 }
                 order={orderIndexValid ? photoType.order_index: 998}
                 actionElements={
@@ -263,12 +262,12 @@ const AdminTypes = () => {
                     </>
                   ) : (
                     <>
-                      <ActionButton variant='default' icon={faEdit} isDisabled={isEditingNotSelected} onAction={() => handleOnEdit(photoType)} />
+                      <ActionButton variant='default' icon={faEdit} isDisabled={isEditingNotSelected || newRecordValue !== null} onAction={() => handleOnEdit(photoType)} />
                       
                       {(deleteMutation.isPending || warningMessage !== null) && photoType.id == pendingDeleteId ? (
                         <FontAwesomeIcon icon={faDiamond} spin />
                       ) : (
-                        <ActionButton variant='alert' icon={faTrashCan} isDisabled={isEditingNotSelected} onAction={() => { assignPendingDeleteId(photoType.id); handleOnDelete(photoType.id, true); }} />
+                        <ActionButton variant='alert' icon={faTrashCan} isDisabled={isEditingNotSelected || newRecordValue !== null} onAction={() => { assignPendingDeleteId(photoType.id); handleOnDelete(photoType.id, true); }} />
                       )}
                     </>
                   )}
@@ -279,11 +278,12 @@ const AdminTypes = () => {
           })}
           {!!data && (
             <Row
-              isOrderingDisabled={selectedTypeEdit !== null}
+              isOrderingDisabled={true}
               isNew={true}
               title={
                 <RowInput
-                  value={newRecordValue}
+                  wrapperClasses={['new']}
+                  value={newRecordValue ? newRecordValue : ""}
                   setValue={(newValue) => setNewRecordValue(newValue)}
                   isNew={true}
                   inputItemLabel='Type'
@@ -296,10 +296,10 @@ const AdminTypes = () => {
                 {addMutation.isPending ? (
                   <FontAwesomeIcon icon={faDiamond} spin />
                 ) : (
-                  <ActionButton variant={newRecordValue === "" ? "default" : 'confirm'} icon={faPlus} isDisabled={newRecordValue === ""} onAction={() => handleOnAdd()} />
+                  <ActionButton variant={newRecordValue === null ? "default" : 'confirm'} icon={faPlus} isDisabled={newRecordValue === null} onAction={() => handleOnAdd()} />
                 )}
-                {newRecordValue !== "" && (
-                  <ActionButton variant={"alert"} icon={faClose} onAction={() => setNewRecordValue("") } isDisabled={false} />
+                {newRecordValue !== null && (
+                  <ActionButton variant={"alert"} icon={faClose} onAction={() => setNewRecordValue(null) } isDisabled={false} />
                 )}
                 </>
               }

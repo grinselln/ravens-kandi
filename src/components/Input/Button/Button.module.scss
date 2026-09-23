@@ -88,10 +88,55 @@
     background-color: var(--color-alert);
   }
 
+  &.confirm {
+    background-color: var(--color-confirm);
+    color: var(--color-text)
+  }
+
+  &.icon {
+    svg {
+      margin-right: .25rem;
+    }
+  }
+
   &.no-style {
     background-color: transparent;
     border: none;
     padding: 0px;
     border-radius: none;
+  }
+
+  &.quantity-revert {
+    position: absolute;
+
+    @include bp-sm-only {
+      right: 0px;
+      top: 1px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-radius: 3px;
+      width: 21px;
+      height: 21px;
+      padding: 0px;
+    }
+
+    @include bp-md {
+      left: 0px;
+      bottom: -3px;
+      padding-top: .2rem;
+      padding-bottom: .2rem;
+      font-size: .6rem;
+    }
+
+    @include bp-xl {
+      left: 30px;
+      right: 30px;
+      bottom: unset;
+      margin-top: 10px;
+      padding-top: .35rem;
+      padding-bottom: .35rem;
+      font-size: .7rem;
+    }
   }
 }

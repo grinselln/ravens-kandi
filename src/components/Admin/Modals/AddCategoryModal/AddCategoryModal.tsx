@@ -64,7 +64,7 @@ const AddCategoryModal = ({ isOpen, setIsOpen, triggerSubcategories, subcategori
         title="Add Category"
         modalButtons={
           <>
-            <Button additionalClass="outline-muted" onClick={() => {setIsOpen(false); setCategoryName(""); setSelectedSubcategories([]); setSelectedTriggerSubcategory(null)}} isDisabled={false}>Cancel</Button>
+            <Button additionalClass={["outline-muted"]} onClick={() => {setIsOpen(false); setCategoryName(""); setSelectedSubcategories([]); setSelectedTriggerSubcategory(null)}} isDisabled={false}>Cancel</Button>
             <Button onClick={() => {
               onSave(formattedRecord);
               setIsOpen(false); setCategoryName(""); setSelectedSubcategories([]); setSelectedTriggerSubcategory(null)
