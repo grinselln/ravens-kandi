@@ -1,0 +1,26 @@
+@use '_breakpoints' as *;
+
+.search {
+  position: relative;
+  color: var(--color-admin-light);
+
+  @include bp-lg {
+    width: 30%;
+  }
+
+  input {
+    padding-right: 2.25rem !important;
+  }
+
+  button {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    right: .75rem;
+
+    svg {
+      width: 12px;
+      height: auto;
+    }
+  }
+}

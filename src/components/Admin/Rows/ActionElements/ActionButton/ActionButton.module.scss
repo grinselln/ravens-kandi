@@ -17,6 +17,11 @@
     opacity: .25
   }
 
+  &.hidden {
+    opacity: 0;
+    pointer-events: none;
+  }
+
   .grip {
     touch-action: none; /* Crucial: stops the browser from hijacking upward drags */
     cursor: grab;

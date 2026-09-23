@@ -43,8 +43,12 @@
         opacity: 1;
         visibility: visible;
       }
-    }
+    }  
     
+    img {
+      aspect-ratio: 1/1;
+      object-fit: cover;
+    }
 
     .overlay {
       display: flex;

@@ -128,7 +128,7 @@ function Layout({ children, darkNav = false, isAdmin = false }: LayoutProps) {
         title='Session Expired'
         modalButtons={
           <>
-            <Button additionalClass="default" onClick={() => openAuthPopup()} isDisabled={false}>Authenticate</Button>
+            <Button additionalClass={["default"]} onClick={() => openAuthPopup()} isDisabled={false}>Authenticate</Button>
           </>
         }
       >

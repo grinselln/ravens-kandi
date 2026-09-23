@@ -39,7 +39,7 @@ const AddBulkModal = ({ recordTypePlural, dropdownData, showModal, setShowModal,
       title={`Add ${recordTypePlural}`}
       modalButtons={
         <>
-          <Button additionalClass="outline-muted" onClick={() => resetStates()} isDisabled={false}>Cancel</Button>
+          <Button additionalClass={["outline-muted"]} onClick={() => resetStates()} isDisabled={false}>Cancel</Button>
           <Button onClick={() => {
             onSave(addedRecords);
             resetStates();

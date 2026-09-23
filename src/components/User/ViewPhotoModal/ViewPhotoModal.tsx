@@ -55,7 +55,7 @@ const ViewPhotoModal = ({isOpen, setIsOpen, selectedPhoto}: IViewPhotoModal) => 
               <span className={styles['source-title']}>Design source:</span>
               <div className={styles['link-wrapper']}>
                 <span className={styles['source-link']}>{selectedPhoto?.source}</span>
-                <Button additionalClass="no-style" onClick={() => {handleCopy()}} isDisabled={false}><FontAwesomeIcon icon={copied ? faCheckCircle : faCopy} /></Button>
+                <Button additionalClass={["no-style"]} onClick={() => {handleCopy()}} isDisabled={false}><FontAwesomeIcon icon={copied ? faCheckCircle : faCopy} /></Button>
                 <a href={selectedPhoto?.source} target="_blank"><FontAwesomeIcon icon={faUpRightFromSquare} /></a>
               </div>
             </div>

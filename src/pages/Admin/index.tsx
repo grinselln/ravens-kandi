@@ -26,7 +26,8 @@ const Admin = () => {
       missingType: null,
       missingCategory: null,
       missingSubcategory: null,
-      sort: ""
+      sort: "",
+      count: null
     }),
   });
   
@@ -38,7 +39,8 @@ const Admin = () => {
       missingType: true,
       missingCategory: true,
       missingSubcategory: true,
-      sort: ""
+      sort: "",
+      count: 5
     }),
   });
 
@@ -50,7 +52,8 @@ const Admin = () => {
       missingType: null,
       missingCategory: null,
       missingSubcategory: null,
-      sort: "viewsD"
+      sort: "viewsD",
+      count: 5
     }),
   });
 
@@ -123,10 +126,9 @@ const Admin = () => {
       return b.averageViews - a.averageViews
     }).slice(0, 5);
 
-    const topFivePhotos = (viewTopPhotos ?? []).slice(0, 5);
     const categoryTopPhotosObj = {} as Record<number, IPhotoTopCount>;
 
-    topFivePhotos.forEach((photo: IAdminQueryPhoto) => {
+    viewTopPhotos.forEach((photo: IAdminQueryPhoto) => {
       const categoryList = photoCategories?.[photo.id] ?? [];
 
       categoryList.forEach((category: IPhotoCategory) => {

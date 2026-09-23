@@ -1,3 +1,7 @@
+import { IPhotoQuantities } from "./IPhotos";
+
+export type SortOption = "" | "alpha" | "viewsA" | "viewsD";
+
 export interface IDropDownOption<T> {
   label: string;
   value: T;
@@ -27,4 +31,9 @@ export interface IEditingStatus {
   isEditing: boolean;
   isEditingNewCategory: boolean;
   isEditingNewSubcategory: boolean;
+}
+
+export interface ITableSort<K = keyof IPhotoQuantities> {
+  key: K;
+  direction: "asc" | "desc"
 }
