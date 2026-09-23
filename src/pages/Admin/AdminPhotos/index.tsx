@@ -163,36 +163,6 @@ const AdminPhotos = () => {
     setSelectedBulkEdit(prev => [...prev, photo]);
   };
 
-  {/*const { filteredPhotos, filteredPhotosMap } = useMemo(() => {
-    if(photoCategories === undefined || photoSubcategories === undefined) return {
-      filteredPhotos: [],
-      filteredPhotosMap: new Map()
-    }
-
-    const filteredPhotos: Array<IAdminFilterPhoto> = (photos ?? []).filter((photo: IAdminQueryPhoto) => {
-      if (photo.title === null) return false;
-
-      const compareTitle = photo.title.toLocaleLowerCase();
-      const compareSearch = searchText.toLocaleLowerCase();
-
-      return compareTitle.includes(compareSearch);
-    }).map((photo: IAdminQueryPhoto) => {
-      return {
-        ...photo,
-        categories: photoCategories[photo.id] ?? [],
-        subcategories: photoSubcategories[photo.id] ?? []
-      }
-    });
-
-    const filteredPhotosMap = (filteredPhotos ?? []).reduce<Map<number, IAdminBulkPhotoValidation>>((map, obj) => {
-      map.set(obj.id, obj);
-      return map;
-    }, new Map());
-
-    return {filteredPhotos, filteredPhotosMap}
-
-  }, [photos, searchText, photoCategories, photoSubcategories]);*/}
-
   const selectedEditPhotosFull = useMemo(() => {
     return filteredPhotos.filter((photo: IPhoto) => 
       selectedBulkEdit.some((bulkPhoto: IUploadItemBulkEdit) => 
