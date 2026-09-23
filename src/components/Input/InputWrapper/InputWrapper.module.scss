@@ -135,6 +135,19 @@
       }
     }
 
+    &.medium {
+      input {
+        padding: .25rem .5rem;
+        font-size: .8rem;
+      } 
+    }
+
+    &.checkbox {
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+    }
+
     input, textarea, &.faux-input button {
       width: 100%;
       padding: .35rem;

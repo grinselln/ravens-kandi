@@ -1,7 +1,7 @@
 import { ICategoryFilterCollection, IPhotoCategory } from "./ICategories";
 import { IPhotoSubcategory } from "./ISubcategories";
 
-export interface IPhoto {
+export interface IPhoto extends IPhotoQuantities {
   id: number;
   photo_type_id: number | null;
   photo_filename: string;
@@ -9,6 +9,20 @@ export interface IPhoto {
   story: string | null;
   source: string | null;
   views: number;
+}
+
+export interface IPhotoQuantities {
+  created_count: number;
+  given_count: number;
+  hidden_count: number;
+  marked_count: number;
+  taken_count: number;
+  discard_count: number;
+}
+
+export interface IQuantityItemEdit extends IUploadItem {
+  id: number;
+  changes: Partial<IPhotoQuantities>;
 }
 
 export interface IPublicPhotoFetchData {
@@ -42,7 +56,7 @@ export interface IAdminQueryPhoto extends IPhoto {
 }
 
 export interface IUploadItem { 
-  status: "pending" | "uploading" | "deleting" | "success" | "error";
+  status: "pending" | "updating" | "uploading" | "deleting" | "success" | "error";
   errorMessage?: string;
 }
 
@@ -56,6 +70,7 @@ export interface IUploadItemEdit extends IUploadItem {
   previewUrl: string;
   imageFile: File | null;
   isRemoved: boolean;
+  inventory: IPhotoInventory;
 }
 
 export interface IUploadItemNew extends IUploadItem {
@@ -63,6 +78,7 @@ export interface IUploadItemNew extends IUploadItem {
   id: string;
   previewUrl: string;
   imageFile: File;
+  inventory: IPhotoInventory;
 }
 
 export type IUploadItemUnion = IUploadItemNew | IUploadItemEdit;
@@ -95,6 +111,7 @@ export interface IUpdatePhoto {
   categories: Array<number>;
   subcategories: Array<number>;
   image: File | null;
+  inventory: IPhotoInventory | null;
 }
 
 export interface IPhotoCategoryViews {
@@ -110,4 +127,13 @@ export interface IPhotoCategoryViewsAvg extends IPhotoCategoryViews {
 
 export interface IPhotoTopCount extends IPhotoCategory {
   topPhotoCount: number;
+}
+
+export interface IPhotoInventory {
+  created_count: number;
+  given_count: number;
+  hidden_count: number;
+  marked_count: number;
+  taken_count: number;
+  discard_count: number;
 }

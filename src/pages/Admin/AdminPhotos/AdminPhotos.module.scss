@@ -26,12 +26,6 @@
         align-items: center;
       }
 
-      .search {
-        @include bp-lg {
-          width: 30%;
-        }
-      }
-
       .base-filters {
         display: flex;
         flex-direction: column;
@@ -193,7 +187,9 @@
 
         .image-wrapper {
           img {
+            width: 100%;
             aspect-ratio: 1/1;
+            object-fit: cover;
           }
 
           .badges {

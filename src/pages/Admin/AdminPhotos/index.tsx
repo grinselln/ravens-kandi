@@ -3,7 +3,6 @@ import styles from './AdminPhotos.module.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faTag, faTableCellsLarge, faTableList, faCheckSquare, faSquare, faSpinner } from '@fortawesome/free-solid-svg-icons';
 import { faEdit, faEye,faTrashCan } from '@fortawesome/free-regular-svg-icons';
-import InputText from '@/components/Input/InputText/InputText';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import InputDropDown from '@/components/Input/InputDropDown/InputDropDown';
 import DashboardHeader from '@/components/Admin/DashboardHeader/DashboardHeader';
@@ -18,12 +17,12 @@ import ActionButton from '@/components/Admin/Rows/ActionElements/ActionButton/Ac
 import FilterDisplay from '@/components/Shared/FilterDisplay/FilterDisplay';
 import { useSearchParams } from 'react-router-dom';
 import { ICategoryFilterCollection } from '@/interfaces/ICategories';
-import { IAdminBulkPhotoValidation, IAdminFilterPhoto, IAdminQueryPhoto, IPhoto, IPhotoAlerts, IUploadItemBulkEdit } from '@/interfaces/IPhotos';
+import { IAdminBulkPhotoValidation, IAdminFilterPhoto, IPhoto, IPhotoAlerts, IUploadItemBulkEdit } from '@/interfaces/IPhotos';
 import { IPhotoType } from '@/interfaces/IPhotoTypes';
 import { IPhotoSubcategory } from '@/interfaces/ISubcategories';
-import { IDropDownOption } from '@/interfaces/IRecords';
-
-type SortOption = "" | "alpha" | "viewsA" | "viewsD";
+import { IDropDownOption, SortOption } from '@/interfaces/IRecords';
+import InputSearch from '@/components/Input/InputSearch/InputSearch';
+import { useSearch } from '@/hooks/useSearch';
 
 const API_URL = import.meta.env.VITE_API_URL;
 const API_UPLOAD_DIRECTORY = import.meta.env.VITE_API_UPLOAD_DIRECTORY;
@@ -34,7 +33,7 @@ const AdminPhotos = () => {
   const filter = searchParams.get('filter');
 
   const baseUploadUrl = `${API_URL}/${API_UPLOAD_DIRECTORY}/`;
-  const [searchText, setSearchText] = useState<string>("");
+  
   const [selectedPhotoTypes, setSelectedPhotoTypes] = useState<Array<number>>([]);
   const [selectedSortOption, setSelectedSortOption] = useState<IDropDownOption<string>>({label: "", value: ""});
   const [selectedCategoryFilters, setSelectedCategoryFilters] = useState<ICategoryFilterCollection>({});
@@ -80,7 +79,8 @@ const AdminPhotos = () => {
         missingType: selectedAlerts.missingType,
         missingCategory: selectedAlerts.missingCategory,
         missingSubcategory: selectedAlerts.missingSubcategory,
-        sort: isSortOption(selectedSortOption.value) ? selectedSortOption.value : ""
+        sort: isSortOption(selectedSortOption.value) ? selectedSortOption.value : "",
+        count: null
       })
     },
   });
@@ -108,6 +108,12 @@ const AdminPhotos = () => {
   const { data: subcategories } = useQuery({
     queryKey: ['subcategories'], 
     queryFn: fetchSubcategories,
+  });
+
+  const { searchText, setSearchText, filteredPhotos, filteredPhotosMap } = useSearch({
+    photos: photos ?? [], 
+    photoCategories : photoCategories ?? [], 
+    photoSubcategories: photoSubcategories ?? []
   });
 
   const deleteMutation = useMutation({
@@ -156,7 +162,7 @@ const AdminPhotos = () => {
     setSelectedBulkEdit(prev => [...prev, photo]);
   };
 
-  const { filteredPhotos, filteredPhotosMap } = useMemo(() => {
+  {/*const { filteredPhotos, filteredPhotosMap } = useMemo(() => {
     if(photoCategories === undefined || photoSubcategories === undefined) return {
       filteredPhotos: [],
       filteredPhotosMap: new Map()
@@ -165,7 +171,10 @@ const AdminPhotos = () => {
     const filteredPhotos: Array<IAdminFilterPhoto> = (photos ?? []).filter((photo: IAdminQueryPhoto) => {
       if (photo.title === null) return false;
 
-      return photo.title.includes(searchText);
+      const compareTitle = photo.title.toLocaleLowerCase();
+      const compareSearch = searchText.toLocaleLowerCase();
+
+      return compareTitle.includes(compareSearch);
     }).map((photo: IAdminQueryPhoto) => {
       return {
         ...photo,
@@ -181,7 +190,7 @@ const AdminPhotos = () => {
 
     return {filteredPhotos, filteredPhotosMap}
 
-  }, [photos, searchText, photoCategories, photoSubcategories]);
+  }, [photos, searchText, photoCategories, photoSubcategories]);*/}
 
   const selectedEditPhotosFull = useMemo(() => {
     return filteredPhotos.filter((photo: IPhoto) => 
@@ -265,14 +274,18 @@ const AdminPhotos = () => {
       <div className={styles['photos-wrapper']}>
         <div className={styles['filters-wrapper']}>
           <div className={styles['top-filters']}>
-            <div className={styles.search}>
+            <InputSearch
+              searchText={searchText}
+              setSearchText={setSearchText}
+            />
+            {/*<div className={styles.search}>
               <InputText
                 wrapperClass={['inverse']}
                 placeholder='Search by title...'
                 value={searchText}
                 setValue={(newValue) => setSearchText(newValue)}
               />
-            </div>
+            </div>*/}
             <div className={styles['base-filters']}>
               <div className={styles.types}>
                 {(photoTypes ?? []).map((type: IPhotoType) => {
@@ -281,7 +294,7 @@ const AdminPhotos = () => {
                   return (
                     <Button
                       key={`type_${type.id}`}
-                      additionalClass={isSelected ? "muted" : "outline-muted"}
+                      additionalClass={isSelected ? ["]muted"] : ["outline-muted"]}
                       onClick={() => {
                         if(isSelected) {
                           setSelectedPhotoTypes((prev: Array<number>) => prev.filter((prevType: number) => prevType !== type.id));
@@ -322,7 +335,7 @@ const AdminPhotos = () => {
             <div className={styles['missing-filters']}>
               <div className={styles['missing-option']}>
                 <Button
-                  additionalClass="no-style"
+                  additionalClass={["no-style"]}
                   onClick={() => setSelectedAlerts((prev: IPhotoAlerts) => ({...prev, missingType: !selectedAlerts.missingType}))} 
                   isDisabled={false}
                   >
@@ -334,7 +347,7 @@ const AdminPhotos = () => {
               </div>
               <div className={styles['missing-option']}>
                   <Button
-                    additionalClass="no-style"
+                    additionalClass={["no-style"]}
                     onClick={() => setSelectedAlerts((prev: IPhotoAlerts) => ({...prev, missingCategory: !selectedAlerts.missingCategory}))} 
                     isDisabled={false}
                     >
@@ -346,7 +359,7 @@ const AdminPhotos = () => {
               </div>
               <div className={styles['missing-option']}>
                   <Button
-                    additionalClass="no-style"
+                    additionalClass={["no-style"]}
                     onClick={() => setSelectedAlerts((prev: IPhotoAlerts) => ({...prev, missingSubcategory: !selectedAlerts.missingSubcategory}))} 
                     isDisabled={false}
                     >
@@ -359,7 +372,7 @@ const AdminPhotos = () => {
             </div>
 
             <div className={`${styles['bulk-edit']}${isBulkEdit ? ` ${styles['edit-active']}` : ""}`}>
-              <Button additionalClass='outline-muted' onClick={() => {
+              <Button additionalClass={['outline-muted']} onClick={() => {
                 setIsBulkEdit(!isBulkEdit);
                 setSelectedBulkEdit([]);
               }} isDisabled={false}>Bulk Select</Button>
@@ -407,7 +420,7 @@ const AdminPhotos = () => {
                       </div>
                       {isBulkEdit && (
                         <Button
-                          additionalClass="no-style"
+                          additionalClass={["no-style"]}
                           onClick={() => {
                             if(selectedBulkEdit.some((item: IUploadItemBulkEdit) => item.id === photo.id)) {
                               setSelectedBulkEdit((prev: Array<IUploadItemBulkEdit>) => prev.filter((prevItem: IUploadItemBulkEdit) => prevItem.id !== photo.id))

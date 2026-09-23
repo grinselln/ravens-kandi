@@ -107,12 +107,12 @@ const Creations = () => {
       />
 
       <div className={styles['filter-types']}>
-        <Button additionalClass={selectedPhotoTypes.length === 0 ? "accent" : "accent-outline"} isDisabled={false} onClick={() => {setSelectedPhotoTypes([])}}>All</Button>
+        <Button additionalClass={selectedPhotoTypes.length === 0 ? ["accent"] : ["accent-outline"]} isDisabled={false} onClick={() => {setSelectedPhotoTypes([])}}>All</Button>
         {(data ?? []).map((photoType: IPhotoType) => {
           const isSelected = selectedPhotoTypes.includes(photoType.id);
         
           return (
-            <Button key={`photoType_${photoType.id}`} additionalClass={isSelected ? "accent" : "accent-outline"} isDisabled={false}
+            <Button key={`photoType_${photoType.id}`} additionalClass={isSelected ? ["accent"] : ["accent-outline"]} isDisabled={false}
               onClick={() => {
                 if(isSelected) {
                   setSelectedPhotoTypes((prev: Array<number>) => prev.filter((prevItem: number) => prevItem !== photoType.id))
@@ -136,7 +136,7 @@ const Creations = () => {
         <div className={styles['count-wrapper']}>
           <span className={styles.count}>{photos?.length ?? 0} photo{photos?.length === 1 ? "" : "s"}</span>
           <Button 
-          additionalClass="pill-square"
+          additionalClass={["pill-square"]}
           onClick={() => {
             setSelectedCategoryFilters({});
           }}

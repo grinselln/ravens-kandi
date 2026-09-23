@@ -1,0 +1,54 @@
+@use '_breakpoints' as *;
+
+.count-wrapper {
+  &.confirm {
+    span {
+      color: var(--color-confirm)
+    }
+  }
+
+  &.inverse {
+
+    .control button {
+      position: relative;
+      z-index: 0;
+      
+      &::before {
+        content: "";
+        position: absolute;
+        display: flex;
+        align-self: center;
+        justify-self: center;
+        margin: 3px;
+        width: 15px;
+        height: 15px;
+        background-color: var(--color-admin-light);
+        z-index: -1;
+      }
+    }
+    svg {
+      path {
+        fill: var(--color-admin-primary) !important;
+      }
+    }
+  }
+}
+
+.count {
+  padding-left: .75rem;
+  padding-right: .75rem;
+  display: flex;
+  align-items: center;
+  font-size: 1rem;
+
+  svg {
+    height: 1.5rem;
+    width: auto;
+    max-width: unset;
+  }
+
+  span {
+    width: 40px;
+    text-align: center;
+  }
+}

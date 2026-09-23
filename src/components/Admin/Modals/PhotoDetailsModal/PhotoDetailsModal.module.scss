@@ -189,7 +189,7 @@
     }
   }
 
-  .category-details {
+  .attribute-details {
     display: flex;
     flex-direction: column;
     gap: .5rem;
@@ -203,6 +203,36 @@
       color: var(--color-admin-light);
       font-size: .9rem;
       margin-top: 1rem;
+    }
+
+    .photo-inventory {
+      display: flex;
+      flex-direction: column;
+      gap: .5rem;
+
+      .header {
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+
+        span {
+          color: var(--color-alert);
+          font-size: .7rem;
+        }
+      }
+
+      .inventory-fields {
+        row-gap: .5rem;
+        padding: .5rem;
+
+        label {
+          font-size: .75rem;
+        }
+
+        input {
+          
+        }
+      }
     }
 
     .accent-box-wrapper {

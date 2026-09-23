@@ -1,0 +1,24 @@
+@use '_breakpoints' as *;
+
+.checkbox {
+  display: flex;
+
+  &.grid {
+    margin: 0px auto;
+  }
+
+  &.confirm {
+    svg {
+      color: var(--color-confirm);
+    }
+  }
+  
+  svg {
+    color: var(--color-admin-light);
+    height: 25px;
+  }
+
+  label {
+    color: var(--color-admin-light);
+  }
+}

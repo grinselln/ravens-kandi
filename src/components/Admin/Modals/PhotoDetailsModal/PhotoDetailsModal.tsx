@@ -15,8 +15,10 @@ import { useWindowWidth } from "@/hooks/useWindowWidth";
 import { IPhotoType, IPhotoTypesQueryData } from "@/interfaces/IPhotoTypes";
 import { ICategoryQueryGroupedCategory, ICategoryQueryGroupedCategorySubcategory, ICategoryWithLink, IPhotoCategory } from "@/interfaces/ICategories";
 import { ISubcategory } from "@/interfaces/ISubcategories";
-import { IAdminFilterPhoto, IUploadItemNew, IUploadItemUnion } from "@/interfaces/IPhotos";
+import { IAdminFilterPhoto, IPhotoInventory, IUploadItemNew, IUploadItemUnion } from "@/interfaces/IPhotos";
 import { IDropDownOption } from "@/interfaces/IRecords";
+import InputNumeric from "@/components/Input/InputNumeric/InputNumeric";
+import { NEW_PHOTO_INVENTORY } from "@/helpers/constants";
 
 interface IPhotoDetailsModal {
   isOpen: boolean;
@@ -44,6 +46,7 @@ const PhotoDetailsModal = ({selectedPhotos = [], setSelectedPhotos, isOpen, setI
   const [photoTitle, setPhotoTitle] = useState<string>("");
   const [photoSource, setPhotoSource] = useState<string>("");
   const [photoSourceError, setPhotoSourceError] = useState<boolean>(false);
+  const [photoInventory, setPhotoInventory] = useState<IPhotoInventory>(NEW_PHOTO_INVENTORY)
   const [photoStory, setPhotoStory] = useState<string>("");
   const [selectedPhotoType, setSelectedPhotoType] = useState<IDropDownOption<number> | null>(null);
   const [selectedCategories, setSelectedCategories] = useState<Array<number>>([]);
@@ -55,12 +58,13 @@ const PhotoDetailsModal = ({selectedPhotos = [], setSelectedPhotos, isOpen, setI
     });
     setSelectedPhotos([]);
     setUploadItems([]);
-    setPhotoTitle("");
+    setPhotoTitle(""); 
     setPhotoSource("");
     setPhotoStory("");
     setSelectedPhotoType(null);
     setSelectedCategories([]);
     setSelectedSubcategories([]);
+    setPhotoInventory(NEW_PHOTO_INVENTORY);
   }
 
   const addMutation = useMutation({
@@ -72,6 +76,7 @@ const PhotoDetailsModal = ({selectedPhotos = [], setSelectedPhotos, isOpen, setI
       categories: Array<number>;
       subcategories: Array<number>;
       image: File;
+      inventory: IPhotoInventory;
     }) => addPhoto(newPhoto),
     onError: (error) => {
       console.error('Upload failed:', error);
@@ -89,6 +94,7 @@ const PhotoDetailsModal = ({selectedPhotos = [], setSelectedPhotos, isOpen, setI
         categories: Array<number>;
         subcategories: Array<number>;
         image: File | null;
+        inventory: IPhotoInventory | null;
       }
     }) => updatePhoto(updates.id, updates.updatedPhoto),
     onError: (error) => {
@@ -122,6 +128,7 @@ const PhotoDetailsModal = ({selectedPhotos = [], setSelectedPhotos, isOpen, setI
               categories: selectedCategories,
               subcategories: selectedSubcategories,
               image: item.imageFile,
+              inventory: photoInventory
             }
           );
           setUploadItems(prev => prev.map(i =>
@@ -173,7 +180,8 @@ const PhotoDetailsModal = ({selectedPhotos = [], setSelectedPhotos, isOpen, setI
                 photo_type_id: selectedPhotoType?.value ? selectedPhotoType?.value : null,
                 categories: selectedCategories,
                 subcategories: selectedSubcategories,
-                image: isSingle ? uploadItems[0].imageFile : null
+                image: isSingle ? uploadItems[0].imageFile : null,
+                inventory: isSingle ? photoInventory : null
               }
             }
           );
@@ -213,6 +221,10 @@ const PhotoDetailsModal = ({selectedPhotos = [], setSelectedPhotos, isOpen, setI
   const photoTypeOptions = useMemo(() => {
     return photoTypes.map((type: IPhotoType) => ({label: type.title, value: type.id}))
   }, [photoTypes]);
+
+  const currentInventory = useMemo(() => {
+    return photoInventory.created_count - photoInventory.given_count - photoInventory.hidden_count - photoInventory.taken_count - photoInventory.discard_count;
+  }, [photoInventory])
 
   const availableCategories: ICategoryWithLink[] = useMemo(() => {
     return (categories).filter((category: ICategoryQueryGroupedCategory) => {
@@ -276,6 +288,7 @@ const PhotoDetailsModal = ({selectedPhotos = [], setSelectedPhotos, isOpen, setI
         imageFile: file,
         previewUrl: URL.createObjectURL(file),
         status: "pending" as const,
+        inventory: NEW_PHOTO_INVENTORY
       }));
 
       setUploadItems(prev => [...prev, ...newItems]);
@@ -362,16 +375,26 @@ const PhotoDetailsModal = ({selectedPhotos = [], setSelectedPhotos, isOpen, setI
 
   useEffect(() => {
     if(selectedPhotos.length > 0) {
-      setUploadItems(selectedPhotos.map((photo: IAdminFilterPhoto) => ({
-        isNew: false,
-        id: photo.id,
-        story: photo.story,
-        source: photo.source,
-        previewUrl: `${baseUploadUrl}${photo.photo_filename}`,
-        status: "pending",
-        imageFile: null,
-        isRemoved: false
-      })));
+      setUploadItems(selectedPhotos.map((photo: IAdminFilterPhoto) => { 
+        return ({
+          isNew: false,
+          id: photo.id,
+          story: photo.story,
+          source: photo.source,
+          previewUrl: `${baseUploadUrl}${photo.photo_filename}`,
+          status: "pending",
+          imageFile: null,
+          isRemoved: false,
+          inventory: {
+            created_count: photo.created_count,
+            given_count: photo.given_count,
+            hidden_count: photo.hidden_count,
+            marked_count: photo.marked_count,
+            taken_count: photo.taken_count,
+            discard_count: photo.discard_count
+          }
+        })
+      }));
 
       const selectedPhotoType = selectedPhotos[0].photo_type_id !== null ? {label: selectedPhotos[0].type_title, value: selectedPhotos[0].photo_type_id} : null;
 
@@ -383,6 +406,14 @@ const PhotoDetailsModal = ({selectedPhotos = [], setSelectedPhotos, isOpen, setI
       if(selectedPhotos.length === 1) {
         setPhotoSource(selectedPhotos[0].source ?? "");
         setPhotoStory(selectedPhotos[0].story ?? "");
+        setPhotoInventory({
+            created_count: selectedPhotos[0].created_count,
+            given_count: selectedPhotos[0].given_count,
+            hidden_count: selectedPhotos[0].hidden_count,
+            marked_count: selectedPhotos[0].marked_count,
+            taken_count: selectedPhotos[0].taken_count,
+            discard_count: selectedPhotos[0].discard_count
+          })
       }
     }
   }, [selectedPhotos, baseUploadUrl]);
@@ -402,7 +433,7 @@ const PhotoDetailsModal = ({selectedPhotos = [], setSelectedPhotos, isOpen, setI
       additionalClass={["add-photo"]}
       modalButtons={
         <>
-          <Button additionalClass="outline-muted" onClick={() => {
+          <Button additionalClass={["outline-muted"]} onClick={() => {
               setIsOpen(false);
               resetState();
             }} 
@@ -484,14 +515,75 @@ const PhotoDetailsModal = ({selectedPhotos = [], setSelectedPhotos, isOpen, setI
             </div>
           )}
         </div>
-        <div className={styles['category-details']}>
+        <div className={styles['attribute-details']}>
           {uploadItems.length <= 1 && (
-            <InputTextArea
-              label='Story'
-              placeholder='Details of the interaction...'
-              value={photoStory}
-              setValue={(story) => setPhotoStory(story)}
-            />
+            <>
+              <div key={uploadItems[0]?.id ?? "new"} className={styles['photo-inventory']}>
+                <p className={styles.header}>Current Inventory: {currentInventory} {currentInventory < 0 ? <span>Check inventory quantities.</span> : null}</p>
+                <div className={styles['accent-box-wrapper']}>
+                  <div className={styles['accent-box']}>
+                    <div className={`${styles['inventory-fields']} grid`}>
+                      <div className="col-4">
+                        <InputNumeric
+                          wrapperClass={["medium", "inverse"]}
+                          label="Created"
+                          value={photoInventory.created_count}
+                          setValue={(createdCount) => {
+                            setPhotoInventory(prev => ({...prev, created_count: createdCount}))
+                          }}
+                        />
+                      </div>
+                      <div className="col-4">
+                        <InputNumeric
+                          wrapperClass={['medium', 'inverse']}
+                          label="Given"
+                          value={photoInventory.given_count}
+                          setValue={(givenCount) => setPhotoInventory(prev => ({...prev, given_count: givenCount}))}
+                        />
+                      </div>
+                      <div className="col-4">
+                        <InputNumeric
+                          wrapperClass={['medium', 'inverse']}
+                          label="Hidden"
+                          value={photoInventory.hidden_count}
+                          setValue={(hiddenCount) => setPhotoInventory(prev => ({...prev, hidden_count: hiddenCount}))}
+                        />
+                      </div>
+                      <div className="col-4">
+                        <InputNumeric
+                          wrapperClass={['medium', 'inverse']}
+                          label="Marked Hidden"
+                          value={photoInventory.marked_count}
+                          setValue={(markedCount) => setPhotoInventory(prev => ({...prev, marked_count: markedCount}))}
+                        />
+                      </div>
+                      <div className="col-4">
+                        <InputNumeric
+                          wrapperClass={['medium', 'inverse']}
+                          label="Taken"
+                          value={photoInventory.taken_count}
+                          setValue={(takenCount) => setPhotoInventory(prev => ({...prev, taken_count: takenCount}))}
+                        />
+                      </div>
+                      <div className="col-4">
+                        <InputNumeric
+                          wrapperClass={['medium', 'inverse']}
+                          label="Discarded"
+                          value={photoInventory.discard_count}
+                          setValue={(discardedCount) => setPhotoInventory(prev => ({...prev, discard_count: discardedCount}))}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <InputTextArea
+                label='Story'
+                placeholder='Details of the interaction...'
+                value={photoStory}
+                setValue={(story) => setPhotoStory(story)}
+              />
+            </>
           )}
           <InputDropDown
             label='Photo type'
@@ -515,7 +607,7 @@ const PhotoDetailsModal = ({selectedPhotos = [], setSelectedPhotos, isOpen, setI
                       )}
                       <div className={styles['category-header']}>
                         <Button
-                          additionalClass="no-style"
+                          additionalClass={["no-style"]}
                           onClick={() => {
                             if(isCategorySelected) {
                               setSelectedCategories((prev: number[]) => prev.filter((prevItem: number) => prevItem !== category.id));
@@ -541,7 +633,7 @@ const PhotoDetailsModal = ({selectedPhotos = [], setSelectedPhotos, isOpen, setI
                             const isSubcategorySelected = selectedSubcategories.includes(subcategory.id);
 
                             return (
-                              <Button key={`detail-subcategory_${subcategory.id}`} additionalClass="no-style" 
+                              <Button key={`detail-subcategory_${subcategory.id}`} additionalClass={["no-style"]} 
                                 onClick={() => {
                                   const triggerCategory = categories.find((category) => category.trigger_subcategory_id === subcategory.id);
 

@@ -7,15 +7,16 @@ import ActionButton from "@/components/Admin/Rows/ActionElements/ActionButton/Ac
 import { ICategoriesQueryData, ICategoryFilter, ICategoryFilterCollection, ICategoryQueryGroupedCategory, ICategoryQueryGroupedCategorySubcategory } from "@/interfaces/ICategories";
 
 interface IFilterDisplay {
+  defaultClosed?: boolean;
   isAdmin: boolean;
   categoryData: ICategoriesQueryData | undefined;
   selectedCategoryFilters: ICategoryFilterCollection;
   setSelectedCategoryFilters: Dispatch<SetStateAction<ICategoryFilterCollection>>;
 }
 
-const FilterDisplay = ({isAdmin, categoryData, selectedCategoryFilters, setSelectedCategoryFilters}: IFilterDisplay) => {
+const FilterDisplay = ({defaultClosed, isAdmin, categoryData, selectedCategoryFilters, setSelectedCategoryFilters}: IFilterDisplay) => {
     const {windowBreakPoints} = useWindowWidth();
-    const [isAccordionOpen, setIsAccordionOpen] = useState<boolean>(true);
+    const [isAccordionOpen, setIsAccordionOpen] = useState<boolean>(defaultClosed === true ? false : true);
     
   const viewableCategories = useMemo(() => {
     const dataToUse = isAdmin ? categoryData?.groupedCategories ?? [] : categoryData?.groupedCategoriesPhotosOnly ?? [];
@@ -62,7 +63,7 @@ const FilterDisplay = ({isAdmin, categoryData, selectedCategoryFilters, setSelec
                           const currentSelectedSubcategories: Array<string | number> = selectedCategoryFilters?.[category.id]?.subcategory_ids ?? [];
 
                           return (
-                            <Button key={`subcategory_${subcategory.id}`} additionalClass={isAdmin ? "pill-square" : "pill-muted"} isSelected={currentSelectedSubcategories.includes(subcategory.id)} isDisabled={false} 
+                            <Button key={`subcategory_${subcategory.id}`} additionalClass={isAdmin ? ["pill-square"] : ["pill-muted"]} isSelected={currentSelectedSubcategories.includes(subcategory.id)} isDisabled={false} 
                               onClick={() => {
                                 if(currentSelectedSubcategories.includes(subcategory.id)) { //remove subcategory
                                   if(category.order_index === 0) {
