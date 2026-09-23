@@ -523,7 +523,7 @@ const PhotoDetailsModal = ({selectedPhotos = [], setSelectedPhotos, isOpen, setI
                 <div className={styles['accent-box-wrapper']}>
                   <div className={styles['accent-box']}>
                     <div className={`${styles['inventory-fields']} grid`}>
-                      <div className="col-4">
+                      <div className="col-4 col-md-6 col-lg-4">
                         <InputNumeric
                           wrapperClass={["medium", "inverse"]}
                           label="Created"
@@ -533,7 +533,7 @@ const PhotoDetailsModal = ({selectedPhotos = [], setSelectedPhotos, isOpen, setI
                           }}
                         />
                       </div>
-                      <div className="col-4">
+                      <div className="col-4 col-md-6 col-lg-4">
                         <InputNumeric
                           wrapperClass={['medium', 'inverse']}
                           label="Given"
@@ -541,7 +541,7 @@ const PhotoDetailsModal = ({selectedPhotos = [], setSelectedPhotos, isOpen, setI
                           setValue={(givenCount) => setPhotoInventory(prev => ({...prev, given_count: givenCount}))}
                         />
                       </div>
-                      <div className="col-4">
+                      <div className="col-4 col-md-6 col-lg-4">
                         <InputNumeric
                           wrapperClass={['medium', 'inverse']}
                           label="Hidden"
@@ -549,7 +549,7 @@ const PhotoDetailsModal = ({selectedPhotos = [], setSelectedPhotos, isOpen, setI
                           setValue={(hiddenCount) => setPhotoInventory(prev => ({...prev, hidden_count: hiddenCount}))}
                         />
                       </div>
-                      <div className="col-4">
+                      <div className="col-4 col-md-6 col-lg-4">
                         <InputNumeric
                           wrapperClass={['medium', 'inverse']}
                           label="Marked Hidden"
@@ -557,7 +557,7 @@ const PhotoDetailsModal = ({selectedPhotos = [], setSelectedPhotos, isOpen, setI
                           setValue={(markedCount) => setPhotoInventory(prev => ({...prev, marked_count: markedCount}))}
                         />
                       </div>
-                      <div className="col-4">
+                      <div className="col-4 col-md-6 col-lg-4">
                         <InputNumeric
                           wrapperClass={['medium', 'inverse']}
                           label="Taken"
@@ -565,7 +565,7 @@ const PhotoDetailsModal = ({selectedPhotos = [], setSelectedPhotos, isOpen, setI
                           setValue={(takenCount) => setPhotoInventory(prev => ({...prev, taken_count: takenCount}))}
                         />
                       </div>
-                      <div className="col-4">
+                      <div className="col-4 col-md-6 col-lg-4">
                         <InputNumeric
                           wrapperClass={['medium', 'inverse']}
                           label="Discarded"
