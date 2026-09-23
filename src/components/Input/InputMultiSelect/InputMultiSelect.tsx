@@ -42,14 +42,6 @@ const InputMultiSelect = ({label, placeholder, addSelection, removeSelection, op
     return isOpen && (options.length > 0 || showAdd)
   }, [isOpen, showAdd, options]);
 
-  const showAdd = useMemo(() => {
-    return options.length === 0 && searchText !== "";
-  }, [options, searchText]);
-  
-  const isDropdownOpen = useMemo(() => {
-    return isOpen && (options.length > 0 || showAdd)
-  }, [isOpen, showAdd, options]);
-
   return (
     <InputWrapper
       label={label}
