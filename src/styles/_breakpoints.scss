@@ -8,6 +8,10 @@ $bpXXL: 82.5rem; // ultra-wide
   @media (min-width: #{$bpSM}) { @content; }
 }
 
+@mixin bp-sm-only {
+  @media (max-width: #{$bpMD}) { @content; }
+}
+
 @mixin bp-md {
   @media (min-width: #{$bpMD}) { @content; }
 }

@@ -5,6 +5,7 @@ import { useWindowWidth } from "@/hooks/useWindowWidth";
 import { faChevronDown, faChevronUp } from "@fortawesome/free-solid-svg-icons";
 import ActionButton from "@/components/Admin/Rows/ActionElements/ActionButton/ActionButton";
 import { ICategoriesQueryData, ICategoryFilter, ICategoryFilterCollection, ICategoryQueryGroupedCategory, ICategoryQueryGroupedCategorySubcategory } from "@/interfaces/ICategories";
+import { isObjectEmpty } from "@/helpers/dataManipulation";
 
 interface IFilterDisplay {
   defaultClosed?: boolean;
@@ -45,9 +46,15 @@ const FilterDisplay = ({defaultClosed, isAdmin, categoryData, selectedCategoryFi
           }}
         >
           <span>Filters</span>
-          <ActionButton variant="default" icon={isAccordionOpen ? faChevronUp : faChevronDown} isDisabled={false} onAction={() => {
-            setIsAccordionOpen(!isAccordionOpen)
-          }} />
+          <div className={styles["header-actions"]}>
+            <Button additionalClass={['pill-square']} onClick={(e) => {
+              e.stopPropagation();
+              setSelectedCategoryFilters({});
+            }} isDisabled={isObjectEmpty(selectedCategoryFilters)}>Clear filters</Button>
+            <ActionButton variant="default" icon={isAccordionOpen ? faChevronUp : faChevronDown} isDisabled={false} onAction={() => {
+              setIsAccordionOpen(!isAccordionOpen)
+            }} />
+          </div>
         </div>
 
         <div className={styles['body-wrapper']}>

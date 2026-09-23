@@ -4,7 +4,7 @@ import styles from "./AdminInventory.module.scss"
 import { useMemo, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faAngleDown, faAngleUp, faCheck, faEdit, faSpinner } from "@fortawesome/free-solid-svg-icons";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { fetchPhotosAdmin, updatePhotoQuantities } from "@/api/photos";
 import CellQuantity from "@/components/Table/CellQuantity/CellQuantity";
 import Button from "@/components/Input/Button/Button";
@@ -32,11 +32,17 @@ const AdminInventory = () => {
   const [isEditing, setIsEditing] = useState<boolean>(false);
 
   const { data: photos } = useQuery({
-    queryKey: ['photos'],
+    queryKey: ['photos', selectedCategoryFilters],
     queryFn: () => {
+      const arrayFilters = Object.entries(selectedCategoryFilters)
+      .map(([key, value]) => ({
+        category_id: key,
+        ...(value ? { ...value } : {})
+      }));
+      
       return fetchPhotosAdmin({
         type: null,
-        filters: null,
+        filters: arrayFilters.length > 0 ? arrayFilters : null,
         missingType: null,
         missingCategory: null,
         missingSubcategory: null,
@@ -44,6 +50,7 @@ const AdminInventory = () => {
         count: null
       })
     },
+    placeholderData: keepPreviousData,
   });
 
   const { data: photoCategories } = useQuery({
@@ -300,89 +307,93 @@ const AdminInventory = () => {
                 </th>
               </tr>
             </thead>
-            <tbody>
-              {displayedRecords.map((photo, idx) => {
-                const existing = editedRecords.find(record => record.id === photo.id);
-                const existingChanges = existing ? existing.changes : null;
-                const inventory = (existingChanges?.created_count ?? photo.created_count) 
-                - (existingChanges?.given_count ?? photo.given_count) 
-                - (existingChanges?.hidden_count ?? photo.hidden_count) 
-                - (existingChanges?.taken_count ?? photo.taken_count) 
-                - (existingChanges?.discard_count ?? photo.discard_count);
+            <tbody className={displayedRecords.length === 0 ? styles.empty : ""}>
+              {displayedRecords.length > 0 ? (
+                displayedRecords.map((photo, idx) => {
+                  const existing = editedRecords.find(record => record.id === photo.id);
+                  const existingChanges = existing ? existing.changes : null;
+                  const inventory = (existingChanges?.created_count ?? photo.created_count) 
+                  - (existingChanges?.given_count ?? photo.given_count) 
+                  - (existingChanges?.hidden_count ?? photo.hidden_count) 
+                  - (existingChanges?.taken_count ?? photo.taken_count) 
+                  - (existingChanges?.discard_count ?? photo.discard_count);
 
-                return (
-                  <tr key={`row_${photo.id}`}>
-                    <td className={styles.fit}>
-                      <img src={`${baseUploadUrl}${photo.photo_filename}`} />
-                      <span className={`${styles.total}${inventory < 0 ? ` ${styles.alert}` : ""}`}>{inventory}</span>
-                      {existing?.status === "error" && (
-                        <p className={styles['error-badge']}>{existing?.errorMessage ?? "Update Failed"}</p>
-                      )}
-                      {existing?.status === "updating" && <FontAwesomeIcon className={styles['status-badge-loading']} icon={faSpinner} spin />}
-                      {existing?.status === "success" && <FontAwesomeIcon className={styles['status-badge-success']} icon={faCheck} />}
-                    </td>
-                    <td data-label="Title">{photo.title}</td>
-                    <td className={styles.fit} data-label="Created">
-                      <CellQuantity
-                        isEditing={isEditing}
-                        classes={[existingChanges?.['created_count'] !== undefined ? "confirm" : "", idx % 2 === 0 ? "inverse" : ""]}
-                        originalQuantity={photo.created_count}
-                        quantity={existingChanges?.['created_count'] !== undefined ? existingChanges['created_count'] : photo.created_count}
-                        onQuantityChange={({value}) => onUpdateQuantity(photo, value, "created_count")}
-                      />
-                    </td>
-                    <td className={styles.fit} data-label="Given">
-                      <CellQuantity
-                        isEditing={isEditing}
-                        classes={[existingChanges?.['given_count'] !== undefined ? "confirm" : "", idx % 2 === 0 ? "inverse" : ""]}
-                        originalQuantity={photo.given_count}
-                        quantity={existingChanges?.['given_count'] !== undefined ? existingChanges['given_count'] : photo.given_count}
-                        onQuantityChange={({value}) => onUpdateQuantity(photo, value, "given_count")}
-                      />
-                    </td>
-                    <td className={styles.fit} data-label="Hidden">
-                      <CellQuantity
-                        isEditing={isEditing}
-                        classes={[existingChanges?.['hidden_count'] !== undefined ? "confirm" : "", idx % 2 === 0 ? "inverse" : ""]}
-                        originalQuantity={photo.hidden_count}
-                        quantity={existingChanges?.['hidden_count'] !== undefined ? existingChanges['hidden_count'] : photo.hidden_count}
-                        onQuantityChange={({value, changeSource}) => {
-                          const currentMarkedCount = existingChanges?.['marked_count'] !== undefined ? existingChanges['marked_count'] : photo.marked_count;
-                          onUpdateQuantity(photo, value, "hidden_count")
-                          onUpdateQuantity(photo, currentMarkedCount > 0 ? currentMarkedCount - changeSource : 0, "marked_count");
-                        }}
-                      />
-                    </td>
-                    <td className={styles.fit} data-label="Marked">
-                      <CellQuantity
-                        isEditing={isEditing}
-                        classes={[existingChanges?.['marked_count'] !== undefined ? "confirm" : "", idx % 2 === 0 ? "inverse" : ""]}
-                        originalQuantity={photo.marked_count}
-                        quantity={existingChanges?.['marked_count'] !== undefined ? existingChanges['marked_count'] : photo.marked_count}
-                        onQuantityChange={({value}) => onUpdateQuantity(photo, value, "marked_count")}
-                      />
-                    </td>
-                    <td className={styles.fit} data-label="Taken">
-                      <CellQuantity
-                        isEditing={isEditing}
-                        classes={[existingChanges?.['taken_count'] !== undefined ? "confirm" : "", idx % 2 === 0 ? "inverse" : ""]}
-                        originalQuantity={photo.taken_count}
-                        quantity={existingChanges?.['taken_count'] !== undefined ? existingChanges['taken_count'] : photo.taken_count}
-                        onQuantityChange={({value}) => onUpdateQuantity(photo, value, "taken_count")}
-                      />
-                    </td>
-                    <td className={styles.fit} data-label="Broken">
-                      <CellQuantity
-                        isEditing={isEditing}
-                        classes={[existingChanges?.['discard_count'] !== undefined ? "confirm" : "", idx % 2 === 0 ? "inverse" : ""]}
-                        originalQuantity={photo.discard_count}
-                        quantity={existingChanges?.['discard_count'] !== undefined ? existingChanges['discard_count'] : photo.discard_count}
-                        onQuantityChange={({value}) => onUpdateQuantity(photo, value, "discard_count")}
-                      />
-                    </td>
-                  </tr>
-                )
-              })}
+                  return (
+                    <tr key={`row_${photo.id}`}>
+                      <td className={`${styles.fit} ${styles.image}`}>
+                        <img src={`${baseUploadUrl}${photo.photo_filename}`} />
+                        <span className={`${styles.total}${inventory < 0 ? ` ${styles.alert}` : ""}`}>{inventory}</span>
+                        {existing?.status === "error" && (
+                          <p className={styles['error-badge']}>{existing?.errorMessage ?? "Update Failed"}</p>
+                        )}
+                        {existing?.status === "updating" && <FontAwesomeIcon className={styles['status-badge-loading']} icon={faSpinner} spin />}
+                        {existing?.status === "success" && <FontAwesomeIcon className={styles['status-badge-success']} icon={faCheck} />}
+                      </td>
+                      <td className={styles.title}>{photo.title}</td>
+                      <td className={styles.fit} data-label="Created">
+                        <CellQuantity
+                          isEditing={isEditing}
+                          classes={[existingChanges?.['created_count'] !== undefined ? "confirm" : "", idx % 2 === 0 ? "inverse" : ""]}
+                          originalQuantity={photo.created_count}
+                          quantity={existingChanges?.['created_count'] !== undefined ? existingChanges['created_count'] : photo.created_count}
+                          onQuantityChange={({value}) => onUpdateQuantity(photo, value, "created_count")}
+                        />
+                      </td>
+                      <td className={styles.fit} data-label="Given">
+                        <CellQuantity
+                          isEditing={isEditing}
+                          classes={[existingChanges?.['given_count'] !== undefined ? "confirm" : "", idx % 2 === 0 ? "inverse" : ""]}
+                          originalQuantity={photo.given_count}
+                          quantity={existingChanges?.['given_count'] !== undefined ? existingChanges['given_count'] : photo.given_count}
+                          onQuantityChange={({value}) => onUpdateQuantity(photo, value, "given_count")}
+                        />
+                      </td>
+                      <td className={styles.fit} data-label="Hidden">
+                        <CellQuantity
+                          isEditing={isEditing}
+                          classes={[existingChanges?.['hidden_count'] !== undefined ? "confirm" : "", idx % 2 === 0 ? "inverse" : ""]}
+                          originalQuantity={photo.hidden_count}
+                          quantity={existingChanges?.['hidden_count'] !== undefined ? existingChanges['hidden_count'] : photo.hidden_count}
+                          onQuantityChange={({value, changeSource}) => {
+                            const currentMarkedCount = existingChanges?.['marked_count'] !== undefined ? existingChanges['marked_count'] : photo.marked_count;
+                            onUpdateQuantity(photo, value, "hidden_count")
+                            onUpdateQuantity(photo, currentMarkedCount > 0 ? currentMarkedCount - changeSource : 0, "marked_count");
+                          }}
+                        />
+                      </td>
+                      <td className={styles.fit} data-label="Marked">
+                        <CellQuantity
+                          isEditing={isEditing}
+                          classes={[existingChanges?.['marked_count'] !== undefined ? "confirm" : "", idx % 2 === 0 ? "inverse" : ""]}
+                          originalQuantity={photo.marked_count}
+                          quantity={existingChanges?.['marked_count'] !== undefined ? existingChanges['marked_count'] : photo.marked_count}
+                          onQuantityChange={({value}) => onUpdateQuantity(photo, value, "marked_count")}
+                        />
+                      </td>
+                      <td className={styles.fit} data-label="Taken">
+                        <CellQuantity
+                          isEditing={isEditing}
+                          classes={[existingChanges?.['taken_count'] !== undefined ? "confirm" : "", idx % 2 === 0 ? "inverse" : ""]}
+                          originalQuantity={photo.taken_count}
+                          quantity={existingChanges?.['taken_count'] !== undefined ? existingChanges['taken_count'] : photo.taken_count}
+                          onQuantityChange={({value}) => onUpdateQuantity(photo, value, "taken_count")}
+                        />
+                      </td>
+                      <td className={styles.fit} data-label="Broken">
+                        <CellQuantity
+                          isEditing={isEditing}
+                          classes={[existingChanges?.['discard_count'] !== undefined ? "confirm" : "", idx % 2 === 0 ? "inverse" : ""]}
+                          originalQuantity={photo.discard_count}
+                          quantity={existingChanges?.['discard_count'] !== undefined ? existingChanges['discard_count'] : photo.discard_count}
+                          onQuantityChange={({value}) => onUpdateQuantity(photo, value, "discard_count")}
+                        />
+                      </td>
+                    </tr>
+                  )
+                })
+              ) : (
+                <p>No photos</p>
+              )}
             </tbody>
           </table>
         </div>
