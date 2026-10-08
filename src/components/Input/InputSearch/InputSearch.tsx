@@ -2,18 +2,28 @@ import InputText from "../InputText/InputText";
 import styles from "./InputSearch.module.scss";
 import { faClose } from "@fortawesome/free-solid-svg-icons";
 import ActionButton from "@/components/Admin/Rows/ActionElements/ActionButton/ActionButton";
+import { formatClsxClassString } from "@/helpers/dataManipulation";
+import clsx from "clsx";
 
 interface IInputSearch {
+  additionalClasses?: string[];
+  fieldWrapperClass?: string[];
   searchText: string;
   setSearchText: (value: string) => void;
 }
 
 const InputSearch = (props: IInputSearch) => {
-  const { searchText, setSearchText } = props;
+  const { additionalClasses, fieldWrapperClass, searchText, setSearchText } = props;
 
   return (
-    <div className={styles.search}>
+    <div 
+      className={clsx(
+        styles.search,
+        formatClsxClassString(additionalClasses, styles)
+      )}
+    >
       <InputText
+        fieldWrapperClass={fieldWrapperClass}
         wrapperClass={['inverse']}
         placeholder='Search by title...'
         value={searchText}

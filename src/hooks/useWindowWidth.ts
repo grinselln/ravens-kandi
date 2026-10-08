@@ -24,9 +24,11 @@ export function useWindowWidth() {
     const isXXL = width >= convertRemToPixels(breakpoints.bpXXL);
 
     const isMobile = isXS || isSM;
+    const isMaxSmallDesktop = isMobile || isMD || isLG;
 
     return {
       isMobile,
+      isMaxSmallDesktop,
       isXS,
       isSM,
       isMD,

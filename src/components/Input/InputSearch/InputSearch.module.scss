@@ -6,7 +6,9 @@
   width: 100%;
 
   @include bp-lg {
-    width: 40%;
+    &:not(.lg-full) {
+      width: 40%;
+    }
   }
 
   @include bp-xl {
