@@ -17,6 +17,8 @@ import { ICategoryFilterCollection } from "@/interfaces/ICategories";
 import InputSearch from "@/components/Input/InputSearch/InputSearch";
 import { useSearch } from "@/hooks/useSearch";
 import { fetchPhotoSubcategories } from "@/api/subcategories";
+import InputDropDown from "@/components/Input/InputDropDown/InputDropDown";
+import { useWindowWidth } from "@/hooks/useWindowWidth";
 
 const API_URL = import.meta.env.VITE_API_URL;
 const API_UPLOAD_DIRECTORY = import.meta.env.VITE_API_UPLOAD_DIRECTORY;
@@ -24,12 +26,76 @@ const API_UPLOAD_DIRECTORY = import.meta.env.VITE_API_UPLOAD_DIRECTORY;
 const AdminInventory = () => {
   const baseUploadUrl = `${API_URL}/${API_UPLOAD_DIRECTORY}/`;
   const queryClient = useQueryClient();
+  const { windowBreakPoints } = useWindowWidth();
 
+  const [showMarkedOnly, setShowMarkedOnly] = useState<boolean>(false);
   const [selectedCategoryFilters, setSelectedCategoryFilters] = useState<ICategoryFilterCollection>({});
   const [sortedIds, setSortedIds] = useState<number[] | null>(null);
   const [columnSort, setColumnSort] = useState<ITableSort<keyof IPhotoQuantities> | null>(null);
   const [editedRecords, setEditedRecords] = useState<IQuantityItemEdit[]>([]);
   const [isEditing, setIsEditing] = useState<boolean>(false);
+
+  type SortDirection = ITableSort["direction"];
+  type SortValue = `${keyof IPhotoQuantities}|${SortDirection}`;
+
+  const sortOptions: { value: SortValue; label: string }[] = [
+    {
+      value: "current_count|asc",
+      label: "Current Ascending"
+    },
+    {
+      value: "current_count|desc",
+      label: "Current Descending"
+    },
+    {
+      value: "created_count|asc",
+      label: "Created Ascending"
+    },
+    {
+      value: "created_count|desc",
+      label: "Created Descending"
+    },
+    {
+      value: "given_count|asc",
+      label: "Given Ascending"
+    },
+    {
+      value: "given_count|desc",
+      label: "Given Descending"
+    },
+    {
+      value: "hidden_count|asc",
+      label: "Hidden Ascending"
+    },
+    {
+      value: "hidden_count|desc",
+      label: "Hidden Descending"
+    },
+    {
+      value: "marked_count|asc",
+      label: "Marked Ascending"
+    },
+    {
+      value: "marked_count|desc",
+      label: "Marked Descending"
+    },
+    {
+      value: "taken_count|asc",
+      label: "Taken Ascending"
+    },
+    {
+      value: "taken_count|desc",
+      label: "Taken Descending"
+    },
+    {
+      value: "discard_count|asc",
+      label: "Discard Ascending"
+    },
+    {
+      value: "discard_count|desc",
+      label: "Discard Descending"
+    },
+  ];
 
   const { data: photos } = useQuery({
     queryKey: ['photos', selectedCategoryFilters],
@@ -157,25 +223,38 @@ const AdminInventory = () => {
     });
   };
 
-  const onSortColumn = (key: keyof IPhotoQuantities) => {
+  const onSortColumn = (key: keyof IPhotoQuantities | null, tempDirection?: "asc" | "desc" | undefined) => {
     if (!photos) return;
 
+    const sortDirection = tempDirection ? tempDirection : columnSort?.direction;
+
     const direction: "asc" | "desc" | null =
-      columnSort?.key === key && columnSort.direction === "asc" 
+      columnSort?.key === key && sortDirection === "asc" 
         ? "desc" 
-        : columnSort?.key === key && columnSort.direction === "desc"
+        : columnSort?.key === key && sortDirection === "desc"
           ? null
           : "asc";
 
-    if (direction === null) {
+    if (key === null || direction === null) {
       setSortedIds(null);
       setColumnSort(null);
       return;
     }
 
     const getValue = (photo: IAdminQueryPhoto) => {
-      const edited = editedRecords.find(record => record.id === photo.id)?.changes[key];
-      return edited ?? photo[key];
+      const edited = editedRecords.find(record => record.id === photo.id)?.changes;
+
+      if (key === "current_count") {
+        const currentInventory = (edited?.created_count ?? photo.created_count) 
+        - (edited?.given_count ?? photo.given_count) 
+        - (edited?.hidden_count ?? photo.hidden_count) 
+        - (edited?.taken_count ?? photo.taken_count) 
+        - (edited?.discard_count ?? photo.discard_count);
+
+        return currentInventory;
+      }
+      
+      return edited?.[key] ?? photo[key];
     };
 
     const ordered = [...photos].sort((a, b) => {
@@ -190,19 +269,37 @@ const AdminInventory = () => {
     setColumnSort({ key, direction });
   };
 
+  const parseSortValue = (value: SortValue): ITableSort<keyof IPhotoQuantities> => {
+    const [key, direction] = value.split("|") as [keyof IPhotoQuantities, SortDirection];
+    return { key, direction };
+  };
+
+  const selectedDropdownOption = useMemo(() => {
+    if (columnSort === null) return null;
+
+    return `${columnSort.key}|${columnSort.direction}` as SortValue;
+  }, [columnSort]);
+
   const displayedRecords = useMemo(() => {
     if (!filteredPhotos) return [];
-    if (!sortedIds) return filteredPhotos;
 
-    const photoMap = new Map(filteredPhotos.map(photo => [photo.id, photo]));
+    const tmpFilteredPhotos = filteredPhotos.filter(photo => !showMarkedOnly || (showMarkedOnly && photo.marked_count > 0));
+
+    if (!sortedIds) return tmpFilteredPhotos;
+
+    const photoMap = new Map(tmpFilteredPhotos.map(photo => [photo.id, photo]));
     return sortedIds
       .map(id => photoMap.get(id))
       .filter((photo): photo is IAdminFilterPhoto => photo !== undefined);
-  }, [filteredPhotos, sortedIds]);
+  }, [filteredPhotos, sortedIds, showMarkedOnly]);
   
   return (
     <LayoutAdmin>
-      <DashboardHeader title='Inventory' />
+      <DashboardHeader title='Inventory'>
+        <Button onClick={() => setShowMarkedOnly(!showMarkedOnly)} additionalClass={!showMarkedOnly ? ["outline-muted"] : []} isDisabled={false}>
+          Show Only Marked Photos
+        </Button>
+      </DashboardHeader>
 
       <div className={styles['inventory-wrapper']}>
         <FilterDisplay
@@ -214,9 +311,24 @@ const AdminInventory = () => {
           />
         <div className={styles['table-filters']}>
           <InputSearch
+            additionalClasses={["lg-full"]}
             searchText={searchText}
             setSearchText={setSearchText}
           />
+          {windowBreakPoints.isMaxSmallDesktop && (
+            <InputDropDown
+              placeholder="Sort By"
+              isDisabled={false}
+              value={selectedDropdownOption}
+              setValue={(newOption) => {
+                const newValue = newOption ? parseSortValue(newOption.value) : null;
+
+                onSortColumn(newValue?.key ?? null, newValue?.direction)
+              }}
+              options={sortOptions}
+              allowRemoval={true}
+            />
+          )}
           <div className={styles.controls}>
             <Button
               additionalClass={["alert"]}
@@ -255,7 +367,14 @@ const AdminInventory = () => {
           <table>
             <thead>
               <tr>
-                <th>Photo</th>
+                <th>
+                  <div className={styles.header} onClick={() => onSortColumn("current_count")}>
+                    <span>Photo</span>
+                    {columnSort?.key === "current_count" && (
+                      <FontAwesomeIcon icon={columnSort.direction === "asc" ? faAngleUp : faAngleDown} />
+                    )}
+                  </div>
+                </th>
                 <th>Title</th>
                 <th>
                   <div className={styles.header} onClick={() => onSortColumn("created_count")}>
@@ -324,7 +443,7 @@ const AdminInventory = () => {
                         <img src={`${baseUploadUrl}${photo.photo_filename}`} />
                         <span className={`${styles.total}${inventory < 0 ? ` ${styles.alert}` : ""}`}>{inventory}</span>
                         {existing?.status === "error" && (
-                          <p className={styles['error-badge']}>{existing?.errorMessage ?? "Update Failed"}</p>
+                          <span className={styles['error-badge']}>{existing?.errorMessage ?? "Update Failed"}</span>
                         )}
                         {existing?.status === "updating" && <FontAwesomeIcon className={styles['status-badge-loading']} icon={faSpinner} spin />}
                         {existing?.status === "success" && <FontAwesomeIcon className={styles['status-badge-success']} icon={faCheck} />}
@@ -392,7 +511,11 @@ const AdminInventory = () => {
                   )
                 })
               ) : (
-                <p>No photos</p>
+                <tr>
+                  <td>
+                    <span>No photos</span>
+                  </td>
+                </tr>
               )}
             </tbody>
           </table>
