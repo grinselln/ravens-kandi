@@ -1,51 +1,53 @@
 import { IPhotoCategoriesQueryData } from '@/interfaces/ICategories';
-import { IAdminBulkPhotoValidation, IAdminFilterPhoto, IAdminPhotosQueryData, IAdminQueryPhoto } from '@/interfaces/IPhotos';
+import { IAdminFilterPhoto, IAdminPhotosQueryData } from '@/interfaces/IPhotos';
 import { IPhotoSubcategoriesQueryData } from '@/interfaces/ISubcategories';
 import { useState, useMemo } from 'react';
 
-interface IUseSearch {
-  photos: IAdminPhotosQueryData,  
-  photoCategories: IPhotoCategoriesQueryData, 
-  photoSubcategories: IPhotoSubcategoriesQueryData
+export interface ISearchablePhoto {
+  id: number;
+  title: string | null;
 }
 
-export const useSearch = ({photos, photoCategories, photoSubcategories}: IUseSearch) => {
+export const useSearch = <TPhoto extends ISearchablePhoto>(photos: Array<TPhoto> | undefined) => {
   const [searchText, setSearchText] = useState<string>("");
 
-  const { filteredPhotos, filteredPhotosMap } = useMemo(() => {
-    if(photoCategories === undefined || photoSubcategories === undefined) return {
-      filteredPhotos: [],
-      filteredPhotosMap: new Map()
-    }
+  const filteredPhotos = useMemo(() => {
+    const needle = searchText.toLocaleLowerCase();
 
-    const filteredPhotos: Array<IAdminFilterPhoto> = (photos ?? []).filter((photo: IAdminQueryPhoto) => {
-      if (photo.title === null) return false;
-
-      const compareTitle = photo.title.toLocaleLowerCase();
-      const compareSearch = searchText.toLocaleLowerCase();
-
-      return compareTitle.includes(compareSearch);
-    }).map((photo: IAdminQueryPhoto) => {
-      return {
-        ...photo,
-        categories: photoCategories[photo.id] ?? [],
-        subcategories: photoSubcategories[photo.id] ?? []
-      }
-    });
-
-    const filteredPhotosMap = (filteredPhotos ?? []).reduce<Map<number, IAdminBulkPhotoValidation>>((map, obj) => {
-      map.set(obj.id, obj);
-      return map;
-    }, new Map());
-
-    return {filteredPhotos, filteredPhotosMap}
-
-  }, [photos, searchText, photoCategories, photoSubcategories]);
+    return (photos ?? []).filter(photo => photo.title?.toLocaleLowerCase().includes(needle) ?? false);
+  }, [photos, searchText]);
 
   return {
     searchText,
     setSearchText,
-    filteredPhotos,
-    filteredPhotosMap
+    filteredPhotos
   }
+}
+
+export const useAdminSearch = ({
+  photos,
+  photoCategories,
+  photoSubcategories
+}: {
+  photos: IAdminPhotosQueryData | undefined;
+  photoCategories: IPhotoCategoriesQueryData | undefined;
+  photoSubcategories: IPhotoSubcategoriesQueryData | undefined;
+}) => {
+  const { searchText, setSearchText, filteredPhotos: matched } = useSearch(photos);
+
+  const filteredPhotos = useMemo<Array<IAdminFilterPhoto>>(() => {
+    if (!photoCategories || !photoSubcategories) return [];
+
+    return matched.map(photo => ({
+      ...photo,
+      categories: photoCategories[photo.id] ?? [],
+      subcategories: photoSubcategories[photo.id] ?? []
+    }))
+  }, [matched, photoCategories, photoSubcategories]);
+
+  const filteredPhotosMap = useMemo(() => {
+    return new Map(filteredPhotos.map(photo => [photo.id, photo]))
+  }, [filteredPhotos]);
+
+  return { searchText, setSearchText, filteredPhotos, filteredPhotosMap}
 }

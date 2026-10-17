@@ -7,24 +7,48 @@
   margin: 1rem 0rem 2rem 0rem;
 }
 
+.filter-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: .5rem;
+
+  @include bp-lg {
+    gap: 2rem;
+  }
+
+  .search-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+
+    @include bp-lg {
+      gap: unset;
+      flex-direction: row;
+      align-items: flex-end;
+      justify-content: space-between;
+    }
+
+    .count-wrapper {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: .75rem;
+
+      .count {
+        font-size: .9rem;
+        color: var(--color-primary);
+        font-weight: 500;
+      }
+    }
+  }
+}
+
 .photos-wrapper {
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  margin-top: 2rem;
-
-  .count-wrapper {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    gap: .75rem;
-
-    .count {
-      font-size: .9rem;
-      color: var(--color-primary);
-      font-weight: 500;
-    }
-  }
+  margin-top: .75rem;
+  //margin-top: 2rem;
 
   .photo-display-wrapper {
     margin-bottom: 5rem;

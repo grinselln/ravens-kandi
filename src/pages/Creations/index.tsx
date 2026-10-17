@@ -14,6 +14,8 @@ import { useWindowWidth } from "@/hooks/useWindowWidth";
 import Layout from "@/components/Layout/Layout";
 import { IPublicQueryPhoto, ISelectedPhoto } from "@/interfaces/IPhotos";
 import { ICategoryFilterCollection } from "@/interfaces/ICategories";
+import InputSearch from "@/components/Input/InputSearch/InputSearch";
+import { useSearch } from "@/hooks/useSearch";
 
 interface IPhotoType {
   id: number;
@@ -63,6 +65,8 @@ const Creations = () => {
     queryFn: fetchCategories,//ICategoriesQueryData
   });
 
+  const { searchText, setSearchText, filteredPhotos } = useSearch(photos);
+
   const updateMutation = useMutation({
     mutationFn: (id: number) => updateViews(id),
     onSuccess: async () => {
@@ -74,8 +78,8 @@ const Creations = () => {
   });
 
   const noFiltersSelected = useMemo(() => {
-    return Object.keys(selectedCategoryFilters).length === 0
-  }, [selectedCategoryFilters]);
+    return Object.keys(selectedCategoryFilters).length === 0 && searchText === ""
+  }, [selectedCategoryFilters, searchText]);
 
   const isMobileOverlayActive = useCallback((photoId: number) => {
     return activeId !== null && windowBreakPoints.isMobile && activeId === photoId;
@@ -126,23 +130,35 @@ const Creations = () => {
           )
         })}
       </div>
-      <FilterDisplay
-        isAdmin={false}
-        categoryData={categoryData}
-        selectedCategoryFilters={selectedCategoryFilters}
-        setSelectedCategoryFilters={setSelectedCategoryFilters}
-      />
-      <div className={styles['photos-wrapper']}>
-        <div className={styles['count-wrapper']}>
-          <span className={styles.count}>{photos?.length ?? 0} photo{photos?.length === 1 ? "" : "s"}</span>
-          <Button 
-          additionalClass={["pill-square"]}
-          onClick={() => {
-            setSelectedCategoryFilters({});
-          }}
-          isDisabled={noFiltersSelected}
-          >Clear Filters</Button>
+      <div className={styles['filter-wrapper']}>
+        <FilterDisplay
+          isAdmin={false}
+          categoryData={categoryData}
+          selectedCategoryFilters={selectedCategoryFilters}
+          setSelectedCategoryFilters={setSelectedCategoryFilters}
+        />
+        <div className={styles['search-wrapper']}>
+          <InputSearch
+            isLight={true}
+            wrapperClass={['medium']}
+            fieldWrapperClass={['field-light-simple', 'small']}
+            searchText={searchText}
+            setSearchText={setSearchText}
+          />
+          <div className={styles['count-wrapper']}>
+            <span className={styles.count}>{photos?.length ?? 0} photo{photos?.length === 1 ? "" : "s"}</span>
+            <Button 
+            additionalClass={["pill-square"]}
+            onClick={() => {
+              setSelectedCategoryFilters({});
+              setSearchText("");
+            }}
+            isDisabled={noFiltersSelected}
+            >Clear Filters</Button>
+          </div>
         </div>
+      </div>
+      <div className={styles['photos-wrapper']}>
         <div className={`grid ${styles['photo-display-wrapper']}`}>
           {photoLoading ? (
             <div className={`col ${styles.loading}`}>
@@ -151,7 +167,7 @@ const Creations = () => {
               </span>
             </div>
           ) : (
-            (photos ?? []).map((photo: IPublicQueryPhoto, idx: number) => {
+            (filteredPhotos).map((photo: IPublicQueryPhoto, idx: number) => {
 
               return (
                 <div className={`col col-sm-6 col-md-4 col-xl-3 ${styles['photo-wrapper']}${isMobileOverlayActive(photo.id) ? ` ${styles.active}` : ''}`} key={`photo_${photo.id}`}
