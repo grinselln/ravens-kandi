@@ -8,7 +8,7 @@ interface IActionButton extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   additionalClass?: string[];
   icon: IconProp;
   onAction: (e: React.MouseEvent) => void;
-  variant: "default" | "action" | "confirm" | "alert";
+  variant: "default" | "default-dark" |  "action" | "confirm" | "alert";
   isDisabled: boolean;
   ref?: ((element: Element | null) => void) | Ref<HTMLButtonElement> | undefined;
 }

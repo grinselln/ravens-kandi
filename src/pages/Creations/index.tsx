@@ -9,13 +9,14 @@ import FilterDisplay from "@/components/Shared/FilterDisplay/FilterDisplay";
 import { fetchPhotos, updateViews } from "@/api/photos";
 import ViewPhotoModal from "@/components/User/ViewPhotoModal/ViewPhotoModal";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSpinner } from "@fortawesome/free-solid-svg-icons";
+import { faSpinner, faTableCells, faTableCellsLarge } from "@fortawesome/free-solid-svg-icons";
 import { useWindowWidth } from "@/hooks/useWindowWidth";
 import Layout from "@/components/Layout/Layout";
 import { IPublicQueryPhoto, ISelectedPhoto } from "@/interfaces/IPhotos";
 import { ICategoryFilterCollection } from "@/interfaces/ICategories";
 import InputSearch from "@/components/Input/InputSearch/InputSearch";
 import { useSearch } from "@/hooks/useSearch";
+import ActionButton from "@/components/Admin/Rows/ActionElements/ActionButton/ActionButton";
 
 interface IPhotoType {
   id: number;
@@ -36,6 +37,7 @@ const Creations = () => {
   const [selectedCategoryFilters, setSelectedCategoryFilters] = useState<ICategoryFilterCollection>({});
   const [selectedPhoto, setSelectedPhoto] = useState<ISelectedPhoto | null>(null);
   const [activeId, setActiveId] = useState<number | null>(null);
+  const [isLargeGridDisplay, setIsLargeGridDisplay] = useState<boolean>(true);
 
   const { data: photos, isLoading: photoLoading } = useQuery({
     queryKey: ['photos', selectedPhotoTypes, selectedCategoryFilters/*, selectedSortOption?.value ?? ""*/],
@@ -80,6 +82,10 @@ const Creations = () => {
   const noFiltersSelected = useMemo(() => {
     return Object.keys(selectedCategoryFilters).length === 0 && searchText === ""
   }, [selectedCategoryFilters, searchText]);
+
+  const gridDisplayClasses = useMemo(() => {
+    return isLargeGridDisplay ? "col col-sm-6 col-md-4 col-xl-3" : "col-6 col-sm-4 col-md-3 col-xl-2"; 
+  }, [isLargeGridDisplay]);
 
   const isMobileOverlayActive = useCallback((photoId: number) => {
     return activeId !== null && windowBreakPoints.isMobile && activeId === photoId;
@@ -137,15 +143,32 @@ const Creations = () => {
           selectedCategoryFilters={selectedCategoryFilters}
           setSelectedCategoryFilters={setSelectedCategoryFilters}
         />
-        <div className={styles['search-wrapper']}>
-          <InputSearch
-            isLight={true}
-            wrapperClass={['medium']}
-            fieldWrapperClass={['field-light-simple', 'small']}
-            searchText={searchText}
-            setSearchText={setSearchText}
-          />
+        <div className={styles['controls-wrapper']}>
+          <div className={styles['search-wrapper']}>
+            <InputSearch
+              isLight={true}
+              additionalClasses={["fit-container"]}
+              wrapperClass={[windowBreakPoints.isMaxSmallDesktop ? 'medium' : '']}
+              fieldWrapperClass={['field-light-simple']}
+              searchText={searchText}
+              setSearchText={setSearchText}
+            />
+          </div>
           <div className={styles['count-wrapper']}>
+            <div className={styles['grid-display-control']}>
+              <ActionButton
+                icon={faTableCellsLarge}
+                variant={isLargeGridDisplay ? "default-dark" : "default"}
+                onAction={() => setIsLargeGridDisplay(true)}
+                isDisabled={false}
+              />
+              <ActionButton
+                icon={faTableCells}
+                variant={!isLargeGridDisplay ? "default-dark" : "default"}
+                onAction={() => setIsLargeGridDisplay(false)}
+                isDisabled={false}
+              />
+            </div>
             <span className={styles.count}>{photos?.length ?? 0} photo{photos?.length === 1 ? "" : "s"}</span>
             <Button 
             additionalClass={["pill-square"]}
@@ -170,7 +193,7 @@ const Creations = () => {
             (filteredPhotos).map((photo: IPublicQueryPhoto, idx: number) => {
 
               return (
-                <div className={`col col-sm-6 col-md-4 col-xl-3 ${styles['photo-wrapper']}${isMobileOverlayActive(photo.id) ? ` ${styles.active}` : ''}`} key={`photo_${photo.id}`}
+                <div className={`${gridDisplayClasses} ${styles['photo-wrapper']}${isLargeGridDisplay ? "" : ` ${styles['small-display']}`}${isMobileOverlayActive(photo.id) ? ` ${styles.active}` : ''}`} key={`photo_${photo.id}`}
                 data-card-id={photo.id}  
                 onClick={() => {
                     if (windowBreakPoints.isMobile) { 

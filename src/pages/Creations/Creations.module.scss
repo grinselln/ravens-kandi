@@ -16,7 +16,7 @@
     gap: 2rem;
   }
 
-  .search-wrapper {
+  .controls-wrapper {
     display: flex;
     flex-direction: column;
     gap: 2rem;
@@ -28,16 +28,46 @@
       justify-content: space-between;
     }
 
+    .search-wrapper {
+      @include bp-lg {
+        width: 30%;
+      }
+    }
+
     .count-wrapper {
       display: flex;
       justify-content: flex-end;
       align-items: center;
       gap: .75rem;
 
+      .grid-display-control {
+        display: flex;
+        gap: .5rem;
+
+        svg {
+          height: 20px;
+          width: auto;
+
+          @include bp-xl {
+            height: 23px;
+          }
+        }
+      }
+
       .count {
         font-size: .9rem;
         color: var(--color-primary);
         font-weight: 500;
+
+        @include bp-xl {
+          font-size: 1rem;
+        }
+
+        &+button {
+          @include bp-xl {
+            font-size: .8rem;
+          }
+        }
       }
     }
   }
@@ -72,6 +102,48 @@
     img {
       aspect-ratio: 1/1;
       object-fit: cover;
+    }
+
+    &.small-display .overlay {
+      .title {
+        padding: .75rem 0rem;
+        font-size: .85rem;
+
+        @include bp-sm {
+          font-size: .8rem;
+        }
+
+        @include bp-xl {
+          font-size: .7rem;
+        }
+
+        @include bp-xxl {
+          font-size: .85rem;
+        }
+
+        @include bp-xxxl {
+          padding: 1rem 0rem;
+          font-size: 1rem;
+        }
+      }
+
+      button {
+        padding: .4rem .75rem;
+        font-size: .6rem;
+
+        @include bp-xl {
+          font-size: .5rem;
+        }
+
+        @include bp-xxl {
+          font-size: .6rem;
+        }
+
+        @include bp-xxxl {
+          padding: .5rem 1rem;
+          font-size: .7rem;
+        }
+      }
     }
 
     .overlay {
