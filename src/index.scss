@@ -112,7 +112,7 @@ h1, h2, h3, h4, p, span, a {
   }
 
   &.action {
-    color: var(----color-admin-light-bright);
+    color: var(--color-admin-light-bright);
   }
 }
 
@@ -138,6 +138,10 @@ button {
 }
 
 svg {
+  &.default-dark path {
+    fill: var(--color-primary);
+  }
+
   &.alert {
     path {
       fill: var(--color-alert);

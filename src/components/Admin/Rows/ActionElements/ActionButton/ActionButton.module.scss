@@ -31,7 +31,7 @@
     cursor: grabbing;
   }
 
-  svg:not(:global(.alert)):not(:global(.action)):not(:global(.confirm)) {
+  svg:not(:global(.alert)):not(:global(.action)):not(:global(.confirm)):not(:global(.default-dark)) {
     path {
       fill: var(--color-admin-light);
     }

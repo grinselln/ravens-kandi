@@ -22,7 +22,7 @@ import { IPhotoType } from '@/interfaces/IPhotoTypes';
 import { IPhotoSubcategory } from '@/interfaces/ISubcategories';
 import { IDropDownOption, SortOption } from '@/interfaces/IRecords';
 import InputSearch from '@/components/Input/InputSearch/InputSearch';
-import { useSearch } from '@/hooks/useSearch';
+import { useAdminSearch } from '@/hooks/useSearch';
 
 const API_URL = import.meta.env.VITE_API_URL;
 const API_UPLOAD_DIRECTORY = import.meta.env.VITE_API_UPLOAD_DIRECTORY;
@@ -111,7 +111,7 @@ const AdminPhotos = () => {
     queryFn: fetchSubcategories,
   });
 
-  const { searchText, setSearchText, filteredPhotos, filteredPhotosMap } = useSearch({
+  const { searchText, setSearchText, filteredPhotos, filteredPhotosMap } = useAdminSearch({
     photos: photos ?? [], 
     photoCategories : photoCategories ?? [], 
     photoSubcategories: photoSubcategories ?? []
@@ -180,8 +180,8 @@ const AdminPhotos = () => {
       const selectedPhoto = filteredPhotosMap.get(photo.id);
     
       return {
-        title: selectedPhoto.title,
-        photo_type_id: selectedPhoto.photo_type_id,
+        title: selectedPhoto?.title ?? null,
+        photo_type_id: selectedPhoto?.photo_type_id ?? null,
         categories: selectedPhoto?.categories ?? [],
         subcategories: selectedPhoto?.subcategories ?? []
       }
@@ -297,6 +297,8 @@ const AdminPhotos = () => {
             </div>
           </div>
           <FilterDisplay
+            searchText={searchText}
+            setSearchText={setSearchText}
             categoryData={categories}
             selectedCategoryFilters={selectedCategoryFilters}
             setSelectedCategoryFilters={setSelectedCategoryFilters}

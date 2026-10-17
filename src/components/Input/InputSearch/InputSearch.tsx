@@ -7,13 +7,15 @@ import clsx from "clsx";
 
 interface IInputSearch {
   additionalClasses?: string[];
+  wrapperClass?: string[];
   fieldWrapperClass?: string[];
+  isLight?: boolean;
   searchText: string;
   setSearchText: (value: string) => void;
 }
 
 const InputSearch = (props: IInputSearch) => {
-  const { additionalClasses, fieldWrapperClass, searchText, setSearchText } = props;
+  const { additionalClasses, wrapperClass, fieldWrapperClass, isLight = false, searchText, setSearchText } = props;
 
   return (
     <div 
@@ -24,7 +26,7 @@ const InputSearch = (props: IInputSearch) => {
     >
       <InputText
         fieldWrapperClass={fieldWrapperClass}
-        wrapperClass={['inverse']}
+        wrapperClass={[isLight ? "" : 'inverse', ...wrapperClass ?? []]}
         placeholder='Search by title...'
         value={searchText}
         setValue={(newValue) => setSearchText(newValue)}

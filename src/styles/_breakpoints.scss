@@ -2,7 +2,8 @@ $bpSM: 36rem; // stacked → two-column
 $bpMD: 48rem; // tablet / compact desktop
 $bpLG: 62rem; // desktop
 $bpXL: 75rem; // wide desktop
-$bpXXL: 82.5rem; // ultra-wide
+$bpXXL: 96rem; // ultra-wide
+$bpXXXL: 120rem; // ultra-wide
 
 @mixin bp-sm {
   @media (min-width: #{$bpSM}) { @content; }
@@ -26,4 +27,8 @@ $bpXXL: 82.5rem; // ultra-wide
 
 @mixin bp-xxl {
   @media (min-width: #{$bpXXL}) { @content; }
+}
+
+@mixin bp-xxxl {
+  @media (min-width: #{$bpXXXL}) { @content; }
 }

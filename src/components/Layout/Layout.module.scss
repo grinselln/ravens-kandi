@@ -294,6 +294,7 @@
             letter-spacing: .12rem;
             text-transform: uppercase;
             border-bottom: 1.5px solid transparent;
+            padding-bottom: .35rem;
             transition: color .35s, border-color .35s;
             
             &:global(.active), &:hover {
