@@ -7,24 +7,78 @@
   margin: 1rem 0rem 2rem 0rem;
 }
 
+.filter-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: .5rem;
+
+  @include bp-lg {
+    gap: 2rem;
+  }
+
+  .controls-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+
+    @include bp-lg {
+      gap: unset;
+      flex-direction: row;
+      align-items: flex-end;
+      justify-content: space-between;
+    }
+
+    .search-wrapper {
+      @include bp-lg {
+        width: 30%;
+      }
+    }
+
+    .count-wrapper {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: .75rem;
+
+      .grid-display-control {
+        display: flex;
+        gap: .5rem;
+
+        svg {
+          height: 20px;
+          width: auto;
+
+          @include bp-xl {
+            height: 23px;
+          }
+        }
+      }
+
+      .count {
+        font-size: .9rem;
+        color: var(--color-primary);
+        font-weight: 500;
+
+        @include bp-xl {
+          font-size: 1rem;
+        }
+
+        &+button {
+          @include bp-xl {
+            font-size: .8rem;
+          }
+        }
+      }
+    }
+  }
+}
+
 .photos-wrapper {
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  margin-top: 2rem;
-
-  .count-wrapper {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    gap: .75rem;
-
-    .count {
-      font-size: .9rem;
-      color: var(--color-primary);
-      font-weight: 500;
-    }
-  }
+  margin-top: .75rem;
+  //margin-top: 2rem;
 
   .photo-display-wrapper {
     margin-bottom: 5rem;
@@ -48,6 +102,48 @@
     img {
       aspect-ratio: 1/1;
       object-fit: cover;
+    }
+
+    &.small-display .overlay {
+      .title {
+        padding: .75rem 0rem;
+        font-size: .85rem;
+
+        @include bp-sm {
+          font-size: .8rem;
+        }
+
+        @include bp-xl {
+          font-size: .7rem;
+        }
+
+        @include bp-xxl {
+          font-size: .85rem;
+        }
+
+        @include bp-xxxl {
+          padding: 1rem 0rem;
+          font-size: 1rem;
+        }
+      }
+
+      button {
+        padding: .4rem .75rem;
+        font-size: .6rem;
+
+        @include bp-xl {
+          font-size: .5rem;
+        }
+
+        @include bp-xxl {
+          font-size: .6rem;
+        }
+
+        @include bp-xxxl {
+          padding: .5rem 1rem;
+          font-size: .7rem;
+        }
+      }
     }
 
     .overlay {

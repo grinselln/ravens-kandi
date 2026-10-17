@@ -6,13 +6,15 @@
   width: 100%;
 
   @include bp-lg {
-    &:not(.lg-full) {
+    &:not(.lg-full):not(.fit-container) {
       width: 40%;
     }
   }
 
   @include bp-xl {
-    width: 30%;
+    &:not(.fit-container) {
+      width: 30%;
+    }
   }
 
   input {

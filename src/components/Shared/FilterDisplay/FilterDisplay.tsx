@@ -9,13 +9,15 @@ import { isObjectEmpty } from "@/helpers/dataManipulation";
 
 interface IFilterDisplay {
   defaultClosed?: boolean;
+  searchText?: string;
+  setSearchText?: Dispatch<SetStateAction<string>>,
   isAdmin: boolean;
   categoryData: ICategoriesQueryData | undefined;
   selectedCategoryFilters: ICategoryFilterCollection;
   setSelectedCategoryFilters: Dispatch<SetStateAction<ICategoryFilterCollection>>;
 }
 
-const FilterDisplay = ({defaultClosed, isAdmin, categoryData, selectedCategoryFilters, setSelectedCategoryFilters}: IFilterDisplay) => {
+const FilterDisplay = ({defaultClosed, searchText, setSearchText, isAdmin, categoryData, selectedCategoryFilters, setSelectedCategoryFilters}: IFilterDisplay) => {
     const {windowBreakPoints} = useWindowWidth();
     const [isAccordionOpen, setIsAccordionOpen] = useState<boolean>(defaultClosed === true ? false : true);
     
@@ -35,7 +37,7 @@ const FilterDisplay = ({defaultClosed, isAdmin, categoryData, selectedCategoryFi
       
       return category.id !== 1 && (category.trigger_subcategory_id == null || includesTrigger);
   });
-  }, [categoryData, selectedCategoryFilters, isAdmin]); 
+  }, [categoryData, selectedCategoryFilters, isAdmin]);
 
   return (
     viewableCategories.length > 0 && (
@@ -47,10 +49,16 @@ const FilterDisplay = ({defaultClosed, isAdmin, categoryData, selectedCategoryFi
         >
           <span>Filters</span>
           <div className={styles["header-actions"]}>
-            <Button additionalClass={['pill-square']} onClick={(e) => {
-              e.stopPropagation();
-              setSelectedCategoryFilters({});
-            }} isDisabled={isObjectEmpty(selectedCategoryFilters)}>Clear filters</Button>
+            {isAdmin && (
+              <Button additionalClass={['pill-square']} onClick={(e) => {
+                e.stopPropagation();
+                setSelectedCategoryFilters({});
+
+                if(setSearchText) {
+                  setSearchText("");
+                }
+              }} isDisabled={isObjectEmpty(selectedCategoryFilters) && (searchText !== undefined ? searchText === "" : true)}>Clear filters</Button>
+            )}
             <ActionButton variant="default" icon={isAccordionOpen ? faChevronUp : faChevronDown} isDisabled={false} onAction={() => {
               setIsAccordionOpen(!isAccordionOpen)
             }} />

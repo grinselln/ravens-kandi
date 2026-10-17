@@ -12,11 +12,10 @@ import { faFloppyDisk } from "@fortawesome/free-regular-svg-icons";
 import { IAdminFilterPhoto, IAdminQueryPhoto, IPhotoQuantities, IQuantityItemEdit } from "@/interfaces/IPhotos";
 import { ITableSort } from "@/interfaces/IRecords";
 import FilterDisplay from "@/components/Shared/FilterDisplay/FilterDisplay";
-import { fetchCategories, fetchPhotoCategories } from "@/api/categories";
+import { fetchCategories } from "@/api/categories";
 import { ICategoryFilterCollection } from "@/interfaces/ICategories";
 import InputSearch from "@/components/Input/InputSearch/InputSearch";
 import { useSearch } from "@/hooks/useSearch";
-import { fetchPhotoSubcategories } from "@/api/subcategories";
 import InputDropDown from "@/components/Input/InputDropDown/InputDropDown";
 import { useWindowWidth } from "@/hooks/useWindowWidth";
 
@@ -119,22 +118,12 @@ const AdminInventory = () => {
     placeholderData: keepPreviousData,
   });
 
-  const { data: photoCategories } = useQuery({
-    queryKey: ['photoCategories'],
-    queryFn: fetchPhotoCategories
-  });
-
-  const { data: photoSubcategories } = useQuery({
-    queryKey: ['photoSubcategories'],
-    queryFn: fetchPhotoSubcategories
-  });
-
   const { data: categories } = useQuery({
     queryKey: ['categories'], 
     queryFn: fetchCategories,
   });
 
-  const { searchText, setSearchText, filteredPhotos } = useSearch({photos: photos ?? [], photoCategories: photoCategories ?? [], photoSubcategories: photoSubcategories ?? []});
+  const { searchText, setSearchText, filteredPhotos } = useSearch(photos);
 
   const updateMutation = useMutation({
     mutationFn: (updates: {
@@ -303,6 +292,8 @@ const AdminInventory = () => {
 
       <div className={styles['inventory-wrapper']}>
         <FilterDisplay
+            searchText={searchText}
+            setSearchText={setSearchText}
             categoryData={categories}
             selectedCategoryFilters={selectedCategoryFilters}
             setSelectedCategoryFilters={setSelectedCategoryFilters}
