@@ -2,9 +2,23 @@
 
 .filter-types {
   display: flex;
-  justify-content: center;
-  gap: 1.5rem;
+  flex-wrap: wrap;
+  gap: 5%;
+  row-gap: .5rem;
   margin: 1rem 0rem 2rem 0rem;
+
+  @include bp-sm {
+    gap: 1.5rem;
+    justify-content: center;
+  }
+
+  button {
+    width: 30%;
+
+    @include bp-sm {
+      width: unset;
+    }
+  }
 }
 
 .filter-wrapper {
