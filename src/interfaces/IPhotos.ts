@@ -5,6 +5,7 @@ export interface IPhoto extends IPhotoQuantities {
   id: number;
   photo_type_id: number | null;
   photo_filename: string;
+  url: string;
   title: string | null;
   story: string | null;
   source: string | null;
