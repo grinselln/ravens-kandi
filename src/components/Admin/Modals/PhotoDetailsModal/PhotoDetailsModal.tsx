@@ -30,11 +30,7 @@ interface IPhotoDetailsModal {
   setSelectedPhotos: (value: Array<IAdminFilterPhoto>) => void;
 }
 
-const API_URL = import.meta.env.VITE_API_URL;
-const API_UPLOAD_DIRECTORY = import.meta.env.VITE_API_UPLOAD_DIRECTORY;
-
 const PhotoDetailsModal = ({selectedPhotos = [], setSelectedPhotos, isOpen, setIsOpen, photoTypes, categories, subcategories}: IPhotoDetailsModal) => {
-  const baseUploadUrl = `${API_URL}/${API_UPLOAD_DIRECTORY}/`;
   const containerRef = useRef<HTMLDivElement>(null);
   const queryClient = useQueryClient();
   const { windowBreakPoints } = useWindowWidth();
@@ -381,7 +377,7 @@ const PhotoDetailsModal = ({selectedPhotos = [], setSelectedPhotos, isOpen, setI
           id: photo.id,
           story: photo.story,
           source: photo.source,
-          previewUrl: `${baseUploadUrl}${photo.photo_filename}`,
+          previewUrl: `${photo.url}`,
           status: "pending",
           imageFile: null,
           isRemoved: false,
@@ -416,7 +412,7 @@ const PhotoDetailsModal = ({selectedPhotos = [], setSelectedPhotos, isOpen, setI
           })
       }
     }
-  }, [selectedPhotos, baseUploadUrl]);
+  }, [selectedPhotos]);
 
   return (
     <Modal

@@ -12,12 +12,7 @@ import { IAdminQueryPhoto, IPhotoCategoryViews, IPhotoCategoryViewsAvg, IPhotoTo
 import { ICategoryQueryGroupedCategory, IPhotoCategory } from '@/interfaces/ICategories';
 import { IPhotoSubcategory } from '@/interfaces/ISubcategories';
 
-const API_URL = import.meta.env.VITE_API_URL;
-const API_UPLOAD_DIRECTORY = import.meta.env.VITE_API_UPLOAD_DIRECTORY;
-
 const Admin = () => {
-  const baseUploadUrl = `${API_URL}/${API_UPLOAD_DIRECTORY}/`;
-
   const { data: allPhotos } = useQuery({
     queryKey: ['photos', 'all'],
     queryFn: () => fetchPhotosAdmin({
@@ -211,7 +206,7 @@ const Admin = () => {
               const hasMissingData = !!photo.missing_type || !!photo.missing_category || !!photo.missing_subcategory;
               return (
                 <div className={`${styles.photo} ${hasMissingData ? ` ${styles.alert}` : ""}`} key={`photoMissing_${photo.id}`}>
-                  <img src={`${baseUploadUrl}${photo.photo_filename}`} />
+                  <img src={`${photo.url}`} />
                   <div className={styles.badges}>
                     {hasMissingData && (
                       <div className={styles.alerts}>
@@ -244,7 +239,7 @@ const Admin = () => {
             {(viewTopPhotos).map((photo: IAdminQueryPhoto) => {
               return (
                 <div className={`${styles.photo}`} key={`photoView_${photo.id}`}>
-                  <img src={`${baseUploadUrl}${photo.photo_filename}`} />
+                  <img src={`${photo.url}`} />
                   <div className={styles.badges}>
                     <div className={styles.views}>
                         <span>{photo.views}</span>

@@ -24,11 +24,7 @@ interface IPhotoType {
   order_index: number;
 }
 
-const API_URL = import.meta.env.VITE_API_URL;
-const API_UPLOAD_DIRECTORY = import.meta.env.VITE_API_UPLOAD_DIRECTORY;
-
 const Creations = () => {
-  const baseUploadUrl = `${API_URL}/${API_UPLOAD_DIRECTORY}/`;
   const queryClient = useQueryClient();
   const {windowBreakPoints} = useWindowWidth();
 
@@ -211,7 +207,7 @@ const Creations = () => {
                       updateMutation.mutate(photo.id);
                     }} isDisabled={false}>View Details</Button>
                   </div>
-                  <img src={`${baseUploadUrl}${photo.photo_filename}`} />
+                  <img src={`${photo.url}`} />
                 </div>
               )
             })
