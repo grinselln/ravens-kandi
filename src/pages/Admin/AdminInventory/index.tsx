@@ -19,11 +19,7 @@ import { useSearch } from "@/hooks/useSearch";
 import InputDropDown from "@/components/Input/InputDropDown/InputDropDown";
 import { useWindowWidth } from "@/hooks/useWindowWidth";
 
-const API_URL = import.meta.env.VITE_API_URL;
-const API_UPLOAD_DIRECTORY = import.meta.env.VITE_API_UPLOAD_DIRECTORY;
-
 const AdminInventory = () => {
-  const baseUploadUrl = `${API_URL}/${API_UPLOAD_DIRECTORY}/`;
   const queryClient = useQueryClient();
   const { windowBreakPoints } = useWindowWidth();
 
@@ -431,7 +427,7 @@ const AdminInventory = () => {
                   return (
                     <tr key={`row_${photo.id}`}>
                       <td className={`${styles.fit} ${styles.image}`}>
-                        <img src={`${baseUploadUrl}${photo.photo_filename}`} />
+                        <img src={`${photo.url}`} />
                         <span className={`${styles.total}${inventory < 0 ? ` ${styles.alert}` : ""}`}>{inventory}</span>
                         {existing?.status === "error" && (
                           <span className={styles['error-badge']}>{existing?.errorMessage ?? "Update Failed"}</span>

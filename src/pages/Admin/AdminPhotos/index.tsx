@@ -24,15 +24,10 @@ import { IDropDownOption, SortOption } from '@/interfaces/IRecords';
 import InputSearch from '@/components/Input/InputSearch/InputSearch';
 import { useAdminSearch } from '@/hooks/useSearch';
 
-const API_URL = import.meta.env.VITE_API_URL;
-const API_UPLOAD_DIRECTORY = import.meta.env.VITE_API_UPLOAD_DIRECTORY;
-
 const AdminPhotos = () => {
   const queryClient = useQueryClient();
   const [searchParams, setSearchParams] = useSearchParams();
   const filter = searchParams.get('filter');
-
-  const baseUploadUrl = `${API_URL}/${API_UPLOAD_DIRECTORY}/`;
   
   const [selectedPhotoTypes, setSelectedPhotoTypes] = useState<Array<number>>([]);
   const [selectedSortOption, setSelectedSortOption] = useState<IDropDownOption<string>>({label: "", value: ""});
@@ -369,7 +364,7 @@ const AdminPhotos = () => {
                 return (
                   <div className={`col-6 col-sm-4 col-xl-3 ${styles['photo-wrapper']}${missingData.hasMissingData ? ` ${styles.alert}` : ""}`} key={`photo_${photo.id}`}>
                     <div className={styles['image-wrapper']}>
-                      <img src={`${baseUploadUrl}${photo.photo_filename}`} />
+                      <img src={`${photo.url}`} />
                       <div className={styles.badges}>
                         {getMissingData(photo).hasMissingData && (
                           <div className={styles.alerts}>

@@ -14,12 +14,7 @@ interface IViewPhotoModal {
   selectedPhoto: ISelectedPhoto | null;
 }
 
-const API_URL = import.meta.env.VITE_API_URL;
-const API_UPLOAD_DIRECTORY = import.meta.env.VITE_API_UPLOAD_DIRECTORY;
-
 const ViewPhotoModal = ({isOpen, setIsOpen, selectedPhoto}: IViewPhotoModal) => {
-  const baseUploadUrl = `${API_URL}/${API_UPLOAD_DIRECTORY}/`;
-  
   const [copied, setCopied] = useState(false);
 
   const isTwoColumn = useMemo(() => {
@@ -49,7 +44,7 @@ const ViewPhotoModal = ({isOpen, setIsOpen, selectedPhoto}: IViewPhotoModal) => 
     >
       <div className={`${styles['view-photo-wrapper']}${selectedPhoto?.isOdd ? ` ${styles.odd}` : ""}${!isTwoColumn ? ` ${styles.single}` : ""}`}>
         <div className={`${styles['photo-wrapper']}`}>
-          <img src={`${baseUploadUrl}${selectedPhoto?.photo_filename}`} alt="Preview" className={styles.previewImage} />
+          <img src={`${selectedPhoto?.url}`} alt="Preview" className={styles.previewImage} />
           {selectedPhoto?.source && (
             <div className={styles.source}>
               <span className={styles['source-title']}>Design source:</span>
