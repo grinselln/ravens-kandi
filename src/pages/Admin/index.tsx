@@ -108,15 +108,15 @@ const Admin = () => {
     });
 
     const categoryViews: Array<IPhotoCategoryViews> = Object.values(categoryViewsObj)
-    .filter((category: IPhotoCategoryViews) => category.totalViews !== 0)
-    .map((category: IPhotoCategoryViews) => ({...category, averageViews: category.totalViews / category.totalPhotos === Infinity ? 0 : Math.round(category.totalViews / category.totalPhotos)}))
+    .filter((category: IPhotoCategoryViews) => category.totalViews !== 0 && category.totalViews / category.totalPhotos !== Infinity && category.totalViews / category.totalPhotos >= 1)
+    .map((category: IPhotoCategoryViews) => ({...category, averageViews: Math.round(category.totalViews / category.totalPhotos)}))
     .sort((a: IPhotoCategoryViewsAvg, b: IPhotoCategoryViewsAvg) => {
       return b.averageViews - a.averageViews
     }).slice(0, 5);
 
     const subcategoryViews: Array<IPhotoCategoryViews> = Object.values(subcategoryViewsObj)
-    .filter((subcategory: IPhotoCategoryViews) => subcategory.totalViews !== 0)
-    .map((subcategory: IPhotoCategoryViews) => ({...subcategory, averageViews: subcategory.totalViews / subcategory.totalPhotos === Infinity ? 0 : Math.round(subcategory.totalViews / subcategory.totalPhotos)}))
+    .filter((subcategory: IPhotoCategoryViews) => subcategory.totalViews !== 0 && subcategory.totalViews / subcategory.totalPhotos !== Infinity && subcategory.totalViews / subcategory.totalPhotos >= 1)
+    .map((subcategory: IPhotoCategoryViews) => ({...subcategory, averageViews: Math.round(subcategory.totalViews / subcategory.totalPhotos)}))
     .sort((a: IPhotoCategoryViewsAvg, b: IPhotoCategoryViewsAvg) => {
       return b.averageViews - a.averageViews
     }).slice(0, 5);
@@ -253,7 +253,7 @@ const Admin = () => {
           {categoryTopPhotos.length > 0 && (
             <div className={styles['category-wrapper']}>
               <h3>
-                Top Photo Categories
+                Photos Per Category
               </h3>
               <div className={styles['category-views']}>
                 {(categoryTopPhotos).map((category: IPhotoTopCount) => (
