@@ -18,6 +18,7 @@ import InputDropDown from "@/components/Input/InputDropDown/InputDropDown";
 import Button from "@/components/Input/Button/Button";
 import { useWindowWidth } from "@/hooks/useWindowWidth";
 import { ITableSort } from "@/interfaces/IRecords";
+import CellQuantity from "@/components/Table/CellQuantity/CellQuantity";
 
 const INITIAL_SORT: ITableSort<keyof IPhotoQuantities> = { key: "current_count", direction: "asc" };
 
@@ -91,11 +92,48 @@ const AdminToDo = () => {
     queryFn: fetchCategories,
   });
 
-  const { searchText, setSearchText, filteredPhotos, filteredPhotosMap } = useAdminSearch({
+  const { searchText, setSearchText, filteredPhotos } = useAdminSearch({
     photos: photos ?? [], 
     photoCategories : photoCategories ?? [], 
     photoSubcategories: photoSubcategories ?? []
   });
+
+  const onUpdateQuantity = <K extends keyof IPhotoQuantities>(
+    photo: IAdminQueryPhoto,
+    newValue: IPhotoQuantities[K],
+    property: K
+  ) => {
+    setEditedRecords(prev => {
+      const existing = prev.find(record => record.id === photo.id);
+      const isBackToOriginal = photo[property] === newValue;
+
+      if (existing) {
+        const remainingChanges = { ...existing.changes };
+        delete remainingChanges[property];
+
+        const updatedChanges = isBackToOriginal
+          ? remainingChanges
+          : { ...remainingChanges, [property]: newValue };
+
+        if (Object.keys(updatedChanges).length === 0) {
+          return prev.filter(record => record.id !== photo.id);
+        }
+
+        return prev.map(record =>
+          record.id === photo.id ? { ...record, changes: updatedChanges } : record
+        );
+      }
+
+      if (isBackToOriginal) {
+        return prev;
+      }
+
+      return [
+        ...prev,
+        { id: photo.id, status: "pending", changes: { [property]: newValue } }
+      ];
+    });
+  };
 
   const onSortColumn = useCallback((key: keyof IPhotoQuantities, direction: "asc" | "desc") => {
     if (!photos) return;
@@ -245,13 +283,21 @@ const AdminToDo = () => {
         </div>
         {displayedRecords.length > 0 && (
           <div className={`grid ${styles.photos}`}>
-            {displayedRecords.map(photo => {
-              console.log("photo", photo);
+            {displayedRecords.map((photo) => {
+              const existing = editedRecords.find(record => record.id === photo.id);
+              const existingChanges = existing ? existing.changes : null;
+              
               return (
                 <div className={`col col-md-6 col-xxl-4 ${styles['photo-todo-wrapper']}`} key={`photo_${photo.id}`}>
                   <div className={styles['photo-display']}>
                     <img src={`${photo.url}`} />
-                    <span className={styles.total}>{photo.current_count}</span>
+                    <span className={`${styles.total} ${photo.needed_count !== 0 && existingChanges?.['tmp_created_count'] === photo.needed_count 
+                      ? "confirm"
+                      : isEditing && photo.needed_count !== 0
+                        ? styles["in-progress"]
+                        : ""}`}>
+                      {(existingChanges?.['tmp_created_count'] ?? 0) + photo.current_count}
+                    </span>
                   </div>
                   <div className={styles['photo-inventory']}>
                     <span className={`${styles.title}${photo.is_needed_priority ? ` ${styles['priority']}` : ''}`}>
@@ -259,8 +305,33 @@ const AdminToDo = () => {
                       <FontAwesomeIcon icon={photo.is_needed_priority ? faStar : faStarOutline} />
                     </span>
                     <div className={styles['inventory-details']}>
-                      <span>Inventory Needed: {photo.needed_count}</span>
-                      <span>Number Made: pending</span>
+                      <div className={styles['inventory-count']}>
+                        <span>Inventory Needed</span>
+                        <CellQuantity
+                          isEditing={isEditing}
+                          classes={['todo-quantity', existingChanges?.['needed_count'] !== undefined ? "confirm" : "", "inverse"]}
+                          originalQuantity={photo.needed_count}
+                          quantity={existingChanges?.['needed_count'] !== undefined ? existingChanges['needed_count'] : photo.needed_count}
+                          onQuantityChange={({value}) => onUpdateQuantity(photo, value, "needed_count")}
+                          keepRevertButtonFormat={true}
+                        />
+                      </div>
+                      <div className={styles['inventory-count']}>
+                        <span>Number Made</span>
+                        <CellQuantity
+                          isEditing={isEditing}
+                          classes={['todo-quantity', photo.needed_count !== 0 && existingChanges?.['tmp_created_count'] === photo.needed_count 
+                          ? "confirm"
+                          : ((existingChanges?.['tmp_created_count'] ?? 999) < photo.needed_count)
+                            ? "alert"
+                            : "",
+                          "inverse"]}
+                          originalQuantity={0}
+                          quantity={existingChanges?.['tmp_created_count'] ?? 0}
+                          onQuantityChange={({value}) => onUpdateQuantity(photo, value, "tmp_created_count")}
+                          keepRevertButtonFormat={true}
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>

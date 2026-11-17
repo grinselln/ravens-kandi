@@ -34,7 +34,8 @@
 
   .photo-display {
     position: relative;
-    width: 30%;
+    width: 125px;
+    height: auto;
     display: flex;
     flex-direction: column;
 
@@ -50,6 +51,14 @@
       padding: 0.5rem 0.75rem;
       font-size: 0.7rem;
       border-radius: 3px 0px 3px 0px;
+    
+      &:global(.confirm) {
+        background-color: var(--color-confirm);
+      }
+
+      &.in-progress {
+        background-color: var(--color-accent-muted);
+      }
     }
   }
 
@@ -57,7 +66,6 @@
     width: 70%;
     display: flex;
     flex-direction: column;
-    gap: .5rem;
     
 
     .title {
@@ -67,6 +75,7 @@
       font-size: .9rem;
       font-weight: 500;
       padding: .25rem .5rem;
+      border-bottom: 1px solid var(--color-admin-muted);
 
       &.priority {
         background-color: var(--color-admin-light-muted);
@@ -76,9 +85,21 @@
 
     .inventory-details {
       display: flex;
-      flex-direction: column;
-      gap: .75rem;
-      padding: 0rem .5rem .5rem .5rem;
+      flex-direction: row;
+      flex-grow: 1;
+
+      .inventory-count {
+        display: flex;
+        flex-direction: column;
+        width: 50%;
+        justify-content: center;
+        align-items: center;
+        gap: .75rem;
+
+        &:global(.confirm) {
+          background-color: var(--color-confirm);
+        }
+      }
     }
   }
 }

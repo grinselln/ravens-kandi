@@ -15,6 +15,7 @@ export interface IPhoto extends IPhotoQuantities {
 export interface IPhotoQuantities {
   current_count: number;
   created_count: number;
+  tmp_created_count: number;
   given_count: number;
   hidden_count: number;
   marked_count: number;
