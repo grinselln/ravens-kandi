@@ -7,7 +7,7 @@ import { useAdminSearch } from "@/hooks/useSearch";
 import { ICategoryFilterCollection } from "@/interfaces/ICategories";
 import { IAdminFilterPhoto, IAdminQueryPhoto, IPhotoQuantities, IQuantityItemEdit } from "@/interfaces/IPhotos";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import styles from "./AdminToDo.module.scss"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEdit, faFloppyDisk, faSpinner, faStar } from "@fortawesome/free-solid-svg-icons";
@@ -19,39 +19,42 @@ import Button from "@/components/Input/Button/Button";
 import { useWindowWidth } from "@/hooks/useWindowWidth";
 import { ITableSort } from "@/interfaces/IRecords";
 
+const INITIAL_SORT: ITableSort<keyof IPhotoQuantities> = { key: "current_count", direction: "asc" };
+
 const AdminToDo = () => {
   const { windowBreakPoints } = useWindowWidth();
   
+  const [showPriorityOnly, setShowPriorityOnly] = useState<boolean>(false);
   const [selectedCategoryFilters, setSelectedCategoryFilters] = useState<ICategoryFilterCollection>({});
-  const [columnSort, setColumnSort] = useState<ITableSort<keyof IPhotoQuantities> | null>(null);
+  const [columnSort, setColumnSort] = useState<ITableSort<keyof IPhotoQuantities>>(INITIAL_SORT);
   const [inventoryThreshold, setInventoryThreshold] = useState<number>(3);
   const [sortedIds, setSortedIds] = useState<number[] | null>(null);
   const [editedRecords, setEditedRecords] = useState<IQuantityItemEdit[]>([]);
   const [isEditing, setIsEditing] = useState<boolean>(false);
 
   type SortDirection = ITableSort["direction"];
-    type SortValue = `${keyof IPhotoQuantities}|${SortDirection}`;
+  type SortValue = `${keyof IPhotoQuantities}|${SortDirection}`;
+
+  const sortOptions: { value: SortValue; label: string }[] = [
+    {
+      value: "current_count|asc",
+      label: "Current Inventory ↑"
+    },
+    {
+      value: "current_count|desc",
+      label: "Current Inventory ↓"
+    },
+    {
+      value: "needed_count|asc",
+      label: "Needed Count ↑"
+    },
+    {
+      value: "needed_count|desc",
+      label: "Needed Count ↓"
+    },
+  ];
   
-    const sortOptions: { value: SortValue; label: string }[] = [
-      {
-        value: "current_count|asc",
-        label: "Current Ascending"
-      },
-      {
-        value: "current_count|desc",
-        label: "Current Descending"
-      },
-      {
-        value: "needed_count|asc",
-        label: "Needed Ascending"
-      },
-      {
-        value: "needed_count|desc",
-        label: "Needed Descending"
-      },
-    ];
-  
-    const { data: photos } = useQuery({
+  const { data: photos } = useQuery({
     queryKey: ['photos', selectedCategoryFilters],
     queryFn: () => {
       const arrayFilters = Object.entries(selectedCategoryFilters)
@@ -94,51 +97,36 @@ const AdminToDo = () => {
     photoSubcategories: photoSubcategories ?? []
   });
 
-  const onSortColumn = (key: keyof IPhotoQuantities | null, tempDirection?: "asc" | "desc" | undefined) => {
-      if (!photos) return;
-  
-      const sortDirection = tempDirection ? tempDirection : columnSort?.direction;
-  
-      const direction: "asc" | "desc" | null =
-        columnSort?.key === key && sortDirection === "asc" 
-          ? "desc" 
-          : columnSort?.key === key && sortDirection === "desc"
-            ? null
-            : "asc";
-  
-      if (key === null || direction === null) {
-        setSortedIds(null);
-        setColumnSort(null);
-        return;
+  const onSortColumn = useCallback((key: keyof IPhotoQuantities, direction: "asc" | "desc") => {
+    if (!photos) return;
+
+    const getValue = (photo: IAdminQueryPhoto) => {
+      const edited = editedRecords.find(record => record.id === photo.id)?.changes;
+
+      if (key === "current_count") {
+        const currentInventory = (edited?.created_count ?? photo.created_count) 
+        - (edited?.given_count ?? photo.given_count) 
+        - (edited?.hidden_count ?? photo.hidden_count) 
+        - (edited?.taken_count ?? photo.taken_count) 
+        - (edited?.discard_count ?? photo.discard_count);
+
+        return currentInventory;
       }
-  
-      const getValue = (photo: IAdminQueryPhoto) => {
-        const edited = editedRecords.find(record => record.id === photo.id)?.changes;
-  
-        if (key === "current_count") {
-          const currentInventory = (edited?.created_count ?? photo.created_count) 
-          - (edited?.given_count ?? photo.given_count) 
-          - (edited?.hidden_count ?? photo.hidden_count) 
-          - (edited?.taken_count ?? photo.taken_count) 
-          - (edited?.discard_count ?? photo.discard_count);
-  
-          return currentInventory;
-        }
-        
-        return edited?.[key] ?? photo[key];
-      };
-  
-      const ordered = [...photos].sort((a, b) => {
-        const valueOne = getValue(a);
-        const valueTwo = getValue(b);
-        if (valueOne === valueTwo) return 0;
-        const result = valueOne > valueTwo ? 1 : -1;
-        return direction === "asc" ? result : -result;
-      });
-  
-      setSortedIds(ordered.map(photo => photo.id));
-      setColumnSort({ key, direction });
+      
+      return edited?.[key] ?? photo[key];
     };
+
+    const ordered = [...photos].sort((a, b) => {
+      const valueOne = getValue(a);
+      const valueTwo = getValue(b);
+      if (valueOne === valueTwo) return 0;
+      const result = valueOne > valueTwo ? 1 : -1;
+      return direction === "asc" ? result : -result;
+    });
+
+    setSortedIds(ordered.map(photo => photo.id));
+    setColumnSort({ key, direction });
+  }, [editedRecords, photos]);
 
   const parseSortValue = (value: SortValue): ITableSort<keyof IPhotoQuantities> => {
     const [key, direction] = value.split("|") as [keyof IPhotoQuantities, SortDirection];
@@ -146,8 +134,6 @@ const AdminToDo = () => {
   };
 
   const selectedDropdownOption = useMemo(() => {
-    if (columnSort === null) return null;
-
     return `${columnSort.key}|${columnSort.direction}` as SortValue;
   }, [columnSort]);
 
@@ -167,7 +153,7 @@ const AdminToDo = () => {
         ...photo,
         current_count: inventory
       })
-    }).filter(photo => photo.current_count <= inventoryThreshold);
+    }).filter(photo => photo.current_count <= inventoryThreshold && (!showPriorityOnly || (showPriorityOnly && photo.is_needed_priority)));
 
     if (!sortedIds) return tmpFilteredPhotos;
 
@@ -175,11 +161,22 @@ const AdminToDo = () => {
     return sortedIds
       .map(id => photoMap.get(id))
       .filter((photo): photo is IAdminFilterPhoto => photo !== undefined);
-  }, [filteredPhotos, sortedIds, inventoryThreshold, editedRecords]);
+  }, [filteredPhotos, sortedIds, inventoryThreshold, editedRecords, showPriorityOnly]);
+
+  useEffect(() => {
+    if(photos && sortedIds === null) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- initial list sort, fires one time
+      onSortColumn(INITIAL_SORT.key, INITIAL_SORT.direction);
+    }
+  }, [photos, sortedIds, onSortColumn])
 
   return (
     <LayoutAdmin>
-      <DashboardHeader title='To Do' />
+      <DashboardHeader title='To Do'>
+        <Button onClick={() => setShowPriorityOnly(!showPriorityOnly)} additionalClass={!showPriorityOnly ? ["outline-muted"] : []} isDisabled={false}>
+          Show Only Priority Items
+        </Button>
+      </DashboardHeader>
 
       <div className={styles['to-do-wrapper']}>
         <FilterDisplay
@@ -203,12 +200,13 @@ const AdminToDo = () => {
               isDisabled={false}
               value={selectedDropdownOption}
               setValue={(newOption) => {
-                const newValue = newOption ? parseSortValue(newOption.value) : null;
+                if(newOption === null) return;
 
-                onSortColumn(newValue?.key ?? null, newValue?.direction)
+                const newValue = parseSortValue(newOption.value);
+
+                onSortColumn(newValue.key, newValue.direction)
               }}
               options={sortOptions}
-              allowRemoval={true}
             />
           )}
           <div className={styles.controls}>
