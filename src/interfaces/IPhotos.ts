@@ -20,6 +20,8 @@ export interface IPhotoQuantities {
   marked_count: number;
   taken_count: number;
   discard_count: number;
+  needed_count: number;
+  is_needed_priority: boolean;
 }
 
 export interface IQuantityItemEdit extends IUploadItem {

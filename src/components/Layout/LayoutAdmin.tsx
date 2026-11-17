@@ -1,7 +1,7 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import styles from './LayoutAdmin.module.scss'
 import Layout from "@/components/Layout/Layout";
-import { faBoxesStacked, faHouse, faImage, faTableCellsLarge, faTag } from '@fortawesome/free-solid-svg-icons';
+import { faBoxesStacked, faHouse, faImage, faListCheck, faTableCellsLarge, faTag } from '@fortawesome/free-solid-svg-icons';
 import { Link } from 'react-router-dom';
 import Modal from '../Modal/Modal';
 import Button from '../Input/Button/Button';
@@ -18,6 +18,7 @@ const LayoutAdmin = ({children}: ILayoutAdmin) => {
     DASHBOARD: "",
     PHOTOS: "photos",
     INVENTORY: "inventory",
+    TODO: "todo",
     CATEGORIES: "categories",
     TYPES: "types"
   }
@@ -41,6 +42,11 @@ const LayoutAdmin = ({children}: ILayoutAdmin) => {
             <li>
               <Link to="/admin/inventory" className={currentPage === links.INVENTORY ? styles.active : ""}>
                 <FontAwesomeIcon icon={faBoxesStacked} /> Inventory
+              </Link>
+            </li>
+            <li>
+              <Link to="/admin/todo" className={currentPage === links.TODO ? styles.active : ""}>
+                <FontAwesomeIcon icon={faListCheck} /> To Do
               </Link>
             </li>
             <li>
