@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom';
 import Modal from '../Modal/Modal';
 import Button from '../Input/Button/Button';
 import { useDeleteConfirmation } from '../Admin/Providers/DeleteModalContext';
+import { useAuth } from '../Admin/Providers/AuthContext';
 
 interface ILayoutAdmin {
   children: React.ReactNode;
@@ -13,6 +14,7 @@ interface ILayoutAdmin {
 
 const LayoutAdmin = ({children}: ILayoutAdmin) => {
   const {recordType, warningMessage, onDismissWarningMessage, onConfirmWarning} = useDeleteConfirmation();
+  const { isAdmin } = useAuth();
 
   const links = {
     DASHBOARD: "",
@@ -39,26 +41,32 @@ const LayoutAdmin = ({children}: ILayoutAdmin) => {
                 <FontAwesomeIcon icon={faImage} /> Photos
               </Link>
             </li>
-            <li>
-              <Link to="/admin/inventory" className={currentPage === links.INVENTORY ? styles.active : ""}>
-                <FontAwesomeIcon icon={faBoxesStacked} /> Inventory
-              </Link>
-            </li>
+            {isAdmin && (
+              <li>
+                <Link to="/admin/inventory" className={currentPage === links.INVENTORY ? styles.active : ""}>
+                  <FontAwesomeIcon icon={faBoxesStacked} /> Inventory
+                </Link>
+              </li>
+            )}
             <li>
               <Link to="/admin/todo" className={currentPage === links.TODO ? styles.active : ""}>
                 <FontAwesomeIcon icon={faListCheck} /> To Do
               </Link>
             </li>
-            <li>
-              <Link to="/admin/types" className={currentPage === links.TYPES ? styles.active : ""}>
-                <FontAwesomeIcon icon={faTag} /> Types
-              </Link>
-            </li>
-            <li>
-              <Link to="/admin/categories" className={currentPage === links.CATEGORIES ? styles.active : ""}>
-                <FontAwesomeIcon icon={faTableCellsLarge} /> Categories
-              </Link>
-            </li>
+            {isAdmin && (
+              <>
+                <li>
+                  <Link to="/admin/types" className={currentPage === links.TYPES ? styles.active : ""}>
+                    <FontAwesomeIcon icon={faTag} /> Types
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/admin/categories" className={currentPage === links.CATEGORIES ? styles.active : ""}>
+                    <FontAwesomeIcon icon={faTableCellsLarge} /> Categories
+                  </Link>
+                </li>
+              </>
+            )}
           </ul>
         </div>
         <div className={styles.body}>

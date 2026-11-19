@@ -15,3 +15,8 @@ export const NEW_PHOTO_INVENTORY_NULL = {
   taken_count: null,
   discard_count: null
 };
+
+export const ROLES = {
+  ADMIN: "admin",
+  USER: "user"
+}

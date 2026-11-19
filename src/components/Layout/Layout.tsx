@@ -8,10 +8,11 @@ import { faClose } from '@fortawesome/free-solid-svg-icons'
 import { useEffect, useRef, useState } from 'react'
 import Modal from '../Modal/Modal'
 import Button from '../Input/Button/Button'
-import { useAuth } from '@/hooks/useAuth'
 import ActionButton from '../Admin/Rows/ActionElements/ActionButton/ActionButton'
 import { getMe, logout } from '@/api/auth';
 import { useSessionStore } from '../Admin/Providers/SessionContext'
+import { useAuth } from '../Admin/Providers/AuthContext'
+import { useQueryClient } from '@tanstack/react-query'
 
 const API_URL = import.meta.env.VITE_API_URL;
 const API_URL_ORIGIN = new URL(API_URL).origin;
@@ -24,11 +25,14 @@ interface LayoutProps {
 
 function Layout({ children, darkNav = false, isAdmin = false }: LayoutProps) {
   const navigate = useNavigate();
+  const queryClient = useQueryClient()
   const {isSessionExpired, dismissSessionExpired} = useSessionStore();
   const { user } = useAuth();
+
   const popupRef = useRef<Window | null>(null);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const resolvedRef = useRef(false);
+  
   const [isMobileNavOpen, setIsMobileNavOpen] = useState<boolean>(false);
 
   const clearPoll = () => {
@@ -107,12 +111,13 @@ function Layout({ children, darkNav = false, isAdmin = false }: LayoutProps) {
             </div>
           </>
         )}
-        {isAdmin && user?.username && (
+        {isAdmin && (
           <div className={styles.account}>
-            <span>Welcome, {user.username}</span>
+            <span>Welcome{user?.username ? `, ${user.username}` : ""}</span>
             <ActionButton variant="default" icon={faArrowRightFromBracket} isDisabled={false} onAction={async () => {
               try {
                 await logout();
+                queryClient.setQueryData(["me"], null);
                 navigate("/login");
               } catch (err) {
                 console.log("[logout error]: ", err);

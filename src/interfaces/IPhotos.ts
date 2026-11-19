@@ -25,6 +25,11 @@ export interface IPhotoQuantities {
   is_needed_priority: number;
 }
 
+export interface IPhotoQuantitiesUser {
+  created_count: number;
+  needed_count: number;
+}
+
 export interface IQuantityItemEdit extends IUploadItem {
   id: number;
   changes: Partial<IPhotoQuantities>;

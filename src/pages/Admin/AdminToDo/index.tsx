@@ -1,5 +1,5 @@
 import { fetchCategories, fetchPhotoCategories } from "@/api/categories";
-import { fetchPhotosAdmin, updatePhotoQuantities } from "@/api/photos";
+import { fetchPhotosAdmin, updatePhotoQuantities, updatePhotoQuantitiesUser } from "@/api/photos";
 import { fetchPhotoSubcategories } from "@/api/subcategories";
 import DashboardHeader from "@/components/Admin/DashboardHeader/DashboardHeader";
 import LayoutAdmin from "@/components/Layout/LayoutAdmin";
@@ -19,22 +19,23 @@ import Button from "@/components/Input/Button/Button";
 import { IDropDownOption, ITableSort } from "@/interfaces/IRecords";
 import CellQuantity from "@/components/Table/CellQuantity/CellQuantity";
 import ActionButton from "@/components/Admin/Rows/ActionElements/ActionButton/ActionButton";
+import { useAuth } from "@/components/Admin/Providers/AuthContext";
 
-const INITIAL_SORT: ITableSort<keyof IPhotoQuantities> = { key: "current_count", direction: "asc" };
+const INITIAL_SORT_ADMIN: ITableSort<keyof IPhotoQuantities> = { key: "current_count", direction: "asc" };
+const INITIAL_SORT_USER: ITableSort<keyof IPhotoQuantities> = { key: "needed_count", direction: "desc" }; 
 
 const AdminToDo = () => {
   const queryClient = useQueryClient();
+  const { isAdmin } = useAuth();
   
   const [showPriorityOnly, setShowPriorityOnly] = useState<boolean>(false);
   const [selectedCategoryFilters, setSelectedCategoryFilters] = useState<ICategoryFilterCollection>({});
-  const [columnSort, setColumnSort] = useState<ITableSort<keyof IPhotoQuantities>>(INITIAL_SORT);
+  const [columnSort, setColumnSort] = useState<ITableSort<keyof IPhotoQuantities>>(isAdmin ? INITIAL_SORT_ADMIN : INITIAL_SORT_USER);
   const [inventoryThreshold, setInventoryThreshold] = useState<IDropDownOption<number>>({value: 0, label: "Show 0 inventory"});
   const [sortedIds, setSortedIds] = useState<number[] | null>(null);
   const [editedRecords, setEditedRecords] = useState<IQuantityItemEdit[]>([]);
   const [isEditingNeeded, setIsEditingNeeded] = useState<boolean>(false);
   const [isEditingMade, setIsEditingMade] = useState<boolean>(false);
-
-  console.log("[items]", inventoryThreshold)
 
   type SortDirection = ITableSort["direction"];
   type SortValue = `${keyof IPhotoQuantities}|${SortDirection}`;
@@ -132,7 +133,18 @@ const AdminToDo = () => {
     mutationFn: (updates: {
       id: number, 
       data: Partial<IPhotoQuantities>
-    }) => updatePhotoQuantities(updates.id, updates.data),
+    }) => {
+      if (isAdmin) {
+        return updatePhotoQuantities(updates.id, updates.data)
+      }
+
+      const userQuantityData = {
+        created_count: updates.data.created_count,
+        needed_count: updates.data.needed_count
+      }
+      
+      return updatePhotoQuantitiesUser(updates.id, userQuantityData)
+    },
     onError: (error) => {
       console.error('Update failed:', error);
     }
@@ -275,7 +287,9 @@ const AdminToDo = () => {
         ...photo,
         current_count: inventory
       })
-    }).filter(photo => photo.current_count <= inventoryThreshold.value && (!showPriorityOnly || (showPriorityOnly && photo.is_needed_priority)));
+    }).filter(photo => (isAdmin ? photo.current_count <= inventoryThreshold.value : true) 
+    && (!isAdmin ? photo.needed_count !== 0 : true)
+    && (!showPriorityOnly || (showPriorityOnly && photo.is_needed_priority)));
 
     if (!sortedIds) return tmpFilteredPhotos;
 
@@ -283,7 +297,7 @@ const AdminToDo = () => {
     return sortedIds
       .map(id => photoMap.get(id))
       .filter((photo): photo is IAdminFilterPhoto => photo !== undefined);
-  }, [filteredPhotos, sortedIds, inventoryThreshold, editedRecords, showPriorityOnly]);
+  }, [filteredPhotos, sortedIds, inventoryThreshold, editedRecords, showPriorityOnly, isAdmin]);
 
   const isEditing = useMemo(() => {
     return isEditingNeeded || isEditingMade;
@@ -291,25 +305,27 @@ const AdminToDo = () => {
 
   useEffect(() => {
     if(photos && sortedIds === null) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- initial list sort, fires one time
-      onSortColumn(INITIAL_SORT.key, INITIAL_SORT.direction);
+      const sort = isAdmin ? INITIAL_SORT_ADMIN : INITIAL_SORT_USER;
+      onSortColumn(sort.key, sort.direction);
     }
-  }, [photos, sortedIds, onSortColumn])
+  }, [photos, sortedIds, onSortColumn, isAdmin])
 
   return (
     <LayoutAdmin>
       <DashboardHeader title='To Do'>
-        <div className={styles['threshold-field']}>
-          <InputDropDown
-            placeholder=""
-            value={inventoryThreshold.value}
-            options={thresholdOptions}
-            setValue={(newValue) => {
-              if (newValue !== null) setInventoryThreshold(newValue)
-            }}
-            isDisabled={false}
-          />
-        </div>
+        {isAdmin && (
+          <div className={styles['threshold-field']}>
+            <InputDropDown
+              placeholder=""
+              value={inventoryThreshold.value}
+              options={thresholdOptions}
+              setValue={(newValue) => {
+                if (newValue !== null) setInventoryThreshold(newValue)
+              }}
+              isDisabled={false}
+            />
+          </div>
+        )}
         <Button onClick={() => setShowPriorityOnly(!showPriorityOnly)} additionalClass={!showPriorityOnly ? ["outline-muted"] : []} isDisabled={false}>
           Show Priority Only
         </Button>
@@ -375,13 +391,15 @@ const AdminToDo = () => {
               </>
             ) : (
               <>
-                <Button
-                  additionalClass={["icon"]}
-                  onClick={() => setIsEditingNeeded(true)}
-                  isDisabled={false}
-                >
-                  <FontAwesomeIcon icon={faEdit} /> Edit Needed
-                </Button>
+                {isAdmin && (
+                  <Button
+                    additionalClass={["icon"]}
+                    onClick={() => setIsEditingNeeded(true)}
+                    isDisabled={false}
+                  >
+                    <FontAwesomeIcon icon={faEdit} /> Edit Needed
+                  </Button>
+                )}
                 <Button
                   additionalClass={["icon"]}
                   onClick={() => setIsEditingMade(true)}

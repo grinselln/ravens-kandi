@@ -23,9 +23,11 @@ import { IPhotoSubcategory } from '@/interfaces/ISubcategories';
 import { IDropDownOption, SortOption } from '@/interfaces/IRecords';
 import InputSearch from '@/components/Input/InputSearch/InputSearch';
 import { useAdminSearch } from '@/hooks/useSearch';
+import { useAuth } from '@/components/Admin/Providers/AuthContext';
 
 const AdminPhotos = () => {
   const queryClient = useQueryClient();
+  const { isAdmin } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
   const filter = searchParams.get('filter');
   
@@ -232,7 +234,7 @@ const AdminPhotos = () => {
   return (
     <LayoutAdmin>
       <DashboardHeader title='Photos'>
-        <Button onClick={() => setIsAddModalOpen(true)} isDisabled={false}>
+        <Button onClick={() => setIsAddModalOpen(true)} isDisabled={!isAdmin}>
           <FontAwesomeIcon icon={faPlus} /> Add Photos
         </Button>
       </DashboardHeader>
@@ -339,19 +341,21 @@ const AdminPhotos = () => {
               </div>
             </div>
 
-            <div className={`${styles['bulk-edit']}${isBulkEdit ? ` ${styles['edit-active']}` : ""}`}>
-              <Button additionalClass={['outline-muted']} onClick={() => {
-                setIsBulkEdit(!isBulkEdit);
-                setSelectedBulkEdit([]);
-              }} isDisabled={false}>Bulk Select</Button>
-              <div className={styles['bulk-controls']}>
-                <ActionButton variant='default' icon={faEdit} onAction={() => {
-                  setSelectedEditPhotos(selectedEditPhotosFull)
-                  setIsBulkEdit(false);
-                }} isDisabled={selectedBulkEdit.length <= 1 || !isBulkEdit || !bulkEditValid} />
-                <ActionButton variant='alert' icon={faTrashCan} onAction={() => handleDelete()} isDisabled={(selectedBulkEdit.length === 0 && isBulkEdit) || !isBulkEdit} />  
+            {isAdmin && (
+              <div className={`${styles['bulk-edit']}${isBulkEdit ? ` ${styles['edit-active']}` : ""}`}>
+                <Button additionalClass={['outline-muted']} onClick={() => {
+                  setIsBulkEdit(!isBulkEdit);
+                  setSelectedBulkEdit([]);
+                }} isDisabled={!isAdmin}>Bulk Select</Button>
+                <div className={styles['bulk-controls']}>
+                  <ActionButton variant='default' icon={faEdit} onAction={() => {
+                    setSelectedEditPhotos(selectedEditPhotosFull)
+                    setIsBulkEdit(false);
+                  }} isDisabled={selectedBulkEdit.length <= 1 || !isBulkEdit || !bulkEditValid} />
+                  <ActionButton variant='alert' icon={faTrashCan} onAction={() => handleDelete()} isDisabled={(selectedBulkEdit.length === 0 && isBulkEdit) || !isBulkEdit} />  
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
         <div className={styles['photos-display-wrapper']}>
@@ -423,15 +427,17 @@ const AdminPhotos = () => {
                             <p>No subcategories</p>
                           )}
                         </div>
-                        <div className={styles.actions}>
-                          <ActionButton variant='default' icon={faEdit} onAction={() => setSelectedEditPhotos([photo])} isDisabled={false} />
-                          <ActionButton variant='alert' icon={faTrashCan} onAction={() => { 
-                            handleBulkAdd({
-                              id: photo.id,
-                              status: "pending", 
-                            })
-                          }} isDisabled={false} />
-                        </div>
+                        {isAdmin && (
+                          <div className={styles.actions}>
+                            <ActionButton variant='default' icon={faEdit} onAction={() => setSelectedEditPhotos([photo])} isDisabled={false} />
+                            <ActionButton variant='alert' icon={faTrashCan} onAction={() => { 
+                              handleBulkAdd({
+                                id: photo.id,
+                                status: "pending", 
+                              })
+                            }} isDisabled={false} />
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
