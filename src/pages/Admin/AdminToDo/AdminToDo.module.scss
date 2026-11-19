@@ -53,14 +53,63 @@
   color: var(--color-admin-light);
   font-size: .8rem;
 
+  .photo-display-wrapper {
+    width: 125px;
+    height: 125px;
+  }
+
   .photo-display {
     position: relative;
-    width: 125px;
-    height: auto;
     display: flex;
     flex-direction: column;
 
+    &.stock {
+      .total {
+        display: block;
+      }
+    }
+
+    &.view {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 102;
+      border-radius: 5px;
+      overflow: hidden;
+      width: calc(100% - 20px);
+      max-width: 500px;
+
+      .total {
+        display: block;
+        border: 1px solid var(--color-admin-mid);
+        border-radius: 5px;
+        padding: .5rem .75rem;
+        font-size: .8rem;
+        top: 10px;
+        left: 10px;
+      }
+
+      .close-view {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+
+        button {
+          padding: .35rem;
+          background-color: var(--color-admin-mid-light);
+          border-radius: 5px;
+        }
+
+        svg {
+          width: 20px;
+          height: 20px;
+        }
+      }
+    }
+
     .total {
+      display: none;
       position: absolute;
       top: 0px;
       left: 0px;
@@ -115,7 +164,8 @@
         width: 50%;
         justify-content: center;
         align-items: center;
-        gap: .75rem;
+        gap: .5rem;
+        font-size: .9rem;
 
         &:global(.confirm) {
           background-color: var(--color-confirm);
@@ -123,4 +173,14 @@
       }
     }
   }
+}
+
+.view-overlay {
+  background-color: rgba(0, 0, 0, .75);
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  width: 100vw;
+  height: 100vh;
+  z-index: 101;
 }

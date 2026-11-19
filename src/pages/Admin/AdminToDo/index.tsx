@@ -10,7 +10,7 @@ import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tansta
 import { useCallback, useEffect, useMemo, useState } from "react";
 import styles from "./AdminToDo.module.scss"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEdit, faFloppyDisk, faSpinner, faStar } from "@fortawesome/free-solid-svg-icons";
+import { faClose, faEdit, faFloppyDisk, faSpinner, faStar } from "@fortawesome/free-solid-svg-icons";
 import { faStar as faStarOutline} from "@fortawesome/free-regular-svg-icons";
 import FilterDisplay from "@/components/Shared/FilterDisplay/FilterDisplay";
 import InputSearch from "@/components/Input/InputSearch/InputSearch";
@@ -36,6 +36,7 @@ const AdminToDo = () => {
   const [editedRecords, setEditedRecords] = useState<IQuantityItemEdit[]>([]);
   const [isEditingNeeded, setIsEditingNeeded] = useState<boolean>(false);
   const [isEditingMade, setIsEditingMade] = useState<boolean>(false);
+  const [selectedPhoto, setSelectedPhoto] = useState<number | null>(null);
 
   type SortDirection = ITableSort["direction"];
   type SortValue = `${keyof IPhotoQuantities}|${SortDirection}`;
@@ -285,7 +286,8 @@ const AdminToDo = () => {
 
       return ({
         ...photo,
-        current_count: inventory
+        current_count: inventory,
+        tmp_created_count: 0
       })
     }).filter(photo => (isAdmin ? photo.current_count <= inventoryThreshold.value : true) 
     && (!isAdmin ? photo.needed_count !== 0 : true)
@@ -418,18 +420,29 @@ const AdminToDo = () => {
               const existing = editedRecords.find(record => record.id === photo.id);
               const existingChanges = existing ? existing.changes : null;
               const isPriority = existingChanges?.['is_needed_priority'] !== undefined ? existingChanges['is_needed_priority'] : photo.is_needed_priority;
+              const isSelected = selectedPhoto === photo.id;
               
               return (
                 <div className={`col col-md-6 col-xxl-4 col-xxxl-3 ${styles['photo-todo-wrapper']}`} key={`photo_${photo.id}`}>
-                  <div className={styles['photo-display']}>
-                    <img src={`${photo.url}`} />
-                    <span className={`${styles.total} ${photo.needed_count !== 0 && existingChanges?.['tmp_created_count'] === photo.needed_count 
-                      ? "confirm"
-                      : isEditingMade && photo.needed_count !== 0
-                        ? styles["in-progress"]
-                        : ""}`}>
-                      {(existingChanges?.['tmp_created_count'] ?? 0) + photo.current_count}
-                    </span>
+                  <div className={styles['photo-display-wrapper']}>
+                    <div className={`${styles['photo-display']}${isSelected ? ` ${styles.view}`  : ''}${isAdmin ? ` ${styles.stock}` : ''}`} onClick={() => setSelectedPhoto(photo.id)}>
+                      <img src={`${photo.url}`} />
+                      <span className={`${styles.total} ${photo.needed_count !== 0 && existingChanges?.['tmp_created_count'] === photo.needed_count 
+                        ? "confirm"
+                        : isEditingMade && photo.needed_count !== 0
+                          ? styles["in-progress"]
+                          : ""}`}>
+                        {!isSelected && isAdmin && (existingChanges?.['tmp_created_count'] ?? 0) + photo.current_count}
+                        {isSelected && (
+                          `${existingChanges?.['needed_count'] !== undefined ? existingChanges['needed_count'] : photo.needed_count} needed`
+                        )}
+                      </span>
+                      {isSelected && (
+                        <div className={styles['close-view']}>
+                          <ActionButton variant="default" icon={faClose} isDisabled={false} onAction={() => setSelectedPhoto(null)} />
+                        </div>
+                      )}
+                    </div>
                   </div>
                   <div className={styles['photo-inventory']}>
                     <span className={`${styles.title}${photo.is_needed_priority ? ` ${styles['priority']}` : ''}`}>
@@ -479,6 +492,10 @@ const AdminToDo = () => {
                             onUpdateRecord(photo, value, "tmp_created_count");
                             onUpdateRecord(photo, currentNeededCount - changeSource, "needed_count");
                           }}
+                          onRevertQuantity={() => {
+                            onUpdateRecord(photo, 0, "tmp_created_count");
+                            onUpdateRecord(photo, photo.needed_count, "needed_count");
+                          }}
                           keepRevertButtonFormat={true}
                           plusDisabled={photo.needed_count === existingChanges?.['tmp_created_count']}
                         />
@@ -491,6 +508,10 @@ const AdminToDo = () => {
           </div>
         )}
       </div>
+
+      {selectedPhoto && (
+        <div className={styles['view-overlay']} />
+      )}
     </LayoutAdmin>
   )  
 }
