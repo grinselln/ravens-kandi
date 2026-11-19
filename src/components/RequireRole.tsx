@@ -8,7 +8,7 @@ export const RequireRole = ({ admin }: Props) => {
 
   if (loading) return null // or your spinner
   if (!user) return <Navigate to="/login" replace />
-  if (admin && isAdmin) return <Navigate to="/admin" replace />
+  if (admin && !isAdmin) return <Navigate to="/admin" replace />
 
   return <Outlet />
 }
