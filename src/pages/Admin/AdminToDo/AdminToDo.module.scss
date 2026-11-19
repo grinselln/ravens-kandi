@@ -1,3 +1,13 @@
+@use '_breakpoints' as *;
+
+.threshold-field{
+  width: 115px;
+
+  @include bp-sm {
+    width: 150px;
+  }
+}
+
 .to-do-wrapper {
   display: flex;
   flex-direction: column;
@@ -12,13 +22,24 @@
   gap: 0.5rem;
   margin-bottom: 0.5rem;
 
+  .sort-filters {
+    display: flex;
+    width: 100%;
+    gap: 1rem;
+    justify-content: space-between;
+
+    .inventory-dd {
+      width: 100%;
+
+      @include bp-xl {
+        width: 30%;
+      }
+    }
+  }
+
   .controls {
     display: flex;
     gap: 0.75rem;
-
-    button {
-      width: 100px;
-    }
   }
 }
 
@@ -63,7 +84,7 @@
   }
 
   .photo-inventory {
-    width: 70%;
+    flex-grow: 1;
     display: flex;
     flex-direction: column;
     

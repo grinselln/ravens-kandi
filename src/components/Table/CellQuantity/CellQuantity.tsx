@@ -15,11 +15,12 @@ interface ICellQuantity {
   onQuantityChange: (values: {value: number, originalValue: number, changeSource: number}) => void;
   minusDisabled?: boolean;
   plusDisabled?: boolean;
+  hideRevert?: boolean;
   keepRevertButtonFormat?: boolean;
 }
 
 const CellQuantity = (props: ICellQuantity) => {
-  const { classes, isEditing, originalQuantity, quantity, onQuantityChange, minusDisabled, plusDisabled, keepRevertButtonFormat } = props;
+  const { classes, isEditing, originalQuantity, quantity, onQuantityChange, minusDisabled, plusDisabled, hideRevert, keepRevertButtonFormat } = props;
   const { windowBreakPoints } = useWindowWidth();
 
   return (
@@ -48,7 +49,7 @@ const CellQuantity = (props: ICellQuantity) => {
           />
         </div> 
       </div>
-      {quantity !== originalQuantity && (
+      {quantity !== originalQuantity && !hideRevert && (
         <Button 
           additionalClass={['alert', 'quantity-revert']} 
           onClick={() => onQuantityChange({value: originalQuantity, originalValue: originalQuantity, changeSource: 0})} 

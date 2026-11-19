@@ -154,13 +154,13 @@ const Creations = () => {
             <div className={styles['grid-display-control']}>
               <ActionButton
                 icon={faTableCellsLarge}
-                variant={isLargeGridDisplay ? "default-dark" : "default"}
+                variant={isLargeGridDisplay ? "default-mid" : "default"}
                 onAction={() => setIsLargeGridDisplay(true)}
                 isDisabled={false}
               />
               <ActionButton
                 icon={faTableCells}
-                variant={!isLargeGridDisplay ? "default-dark" : "default"}
+                variant={!isLargeGridDisplay ? "default-mid" : "default"}
                 onAction={() => setIsLargeGridDisplay(false)}
                 isDisabled={false}
               />

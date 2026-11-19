@@ -11,6 +11,17 @@
     font-size: .85rem;
   }
 
+  &.base-small {
+    label {
+      font-size: .7rem;
+    }
+
+    .input-wrapper input {
+      font-size: .7rem;
+      padding: 0.25rem .35rem;
+    }
+  }
+
   &.small {
     width: unset;
 

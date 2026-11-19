@@ -22,7 +22,7 @@ export interface IPhotoQuantities {
   taken_count: number;
   discard_count: number;
   needed_count: number;
-  is_needed_priority: boolean;
+  is_needed_priority: number;
 }
 
 export interface IQuantityItemEdit extends IUploadItem {

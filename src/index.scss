@@ -138,8 +138,12 @@ button {
 }
 
 svg {
-  &.default-dark path {
+  &.default-mid path {
     fill: var(--color-primary);
+  }
+
+  &.default-dark path {
+    fill: var(--color-admin-bg);
   }
 
   &.alert {
