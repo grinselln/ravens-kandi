@@ -60,5 +60,13 @@ $gap: 1rem;
   }
 }
 
+@include bp-xxxl {
+  @for $i from 1 through $columns {
+    .col-xxxl-#{$i} {
+      grid-column: span #{$i};
+    }
+  }
+}
+
 
   
