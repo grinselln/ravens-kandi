@@ -1,4 +1,4 @@
-import { IAdminPhotosQueryData, IPhotoInventory, IPhotoQuantities, IPublicPhotoFetchData, IPublicPhotosQueryData, IUpdatePhoto } from "@/interfaces/IPhotos";
+import { IAdminPhotosQueryData, IPhotoInventory, IPhotoQuantities, IPhotoQuantitiesUser, IPublicPhotoFetchData, IPublicPhotosQueryData, IUpdatePhoto } from "@/interfaces/IPhotos";
 import { apiFetch } from "./apiFetch";
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -87,6 +87,16 @@ export const updatePhoto = async (id: number, data: IUpdatePhoto) => {
 
 export const updatePhotoQuantities = async (id: number, data: Partial<IPhotoQuantities>) => {
   return apiFetch(`${API_URL}/photos/${id}/quantities`, {requiresAuth: true}, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(data),
+  })
+}
+
+export const updatePhotoQuantitiesUser = async (id: number, data: Partial<IPhotoQuantitiesUser>) => {
+  return apiFetch(`${API_URL}/photos/${id}/quantities/user`, {requiresAuth: true}, {
     method: 'PATCH',
     headers: {
       'Content-Type': 'application/json',

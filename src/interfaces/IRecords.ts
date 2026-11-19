@@ -37,3 +37,9 @@ export interface ITableSort<K = keyof IPhotoQuantities> {
   key: K;
   direction: "asc" | "desc"
 }
+
+export interface IUser {
+  id: string; 
+  username: string; 
+  role: string
+}
