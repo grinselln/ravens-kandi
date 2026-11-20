@@ -3,7 +3,7 @@ import LayoutAdmin from "@/components/Layout/LayoutAdmin";
 import styles from "./AdminInventory.module.scss"
 import { useMemo, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faAngleDown, faAngleUp, faCheck, faEdit, faSpinner } from "@fortawesome/free-solid-svg-icons";
+import { faAngleDown, faAngleUp, faCheck, faEdit, faEye, faEyeSlash, faSpinner } from "@fortawesome/free-solid-svg-icons";
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { fetchPhotosAdmin, updatePhotoQuantities } from "@/api/photos";
 import CellQuantity from "@/components/Table/CellQuantity/CellQuantity";
@@ -18,11 +18,13 @@ import InputSearch from "@/components/Input/InputSearch/InputSearch";
 import { useSearch } from "@/hooks/useSearch";
 import InputDropDown from "@/components/Input/InputDropDown/InputDropDown";
 import { useWindowWidth } from "@/hooks/useWindowWidth";
+import ActionButton from "@/components/Admin/Rows/ActionElements/ActionButton/ActionButton";
 
 const AdminInventory = () => {
   const queryClient = useQueryClient();
   const { windowBreakPoints } = useWindowWidth();
 
+  const [showRetiredOnly, setShowRetiredOnly] = useState<boolean>(false);
   const [showMarkedOnly, setShowMarkedOnly] = useState<boolean>(false);
   const [selectedCategoryFilters, setSelectedCategoryFilters] = useState<ICategoryFilterCollection>({});
   const [sortedIds, setSortedIds] = useState<number[] | null>(null);
@@ -268,7 +270,14 @@ const AdminInventory = () => {
   const displayedRecords = useMemo(() => {
     if (!filteredPhotos) return [];
 
-    const tmpFilteredPhotos = filteredPhotos.filter(photo => !showMarkedOnly || (showMarkedOnly && photo.marked_count > 0));
+    const tmpFilteredPhotos = filteredPhotos.filter(photo => {
+      const filterOnlyRetired = showRetiredOnly && !showMarkedOnly && photo.is_retired;
+      const filterOnlyMarked = showMarkedOnly && !showRetiredOnly && !photo.is_retired && photo.marked_count > 0;
+      const filterRetiredMark = showRetiredOnly && showMarkedOnly && photo.is_retired && photo.marked_count > 0;
+      const filterAllNotRetired = !showRetiredOnly && !showMarkedOnly && !photo.is_retired;
+
+      return filterOnlyRetired || filterOnlyMarked || filterRetiredMark || filterAllNotRetired
+    });
 
     if (!sortedIds) return tmpFilteredPhotos;
 
@@ -276,13 +285,16 @@ const AdminInventory = () => {
     return sortedIds
       .map(id => photoMap.get(id))
       .filter((photo): photo is IAdminFilterPhoto => photo !== undefined);
-  }, [filteredPhotos, sortedIds, showMarkedOnly]);
+  }, [filteredPhotos, sortedIds, showMarkedOnly, showRetiredOnly]);
   
   return (
     <LayoutAdmin>
       <DashboardHeader title='Inventory'>
         <Button onClick={() => setShowMarkedOnly(!showMarkedOnly)} additionalClass={!showMarkedOnly ? ["outline-muted"] : []} isDisabled={false}>
-          Show Only Marked Photos
+          Show Marked
+        </Button>
+        <Button onClick={() => setShowRetiredOnly(!showRetiredOnly)} additionalClass={!showRetiredOnly ? ["outline-muted"] : []} isDisabled={false}>
+          Show Retired
         </Button>
       </DashboardHeader>
 
@@ -423,19 +435,34 @@ const AdminInventory = () => {
                   - (existingChanges?.hidden_count ?? photo.hidden_count) 
                   - (existingChanges?.taken_count ?? photo.taken_count) 
                   - (existingChanges?.discard_count ?? photo.discard_count);
+                  const isRetired = existingChanges?.['is_retired'] !== undefined ? existingChanges['is_retired'] : photo.is_retired;
 
                   return (
                     <tr key={`row_${photo.id}`}>
                       <td className={`${styles.fit} ${styles.image}`}>
                         <img src={`${photo.url}`} />
                         <span className={`${styles.total}${inventory < 0 ? ` ${styles.alert}` : ""}`}>{inventory}</span>
+                        <span className={`${styles.retired}${existingChanges?.['is_retired'] !== undefined ? ` ${styles['has-change']}` : ""}`}>
+                          <ActionButton
+                            variant={existingChanges?.['is_retired'] !== undefined ? "confirm" : "default-dark"}
+                            icon={isRetired ? faEyeSlash : faEye}
+                            isDisabled={!isEditing}
+                            onAction={() => {
+                              onUpdateQuantity(photo, isRetired ? 0 : 1, "is_retired")
+                            }}
+                          />
+                        </span>
                         {existing?.status === "error" && (
                           <span className={styles['error-badge']}>{existing?.errorMessage ?? "Update Failed"}</span>
                         )}
                         {existing?.status === "updating" && <FontAwesomeIcon className={styles['status-badge-loading']} icon={faSpinner} spin />}
                         {existing?.status === "success" && <FontAwesomeIcon className={styles['status-badge-success']} icon={faCheck} />}
                       </td>
-                      <td className={styles.title}>{photo.title}</td>
+                      <td className={styles.title}>
+                        <span>
+                          {photo.title}
+                        </span>
+                      </td>
                       <td className={styles.fit} data-label="Created">
                         <CellQuantity
                           isEditing={isEditing}
