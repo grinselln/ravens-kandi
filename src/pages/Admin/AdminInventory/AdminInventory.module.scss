@@ -285,6 +285,11 @@
             top: 0px;
             right: 0px;
 
+            @include bp-xl {
+              top: 10px;
+              right: 15px;
+            }
+
             &.has-change button {
               background-color: var(--color-admin-bg);
             }
