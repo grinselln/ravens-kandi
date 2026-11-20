@@ -28,10 +28,11 @@ const AdminToDo = () => {
   const queryClient = useQueryClient();
   const { isAdmin } = useAuth();
   
+  const [showNeededOnly, setShowNeededOnly] = useState<boolean>(false);
   const [showPriorityOnly, setShowPriorityOnly] = useState<boolean>(false);
   const [selectedCategoryFilters, setSelectedCategoryFilters] = useState<ICategoryFilterCollection>({});
   const [columnSort, setColumnSort] = useState<ITableSort<keyof IPhotoQuantities>>(isAdmin ? INITIAL_SORT_ADMIN : INITIAL_SORT_USER);
-  const [inventoryThreshold, setInventoryThreshold] = useState<IDropDownOption<number>>({value: 0, label: "Show 0 inventory"});
+  const [inventoryThreshold, setInventoryThreshold] = useState<IDropDownOption<number> | null>(null);
   const [sortedIds, setSortedIds] = useState<number[] | null>(null);
   const [editedRecords, setEditedRecords] = useState<IQuantityItemEdit[]>([]);
   const [isEditingNeeded, setIsEditingNeeded] = useState<boolean>(false);
@@ -40,25 +41,19 @@ const AdminToDo = () => {
 
   type SortDirection = ITableSort["direction"];
   type SortValue = `${keyof IPhotoQuantities}|${SortDirection}`;
+  type SortOption = { value: SortValue; label: string };
 
-  const sortOptions: { value: SortValue; label: string }[] = [
-    {
-      value: "current_count|asc",
-      label: "Current Inventory ↑"
-    },
-    {
-      value: "current_count|desc",
-      label: "Current Inventory ↓"
-    },
-    {
-      value: "needed_count|asc",
-      label: "Needed Count ↑"
-    },
-    {
-      value: "needed_count|desc",
-      label: "Needed Count ↓"
-    },
+  const baseOptions: SortOption[] = [
+  { value: "needed_count|asc", label: "Needed Count ↑" },
+  { value: "needed_count|desc", label: "Needed Count ↓" },
   ];
+
+  const sortOptions: SortOption[] = isAdmin
+    ? [
+      { value: "current_count|asc", label: "Current Inventory ↑" }, 
+      { value: "current_count|desc", label: "Current Inventory ↓" },
+      ...baseOptions]
+    : baseOptions;
 
   const thresholdOptions = [
     {
@@ -141,7 +136,8 @@ const AdminToDo = () => {
 
       const userQuantityData = {
         created_count: updates.data.created_count,
-        needed_count: updates.data.needed_count
+        needed_count: updates.data.needed_count,
+        is_needed_priority: updates.data.is_needed_priority
       }
       
       return updatePhotoQuantitiesUser(updates.id, userQuantityData)
@@ -167,7 +163,10 @@ const AdminToDo = () => {
             data: {
               ...item.changes,
               ...(tmpCreated !== undefined && photoRecord !== undefined
-                ? { created_count: photoRecord.created_count + tmpCreated }
+                ? { 
+                  created_count: photoRecord.created_count + tmpCreated,
+                  is_needed_priority: tmpCreated === photoRecord.needed_count ? 0 : 1
+                }
                 : {}),
             },
           });
@@ -289,9 +288,10 @@ const AdminToDo = () => {
         current_count: inventory,
         tmp_created_count: 0
       })
-    }).filter(photo => (isAdmin ? photo.current_count <= inventoryThreshold.value : true) 
+    }).filter(photo => (isAdmin && inventoryThreshold ? photo.current_count <= inventoryThreshold.value : true) 
     && (!isAdmin ? photo.needed_count !== 0 : true)
-    && (!showPriorityOnly || (showPriorityOnly && photo.is_needed_priority)));
+    && (!showPriorityOnly || (showPriorityOnly && photo.is_needed_priority))
+    && (!showNeededOnly || (showNeededOnly && photo.needed_count > 0)));
 
     if (!sortedIds) return tmpFilteredPhotos;
 
@@ -299,7 +299,7 @@ const AdminToDo = () => {
     return sortedIds
       .map(id => photoMap.get(id))
       .filter((photo): photo is IAdminFilterPhoto => photo !== undefined);
-  }, [filteredPhotos, sortedIds, inventoryThreshold, editedRecords, showPriorityOnly, isAdmin]);
+  }, [filteredPhotos, sortedIds, inventoryThreshold, editedRecords, showPriorityOnly, showNeededOnly, isAdmin]);
 
   const isEditing = useMemo(() => {
     return isEditingNeeded || isEditingMade;
@@ -316,20 +316,26 @@ const AdminToDo = () => {
     <LayoutAdmin>
       <DashboardHeader title='To Do'>
         {isAdmin && (
+          <>
           <div className={styles['threshold-field']}>
             <InputDropDown
-              placeholder=""
-              value={inventoryThreshold.value}
+              placeholder="Select threshold"
+              value={inventoryThreshold?.value}
               options={thresholdOptions}
               setValue={(newValue) => {
-                if (newValue !== null) setInventoryThreshold(newValue)
+                setInventoryThreshold(newValue)
               }}
               isDisabled={false}
+              allowRemoval={true}
             />
           </div>
+          <Button onClick={() => setShowNeededOnly(!showNeededOnly)} additionalClass={!showNeededOnly ? ["outline-muted"] : []} isDisabled={false}>
+            Needed Only
+          </Button>
+          </>
         )}
         <Button onClick={() => setShowPriorityOnly(!showPriorityOnly)} additionalClass={!showPriorityOnly ? ["outline-muted"] : []} isDisabled={false}>
-          Show Priority Only
+          Priority Only
         </Button>
       </DashboardHeader>
 
@@ -458,7 +464,7 @@ const AdminToDo = () => {
                         variant={existingChanges?.['is_needed_priority'] !== undefined
                           ? "confirm"
                           : isPriority ? 'default-dark' : 'default'}
-                        isDisabled={false}
+                        isDisabled={!isEditing || !isAdmin || (isAdmin && isEditingMade)}
                       />
                     </span>
                     <div className={styles['inventory-details']}>

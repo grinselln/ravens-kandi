@@ -1,7 +1,7 @@
 @use '_breakpoints' as *;
 
 .threshold-field{
-  width: 115px;
+  width: 120px;
 
   @include bp-sm {
     width: 150px;
@@ -150,6 +150,10 @@
       &.priority {
         background-color: var(--color-admin-light-muted);
         color: var(--color-admin-bg);
+      }
+
+      button {
+        opacity: 1;
       }
     }
 
