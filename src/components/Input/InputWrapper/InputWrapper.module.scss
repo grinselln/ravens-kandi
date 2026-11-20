@@ -167,6 +167,10 @@
       gap: .5rem;
     }
 
+    &.faux-input button {
+      white-space: nowrap;
+    }
+
     input, textarea, &.faux-input button {
       width: 100%;
       padding: .35rem;

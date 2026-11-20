@@ -12,22 +12,20 @@ export interface IPhoto extends IPhotoQuantities {
   views: number;
 }
 
-export interface IPhotoQuantities {
+export interface IPhotoQuantities extends IPhotoQuantitiesUser {
   current_count: number;
-  created_count: number;
   tmp_created_count: number;
   given_count: number;
   hidden_count: number;
   marked_count: number;
   taken_count: number;
   discard_count: number;
-  needed_count: number;
-  is_needed_priority: number;
 }
 
 export interface IPhotoQuantitiesUser {
   created_count: number;
   needed_count: number;
+  is_needed_priority: number;
 }
 
 export interface IQuantityItemEdit extends IUploadItem {
