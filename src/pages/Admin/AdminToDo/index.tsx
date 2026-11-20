@@ -288,10 +288,13 @@ const AdminToDo = () => {
         current_count: inventory,
         tmp_created_count: 0
       })
-    }).filter(photo => (isAdmin && inventoryThreshold ? photo.current_count <= inventoryThreshold.value : true) 
-    && (!isAdmin ? photo.needed_count !== 0 : true)
-    && (!showPriorityOnly || (showPriorityOnly && photo.is_needed_priority))
-    && (!showNeededOnly || (showNeededOnly && photo.needed_count > 0)));
+    }).filter(photo => { 
+      return (!photo.is_retired
+        && (isAdmin && inventoryThreshold ? photo.current_count <= inventoryThreshold.value : true)
+        && (!isAdmin ? photo.needed_count !== 0 : true)
+        && (!showPriorityOnly || (showPriorityOnly && photo.is_needed_priority))
+        && (!showNeededOnly || (showNeededOnly && photo.needed_count > 0)))} 
+      );
 
     if (!sortedIds) return tmpFilteredPhotos;
 

@@ -20,6 +20,7 @@ export interface IPhotoQuantities extends IPhotoQuantitiesUser {
   marked_count: number;
   taken_count: number;
   discard_count: number;
+  is_retired: number;
 }
 
 export interface IPhotoQuantitiesUser {
