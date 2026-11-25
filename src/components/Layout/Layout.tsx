@@ -1,102 +1,25 @@
-import { Link, NavLink, useNavigate } from 'react-router-dom'
+import { Link, NavLink } from 'react-router-dom'
 import styles from './Layout.module.scss'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faInstagram } from '@fortawesome/free-brands-svg-icons'
-import { faArrowRightFromBracket, faDiamond } from '@fortawesome/free-solid-svg-icons'
+import { faDiamond } from '@fortawesome/free-solid-svg-icons'
 import { faBars } from '@fortawesome/free-solid-svg-icons'
 import { faClose } from '@fortawesome/free-solid-svg-icons'
-import { useEffect, useRef, useState } from 'react'
-import Modal from '../Modal/Modal'
-import Button from '../Input/Button/Button'
-import ActionButton from '../Admin/Rows/ActionElements/ActionButton/ActionButton'
-import { getMe, logout } from '@/api/auth';
-import { useSessionStore } from '../Admin/Providers/SessionContext'
-import { useAuth } from '../Admin/Providers/AuthContext'
-import { useQueryClient } from '@tanstack/react-query'
-
-const API_URL = import.meta.env.VITE_API_URL;
-const API_URL_ORIGIN = new URL(API_URL).origin;
+import { useState } from 'react'
 
 interface LayoutProps {
   children: React.ReactNode
   darkNav?: boolean
-  isAdmin?: boolean;
 }
 
-function Layout({ children, darkNav = false, isAdmin = false }: LayoutProps) {
-  const navigate = useNavigate();
-  const queryClient = useQueryClient()
-  const {isSessionExpired, dismissSessionExpired} = useSessionStore();
-  const { user } = useAuth();
-
-  const popupRef = useRef<Window | null>(null);
-  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const resolvedRef = useRef(false);
-  
+function Layout({ children, darkNav = false }: LayoutProps) {
   const [isMobileNavOpen, setIsMobileNavOpen] = useState<boolean>(false);
 
-  const clearPoll = () => {
-    if (pollRef.current) {
-      clearInterval(pollRef.current);
-      pollRef.current = null;
-    }
-  };
-
-  const openAuthPopup = () => {
-    const width = 500;
-    const height = 600;
-    const left = window.screen.width / 2 - width / 2;
-    const top = window.screen.height / 2 - height / 2;
-
-    clearPoll();
-    resolvedRef.current = false;
-
-    popupRef.current = window.open(
-      `${API_URL}/auth/google?popup=true`,
-      'googleAuth',
-      `width=500,height=600,left=${left},top=${top}`
-    );
-
-    pollRef.current = setInterval(() => {
-      if (popupRef.current?.closed) {
-        clearPoll();
-        if (!resolvedRef.current) {
-          //decide if error message
-        }
-      }
-    }, 500);
-  };
-
-  useEffect(() => {
-    const handler = (event: MessageEvent) => {
-      if (event.origin !== API_URL_ORIGIN) return;
-      if (event.data === 'auth-success') {
-        resolvedRef.current = true;
-        clearPoll();
-        popupRef.current?.close();
-
-        getMe().then(user => {
-          if (user) dismissSessionExpired();
-        });  
-      } else if (event.data === 'auth-failure') {
-        resolvedRef.current = true;
-        clearPoll();
-        popupRef.current?.close();
-      }
-    };
-
-    window.addEventListener('message', handler);
-    return () => {
-      window.removeEventListener('message', handler);
-      clearPoll();
-    }
-  }, [dismissSessionExpired]);
-
   return (
-    <div className={`${styles.layout} ${darkNav ? styles['nav-dark'] : ''} ${isAdmin ? styles['admin'] : ''}`}>
+    <div className={`${styles.layout} ${darkNav ? styles['nav-dark'] : ''}`}>
       <nav className={styles.nav}>
         <Link to="/" className={styles.logo}>Raven's<FontAwesomeIcon icon={faDiamond} />Kandi</Link>
-        {!darkNav && !isAdmin && (
+        {!darkNav && (
           <>
             <button className={styles.open} onClick={() => setIsMobileNavOpen(!isMobileNavOpen)}><FontAwesomeIcon icon={faBars} /></button>
             <div className={`${styles['nav-links-wrapper']}${isMobileNavOpen ? ` ${styles.open}` : ""}`}>
@@ -111,34 +34,8 @@ function Layout({ children, darkNav = false, isAdmin = false }: LayoutProps) {
             </div>
           </>
         )}
-        {isAdmin && (
-          <div className={styles.account}>
-            <span>Welcome{user?.username ? `, ${user.username}` : ""}</span>
-            <ActionButton variant="default" icon={faArrowRightFromBracket} isDisabled={false} onAction={async () => {
-              try {
-                await logout();
-                queryClient.setQueryData(["me"], null);
-                navigate("/login");
-              } catch (err) {
-                console.log("[logout error]: ", err);
-              }
-            }} />
-          </div>
-        )}
       </nav>
       <main>{children}</main>
-      <Modal
-        additionalClass={["session"]}
-        visibility={isSessionExpired}
-        title='Session Expired'
-        modalButtons={
-          <>
-            <Button additionalClass={["default"]} onClick={() => openAuthPopup()} isDisabled={false}>Authenticate</Button>
-          </>
-        }
-      >
-        <p>Your session has timed out. Please reauthenticate to continue.</p>
-      </Modal>
     </div>
   )
 }

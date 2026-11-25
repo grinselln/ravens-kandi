@@ -1,5 +1,123 @@
 @use '_breakpoints' as *;
 
+.admin {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  height: 100svh;
+  background-color: var(--color-admin-primary);
+  padding: 0px;
+
+  .nav {
+    display: flex;
+    flex: none;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    background-color: var(--color-bg);
+    padding: 1rem 1.3rem;
+    border-bottom: 1.5px solid var(--color-admin-accent);
+    background-color: transparent;
+    position: sticky !important;
+    top: 0;
+    z-index: 100;
+
+    .logo {
+      font-size: 1.25rem;
+      letter-spacing: 3%;
+      font-family: var(--font-heading);
+      display: flex;
+      align-items: center;
+      color: var(--color-text-light);
+      //color: brown !important;
+
+      @include bp-lg {
+        font-size: 1.5rem;
+      }
+
+      svg { 
+        width: .8rem;
+        height: .8rem;
+        margin: 0rem .5rem;
+
+        @include bp-lg {
+          width: .8rem;
+          height: .8rem;
+          margin: 0rem .5rem;
+        }
+
+        path {
+          fill: var(--color-accent);
+        }
+      }
+  }
+
+  .account {
+    display: flex;
+    align-items: center;
+    color: var(--color-text-light);
+    font-size: .8rem;
+    gap: .5rem;
+
+    @include bp-lg {
+      font-size: 1.1rem;
+      gap: 1rem;
+    }
+
+    button {
+      svg {
+        height: 15px;
+
+        @include bp-lg {
+          height: 18px;
+        }
+      }
+    }
+  }
+}
+
+  main {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: 0px;
+
+    @include bp-lg {
+      flex-direction: row;
+      flex: 1;
+      min-height: 0;
+    }
+  }
+
+  p {
+    letter-spacing: 3%;
+    font-size: .8rem;
+    color: var(--color-admin-muted-light) !important;
+  }
+
+  h2, h3, h4, p:not(:global(.alert)) {
+    color: var(--color-text-light)
+  }
+
+  textarea {
+    resize: none;
+  }
+
+  input, textarea {
+    color: var(--color-admin-light);
+
+    &::placeholder {
+      color: var(--color-admin-light-muted);
+      opacity: 1; /* Ensures Firefox displays the exact color */
+      letter-spacing: 3%;
+    }
+
+    &:focus-visible {
+      border-color: var(--color-admin-light-muted);
+    }
+  }
+}
+
 .sidebar {
   display: flex;
   overflow-x: auto;
