@@ -12,6 +12,7 @@ import Login from './pages/Login/Login';
 import AdminInventory from './pages/Admin/AdminInventory';
 import AdminToDo from './pages/Admin/AdminToDo';
 import { RequireRole } from './components/RequireRole';
+import { AdminAuthLayout } from './components/AdminAuthLayout';
 
 function App() {
   useEffect(() => {
@@ -49,25 +50,27 @@ function App() {
       <Route path="/login" element={<Login />} />
 
       {/*user*/}
-      <Route element={<RequireRole />}>
-        <Route path="/admin" element={<Admin />} />
-      </Route>
-      <Route element={<RequireRole />}>
-        <Route path="/admin/photos" element={<AdminPhotos />} />
-      </Route>
-      <Route element={<RequireRole />}>
-        <Route path="/admin/todo" element={<AdminToDo />} />
-      </Route>
+      <Route element={<AdminAuthLayout />}>
+        <Route element={<RequireRole />}>
+          <Route path="/admin" element={<Admin />} />
+        </Route>
+        <Route element={<RequireRole />}>
+          <Route path="/admin/photos" element={<AdminPhotos />} />
+        </Route>
+        <Route element={<RequireRole />}>
+          <Route path="/admin/todo" element={<AdminToDo />} />
+        </Route>
 
-      {/*admin*/}
-      <Route element={<RequireRole admin />}>
-        <Route path="/admin/inventory" element={<AdminInventory />} />
-      </Route>
-      <Route element={<RequireRole admin />}>
-        <Route path="/admin/categories" element={<AdminCategories />} />
-      </Route>
-      <Route element={<RequireRole admin />}>
-        <Route path="/admin/types" element={<AdminTypes />} />
+        {/*admin*/}
+        <Route element={<RequireRole admin />}>
+          <Route path="/admin/inventory" element={<AdminInventory />} />
+        </Route>
+        <Route element={<RequireRole admin />}>
+          <Route path="/admin/categories" element={<AdminCategories />} />
+        </Route>
+        <Route element={<RequireRole admin />}>
+          <Route path="/admin/types" element={<AdminTypes />} />
+        </Route>
       </Route>
     </Routes>
   );
